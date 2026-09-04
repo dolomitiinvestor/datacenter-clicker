@@ -18,6 +18,7 @@ Game.data.resources = [
   { id: 'money', name: 'Cash', icon: '💵', symbol: '$', kind: 'stock', decimals: 2, format: 'currency', unlockEra: null },
   { id: 'electricity', name: 'Electricity', icon: '⚡', symbol: 'kW', kind: 'flow', decimals: 2, unlockEra: null },
   { id: 'compute', name: 'Compute', icon: '🧠', symbol: 'FLOPS', kind: 'stock', decimals: 1, showRate: true, unlockEra: 'era1' },
+  { id: 'tokens', name: 'Tokens', icon: '🔤', symbol: 'tokens', kind: 'stock', decimals: 0, showRate: true, unlockEra: 'era1' },
   { id: 'land', name: 'Land', icon: '🗺️', symbol: 'acres', kind: 'capacity', decimals: 0, secondaryUnit: { label: 'sqft', factor: 43560 }, unlockEra: 'era2' },
   { id: 'influence', name: 'Influence', icon: '🏛️', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
   { id: 'reputation', name: 'Research Points', icon: '⭐', symbol: 'RP', kind: 'stock', decimals: 0, unlockEra: 'era3' },

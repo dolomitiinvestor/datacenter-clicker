@@ -14,6 +14,20 @@ Game.data = Game.data || {};
 // requires:      optional { buildingId, count } prerequisite beyond the era gate
 Game.data.buildings = [
   {
+    id: 'laptop',
+    name: 'Used Laptop',
+    icon: '💻',
+    era: 'era1',
+    flavor: 'A $200 Craigslist find, running inference jobs between browser tabs.',
+    baseCost: { money: 200 },
+    costScale: 1.15,
+    land: 0,
+    // 100 gigaflops/hour and 20,000 tokens/hour, expressed as the
+    // per-second rates the engine expects (rate * dtSeconds each tick).
+    produces: { compute: 100 / 3600, tokens: 20000 / 3600 },
+    consumes: { electricity: 0.07 },
+  },
+  {
     id: 'gpu_gaming',
     name: 'Used Gaming GPU',
     icon: '🎮',

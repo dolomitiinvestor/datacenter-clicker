@@ -44,6 +44,11 @@ window.Game = window.Game || {};
       Game.ui.renderComputeControls();
     });
 
+    document.getElementById('btn-sell-tokens').addEventListener('click', () => {
+      Game.actions.sellTokens();
+      Game.ui.renderResources();
+    });
+
     document.getElementById('alloc-slider').addEventListener('input', (e) => {
       Game.actions.setTrainAllocation(Number(e.target.value));
       Game.ui.renderAllocLabels();

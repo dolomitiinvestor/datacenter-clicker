@@ -19,4 +19,6 @@ Game.config = {
 
   freelanceHourlyRate: 15,    // $ earned per Freelance (DoorDash) click
   freelanceMaxClicksPerDay: 12, // shift cap per rolling in-game 24h day (see state.time.hours)
+
+  tokensPricePerMillion: 5, // $ earned per 1,000,000 tokens sold (see actions.sellTokens)
 };

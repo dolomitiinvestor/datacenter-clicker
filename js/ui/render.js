@@ -22,6 +22,7 @@ Game.ui = {
       clockSpeedLabel: document.getElementById('clock-speed-label'),
       btnFreelance: document.getElementById('btn-freelance'),
       freelanceHint: document.getElementById('freelance-hint'),
+      btnSellTokens: document.getElementById('btn-sell-tokens'),
     };
   },
 
@@ -251,12 +252,14 @@ Game.ui = {
       const id = btn.getAttribute('data-upgrade');
       btn.disabled = !Game.actions.canBuyUpgrade(id);
     });
+    if (this.els.btnSellTokens) this.els.btnSellTokens.disabled = Game.state.resources.tokens.amount <= 0;
   },
 
   renderActionVisibility() {
     const computeUnlocked = Game.state.erasUnlocked.era1;
     const influenceUnlocked = Game.state.erasUnlocked.era3;
     document.getElementById('compute-actions').style.display = computeUnlocked ? '' : 'none';
+    document.getElementById('token-actions').style.display = computeUnlocked ? '' : 'none';
     document.getElementById('influence-actions').style.display = influenceUnlocked ? '' : 'none';
   },
 
