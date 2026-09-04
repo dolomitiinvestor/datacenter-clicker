@@ -33,6 +33,7 @@ Game.save = {
     Object.assign(Game.state.erasUnlocked, loaded.erasUnlocked || {});
     Object.assign(Game.state.stats, loaded.stats || {});
     Object.assign(Game.state.time, loaded.time || {});
+    if (typeof loaded.clockSpeedMultiplier === 'number') Game.state.clockSpeedMultiplier = loaded.clockSpeedMultiplier;
     Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;
     if (typeof loaded.trainAllocationPct === 'number') Game.state.trainAllocationPct = loaded.trainAllocationPct;
     Game.state.log = loaded.log || [];

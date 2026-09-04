@@ -18,6 +18,8 @@ Game.ui = {
       allocSellPct: document.getElementById('alloc-sell-pct'),
       allocTrainPct: document.getElementById('alloc-train-pct'),
       btnSchmooze: document.getElementById('btn-schmooze'),
+      clockSpeedSlider: document.getElementById('clock-speed-slider'),
+      clockSpeedLabel: document.getElementById('clock-speed-label'),
     };
   },
 
@@ -31,6 +33,8 @@ Game.ui = {
     this.renderLog();
     this.renderActionVisibility();
     this.renderComputeControls();
+    this.renderClockSpeedLabel();
+    if (this.els.clockSpeedSlider) this.els.clockSpeedSlider.value = Game.state.clockSpeedMultiplier;
   },
 
   // Cheap per-frame refresh: numbers + afford-state only, no DOM rebuild.
@@ -43,12 +47,20 @@ Game.ui = {
 
   renderStatusBar() {
     if (this.els.statusTime) {
-      this.els.statusTime.textContent = '⏱ ' + Game.format.number(Game.state.time.hours, 1) + 'h elapsed';
+      const gc = Game.format.gameClock(Game.state.time.hours);
+      this.els.statusTime.textContent = '📅 Day ' + gc.daysPassed + ' • ' + gc.dateStr;
     }
     if (this.els.statusFlops) {
       const rate = Game.state.resources.compute.perSecond || 0;
       this.els.statusFlops.textContent = '🧠 ' + Game.format.number(rate, 2) + ' FLOPS/s';
     }
+  },
+
+  // Synced on full renders only (see renderComputeControls comment) -
+  // dragging the slider updates the label directly via main.js's 'input'
+  // listener without going through here.
+  renderClockSpeedLabel() {
+    if (this.els.clockSpeedLabel) this.els.clockSpeedLabel.textContent = Game.state.clockSpeedMultiplier + 'x';
   },
 
   // trainAllocationPct/autoConvertEnabled sync to the DOM - called on full

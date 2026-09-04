@@ -5,11 +5,16 @@ window.Game = window.Game || {};
 
   function loop() {
     const now = Date.now();
-    const dt = (now - lastTick) / 1000;
+    const realDt = (now - lastTick) / 1000;
     lastTick = now;
 
+    // Real seconds -> in-game seconds: base pace (1 real sec = 1 game hour)
+    // times the player's clock-speed slider, times the DEV MODE speed
+    // multiplier on top for testing.
+    const gameDt = realDt * Game.config.baseGameSecondsPerRealSecond * Game.state.clockSpeedMultiplier * Game.dev.speedMultiplier;
+
     const erasBefore = Object.keys(Game.state.erasUnlocked).length;
-    Game.engine.tick(dt * Game.dev.speedMultiplier); // DEV MODE speed multiplier
+    Game.engine.tick(gameDt);
     const erasAfter = Object.keys(Game.state.erasUnlocked).length;
 
     if (erasAfter !== erasBefore) {
@@ -38,6 +43,11 @@ window.Game = window.Game || {};
     document.getElementById('alloc-slider').addEventListener('input', (e) => {
       Game.actions.setTrainAllocation(Number(e.target.value));
       Game.ui.renderAllocLabels();
+    });
+
+    document.getElementById('clock-speed-slider').addEventListener('input', (e) => {
+      Game.state.clockSpeedMultiplier = Number(e.target.value);
+      Game.ui.renderClockSpeedLabel();
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
@@ -94,6 +104,48 @@ window.Game = window.Game || {};
         Game.ui.renderBuildings();
         Game.ui.renderUpgrades();
       });
+    });
+
+    document.getElementById('btn-cost-scaling').addEventListener('click', (e) => {
+      const on = Game.dev.toggleCostScaling();
+      e.currentTarget.classList.toggle('active', on);
+      e.currentTarget.textContent = 'Cost Scaling: ' + (on ? 'ON' : 'OFF');
+      Game.ui.renderBuildings();
+    });
+
+    bindDevStateEditor();
+  }
+
+  // DEV MODE — remove this function, its call site, and the
+  // #dev-state-editor block in index.html to drop the raw-state editor.
+  function bindDevStateEditor() {
+    const panel = document.getElementById('dev-state-editor');
+    const textarea = document.getElementById('dev-state-textarea');
+
+    function refresh() {
+      textarea.value = JSON.stringify(Game.state, null, 2);
+    }
+
+    document.getElementById('btn-edit-state').addEventListener('click', () => {
+      Game.dev.stateEditorOpen = !Game.dev.stateEditorOpen;
+      panel.hidden = !Game.dev.stateEditorOpen;
+      if (Game.dev.stateEditorOpen) refresh();
+    });
+
+    document.getElementById('btn-state-refresh').addEventListener('click', refresh);
+
+    document.getElementById('btn-state-apply').addEventListener('click', () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(textarea.value);
+      } catch (e) {
+        flashMessage('Invalid JSON: ' + e.message);
+        return;
+      }
+      Game.state = parsed;
+      Game.state_helpers.recalcLandCap();
+      Game.ui.renderAll();
+      flashMessage('State applied.');
     });
   }
 

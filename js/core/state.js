@@ -24,6 +24,7 @@ Game.stateFactory = {
       upgrades: {}, // upgradeId -> true once purchased
       erasUnlocked: { era1: true },
       time: { hours: 0 }, // elapsed in-game hours, ticks with dt (incl. dev speed) - the basis for time-based costs like electricity billing
+      clockSpeedMultiplier: 1, // player-facing pace control on top of the base 1 real sec = 1 game hour clock (see config.baseGameSecondsPerRealSecond)
       autoConvertEnabled: false, // compute -> money/reputation continuous conversion, split by trainAllocationPct
       trainAllocationPct: 50,    // 0 = all compute sold for cash, 100 = all compute trained into reputation
       log: [],

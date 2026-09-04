@@ -20,6 +20,18 @@
   <button data-cost="0.1">0.1x</button>
   <button data-cost="1" class="active">1x</button>
   <button data-cost="10">10x</button>
+  <button id="btn-cost-scaling" class="active">Cost Scaling: ON</button>
+  <button id="btn-edit-state">✏️ Edit State</button>
+</div>
+
+<!-- DEV MODE — raw state editor. Delete this <div> along with the
+     bindDevStateEditor() wiring in main.js to remove it. -->
+<div id="dev-state-editor" hidden>
+  <div class="dev-state-actions">
+    <button id="btn-state-refresh">🔄 Refresh from game</button>
+    <button id="btn-state-apply">✅ Apply to game</button>
+  </div>
+  <textarea id="dev-state-textarea" spellcheck="false"></textarea>
 </div>
 
 <header id="top-bar">
@@ -28,8 +40,12 @@
 </header>
 
 <div id="status-bar">
-  <span id="status-time">⏱ 0h elapsed</span>
+  <span id="status-time">📅 Day 0 • Nov 30, 2022, 12:00 AM</span>
   <span id="status-flops">🧠 0 FLOPS/s</span>
+  <div id="clock-speed-wrap">
+    <label for="clock-speed-slider">⏩ Clock Speed: <span id="clock-speed-label">1x</span></label>
+    <input type="range" id="clock-speed-slider" min="0" max="20" step="0.5" value="1">
+  </div>
 </div>
 
 <div id="resource-bar"></div>

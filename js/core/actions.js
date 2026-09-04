@@ -37,7 +37,7 @@ Game.actions = {
   buildingCost(buildingId) {
     const def = Game.data.buildingsById[buildingId];
     const count = Game.state.buildings[buildingId] || 0;
-    const scale = Math.pow(def.costScale, count);
+    const scale = Game.dev.costScalingEnabled ? Math.pow(def.costScale, count) : 1;
     const costMult = Game.effects.getMult('cost_all') * Game.effects.getMult('cost:' + buildingId) * Game.dev.costMultiplier;
     const cost = {};
     for (const resId in def.baseCost) {

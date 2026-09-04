@@ -8,4 +8,12 @@ Game.config = {
   baseLandCap: 4,         // land plots available before any land is leased
   electricityPricePerKwh: 0.01, // $ per kWh actually drawn - your utility bill
   saveKey: 'datacenter-clicker-save-v1',
+
+  // The in-game clock: base pace is 1 real second = 1 in-game hour
+  // (3600 in-game seconds), before the player's clock-speed slider or
+  // dev mode's speed multiplier are applied. This is what state.time.hours
+  // ticks on, so it's the linear basis for time-based costs (electricity
+  // billing) and the calendar display.
+  baseGameSecondsPerRealSecond: 3600,
+  startDate: Date.UTC(2022, 10, 30), // November 30, 2022, 00:00 UTC - in-game "day zero"
 };

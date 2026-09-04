@@ -49,4 +49,21 @@ Game.format = {
     if (resourceDef.format === 'currency') return this.money(amount);
     return this.number(amount, resourceDef.decimals);
   },
+
+  // Turns elapsed in-game hours into a day count + calendar date/time,
+  // anchored at Game.config.startDate. Displayed in the status bar and
+  // usable as the basis for any future time-based cost/event.
+  gameClock(hoursElapsed) {
+    const daysPassed = Math.floor(hoursElapsed / 24);
+    const date = new Date(Game.config.startDate + hoursElapsed * 3600 * 1000);
+    const dateStr = date.toLocaleString('en-US', {
+      timeZone: 'UTC',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    return { daysPassed, dateStr };
+  },
 };
