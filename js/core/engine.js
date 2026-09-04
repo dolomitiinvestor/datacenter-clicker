@@ -5,6 +5,7 @@ Game.engine = {
   tick(dtSeconds) {
     this._runElectricity(dtSeconds);
     this._runProduction(dtSeconds);
+    this._runComputeConversion();
     this.checkEras();
   },
 
@@ -54,6 +55,37 @@ Game.engine = {
         if (resId === 'compute') Game.state.stats.totalComputeMade += amount;
       }
     });
+  },
+
+  // While auto-sell/auto-train are toggled on, compute is converted every
+  // tick instead of being manually dumped - it never gets a chance to pile
+  // up. With both toggled on the flow is split evenly between the two.
+  _runComputeConversion() {
+    const compute = Game.state.resources.compute;
+    if (compute.amount <= 0) return;
+
+    const sellOn = Game.state.autoSell;
+    const trainOn = Game.state.autoTrain;
+    if (!sellOn && !trainOn) return;
+
+    const sellFrac = sellOn && trainOn ? 0.5 : (sellOn ? 1 : 0);
+    const trainFrac = sellOn && trainOn ? 0.5 : (trainOn ? 1 : 0);
+
+    const sellAmount = compute.amount * sellFrac;
+    const trainAmount = compute.amount * trainFrac;
+
+    if (sellAmount > 0) {
+      const price = 0.5 * Game.effects.getMult('sell_price');
+      const earned = sellAmount * price;
+      Game.state_helpers.add('money', earned);
+      Game.state.stats.totalMoneyEarned += earned;
+    }
+    if (trainAmount > 0) {
+      const ratio = 0.1 * Game.effects.getMult('train_ratio');
+      Game.state_helpers.add('reputation', trainAmount * ratio);
+    }
+
+    compute.amount -= sellAmount + trainAmount;
   },
 
   checkEras() {

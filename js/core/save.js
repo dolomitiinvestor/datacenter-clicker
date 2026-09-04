@@ -32,6 +32,8 @@ Game.save = {
     Object.assign(Game.state.upgrades, loaded.upgrades || {});
     Object.assign(Game.state.erasUnlocked, loaded.erasUnlocked || {});
     Object.assign(Game.state.stats, loaded.stats || {});
+    Game.state.autoSell = !!loaded.autoSell;
+    Game.state.autoTrain = !!loaded.autoTrain;
     Game.state.log = loaded.log || [];
 
     if (loaded.resources) {

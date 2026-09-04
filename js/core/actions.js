@@ -4,7 +4,7 @@ Game.actions = {
   // --- manual click actions ---
 
   freelanceGig() {
-    const amount = 1 * Game.effects.getMult('click_money');
+    const amount = 10 * Game.effects.getMult('click_money');
     Game.state_helpers.add('money', amount);
     Game.state.stats.totalMoneyEarned += amount;
     Game.state.stats.totalClicks++;
@@ -17,25 +17,18 @@ Game.actions = {
     return amount;
   },
 
-  sellCompute() {
-    const stock = Game.state.resources.compute.amount;
-    if (stock <= 0) return 0;
-    const price = 0.5 * Game.effects.getMult('sell_price');
-    const earned = stock * price;
-    Game.state.resources.compute.amount = 0;
-    Game.state_helpers.add('money', earned);
-    Game.state.stats.totalMoneyEarned += earned;
-    return earned;
+  // Auto-sell/auto-train are toggles, not one-shot actions: while active the
+  // engine continuously converts compute into money/reputation every tick
+  // (see engine._runComputeConversion) instead of the player having to
+  // click to dump an accumulated pile.
+  toggleAutoSell() {
+    Game.state.autoSell = !Game.state.autoSell;
+    return Game.state.autoSell;
   },
 
-  trainModel() {
-    const stock = Game.state.resources.compute.amount;
-    if (stock <= 0) return 0;
-    const ratio = 0.1 * Game.effects.getMult('train_ratio');
-    const gained = stock * ratio;
-    Game.state.resources.compute.amount = 0;
-    Game.state_helpers.add('reputation', gained);
-    return gained;
+  toggleAutoTrain() {
+    Game.state.autoTrain = !Game.state.autoTrain;
+    return Game.state.autoTrain;
   },
 
   // --- buying ---

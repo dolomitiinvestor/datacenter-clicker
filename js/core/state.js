@@ -23,6 +23,8 @@ Game.stateFactory = {
       buildings,
       upgrades: {}, // upgradeId -> true once purchased
       erasUnlocked: { era1: true },
+      autoSell: false,
+      autoTrain: false,
       log: [],
       stats: {
         totalMoneyEarned: 0,

@@ -148,6 +148,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.toggle-btn.active {
+  background: var(--good);
+  border-color: var(--good);
+  color: #06210c;
+}
+
+.toggle-btn.active .hint {
+  color: #0a3a17;
+}
+
 button .hint {
   font-size: 10px;
   color: var(--text-dim);

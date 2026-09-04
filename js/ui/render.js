@@ -25,6 +25,7 @@ Game.ui = {
     this.renderUpgrades();
     this.renderLog();
     this.renderActionVisibility();
+    this.renderComputeToggles();
   },
 
   // Cheap per-frame refresh: numbers + afford-state only, no DOM rebuild.
@@ -32,6 +33,17 @@ Game.ui = {
     this.renderResources();
     this.renderElectricity();
     this.refreshAffordability();
+  },
+
+  renderComputeToggles() {
+    if (this.els.btnSellCompute) {
+      this.els.btnSellCompute.classList.toggle('active', Game.state.autoSell);
+      this.els.btnSellCompute.firstChild.textContent = '💸 Auto-Sell Compute: ' + (Game.state.autoSell ? 'ON' : 'OFF');
+    }
+    if (this.els.btnTrainModel) {
+      this.els.btnTrainModel.classList.toggle('active', Game.state.autoTrain);
+      this.els.btnTrainModel.firstChild.textContent = '🎯 Auto-Train Model: ' + (Game.state.autoTrain ? 'ON' : 'OFF');
+    }
   },
 
   renderEraBanner() {
@@ -181,8 +193,6 @@ Game.ui = {
       const id = btn.getAttribute('data-upgrade');
       btn.disabled = !Game.actions.canBuyUpgrade(id);
     });
-    if (this.els.btnSellCompute) this.els.btnSellCompute.disabled = Game.state.resources.compute.amount <= 0;
-    if (this.els.btnTrainModel) this.els.btnTrainModel.disabled = Game.state.resources.compute.amount <= 0;
   },
 
   renderActionVisibility() {

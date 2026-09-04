@@ -31,13 +31,13 @@ window.Game = window.Game || {};
     });
 
     document.getElementById('btn-sell-compute').addEventListener('click', () => {
-      Game.actions.sellCompute();
-      Game.ui.renderResources();
+      Game.actions.toggleAutoSell();
+      Game.ui.renderComputeToggles();
     });
 
     document.getElementById('btn-train-model').addEventListener('click', () => {
-      Game.actions.trainModel();
-      Game.ui.renderResources();
+      Game.actions.toggleAutoTrain();
+      Game.ui.renderComputeToggles();
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
