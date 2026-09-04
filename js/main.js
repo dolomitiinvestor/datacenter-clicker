@@ -9,7 +9,7 @@ window.Game = window.Game || {};
     lastTick = now;
 
     const erasBefore = Object.keys(Game.state.erasUnlocked).length;
-    Game.engine.tick(dt);
+    Game.engine.tick(dt * Game.dev.speedMultiplier); // DEV MODE speed multiplier
     const erasAfter = Object.keys(Game.state.erasUnlocked).length;
 
     if (erasAfter !== erasBefore) {
@@ -69,6 +69,19 @@ window.Game = window.Game || {};
       Game.save.hardReset();
       Game.ui.renderAll();
       flashMessage('Progress reset.');
+    });
+
+    bindDevSpeedButtons(); // DEV MODE
+  }
+
+  // DEV MODE — remove this function and its call site to drop dev mode.
+  function bindDevSpeedButtons() {
+    const buttons = document.querySelectorAll('#dev-mode-panel button[data-speed]');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        Game.dev.setSpeed(Number(btn.getAttribute('data-speed')));
+        buttons.forEach((b) => b.classList.toggle('active', b === btn));
+      });
     });
   }
 

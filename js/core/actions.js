@@ -4,7 +4,7 @@ Game.actions = {
   // --- manual click actions ---
 
   freelanceGig() {
-    const amount = 10 * Game.effects.getMult('click_money');
+    const amount = 1 * Game.effects.getMult('click_money') * Game.dev.speedMultiplier;
     Game.state_helpers.add('money', amount);
     Game.state.stats.totalMoneyEarned += amount;
     Game.state.stats.totalClicks++;
@@ -12,7 +12,7 @@ Game.actions = {
   },
 
   schmoozePolitician() {
-    const amount = 1 * Game.effects.getMult('influence_gain');
+    const amount = 1 * Game.effects.getMult('influence_gain') * Game.dev.speedMultiplier;
     Game.state_helpers.add('influence', amount);
     return amount;
   },

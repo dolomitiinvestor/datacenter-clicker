@@ -8,6 +8,15 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<!-- DEV MODE — testing-only speed controls. Delete this <div> (and the
+     matching CSS, JS wiring, and devmode.js) to remove dev mode. -->
+<div id="dev-mode-panel">
+  <span class="dev-label">⚙ DEV MODE</span>
+  <button data-speed="1" class="active">1x</button>
+  <button data-speed="10">10x</button>
+  <button data-speed="100">100x</button>
+</div>
+
 <header id="top-bar">
   <h1>Datacenter Clicker</h1>
   <div id="era-banner"></div>
@@ -61,6 +70,7 @@
 <div id="flash-message"></div>
 
 <script src="js/core/config.js"></script>
+<script src="js/core/devmode.js"></script>
 <script src="js/core/format.js"></script>
 <script src="js/data/resources.js"></script>
 <script src="js/data/eras.js"></script>

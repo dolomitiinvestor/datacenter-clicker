@@ -21,6 +21,38 @@ body {
   font-size: 14px;
 }
 
+/* DEV MODE — delete this block along with #dev-mode-panel in index.html
+   and devmode.js to remove dev mode. */
+#dev-mode-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  background: repeating-linear-gradient(45deg, #3a2a06, #3a2a06 10px, #2e2205 10px, #2e2205 20px);
+  border-bottom: 1px solid var(--accent-2);
+  font-size: 12px;
+}
+
+#dev-mode-panel .dev-label {
+  color: var(--accent-2);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+
+#dev-mode-panel button {
+  padding: 4px 10px;
+  font-size: 12px;
+  flex-direction: row;
+}
+
+#dev-mode-panel button.active {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: #2e2205;
+  font-weight: 600;
+}
+
 #top-bar {
   display: flex;
   align-items: baseline;
