@@ -132,14 +132,19 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+#elec-price-wrap,
 #clock-speed-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+#elec-price-wrap {
   margin-left: auto;
 }
 
-#clock-speed-wrap label {
+#clock-speed-wrap label,
+#elec-price-wrap label {
   color: var(--text-dim);
   white-space: nowrap;
 }
@@ -152,6 +157,17 @@ body {
 #clock-speed-slider {
   width: 120px;
   accent-color: var(--accent);
+}
+
+#elec-price-input {
+  width: 60px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 #resource-bar {

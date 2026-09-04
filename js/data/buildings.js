@@ -20,7 +20,13 @@ Game.data = Game.data || {};
 //                repeatable milestone purchase (Publish arXiv Paper, Raise
 //                VC Money) with the same cost-scaling/afford-check plumbing
 //                as everything else, instead of a one-shot resource dump.
-// requires:      optional { buildingId, count } prerequisite beyond the era gate
+// requires:      optional array of gates beyond the era check, every one of
+//                which must hold - see actions.meetsRequirements:
+//                  { type: 'upgrade', id: '<upgradeId>' }       - upgrade must be purchased
+//                  { type: 'building', id: '<buildingId>', count } - must own at least `count` (default 1)
+// maxCount:      { buildingId: '<id>', per } - caps how many of this
+//                building you can own at (per * count of buildingId owned),
+//                e.g. one Extra Power Outlet per SF Apartment.
 Game.data.buildings = [
   {
     id: 'laptop',
@@ -62,18 +68,7 @@ Game.data.buildings = [
     consumes: {},
     rentPerMonth: { money: 2000 }, // ongoing rent, billed hourly
     sqft: 200,
-  },
-  {
-    id: 'gpu_gaming',
-    name: 'Used Gaming GPU',
-    icon: '🎮',
-    era: 'era1',
-    flavor: 'A secondhand RTX card, duct-taped into a mining rig on your desk.',
-    baseCost: { money: 15 },
-    costScale: 1.15,
-    land: 0,
-    produces: { tokens: 20 }, // 0.1 gigaflops/s worth of inference, at 200 tokens/gigaflop
-    consumes: { electricity: 0.05 },
+    providesLandCap: 200 / 43560, // your land cap is literally the sqft you're renting, until you lease real land
   },
   {
     id: 'extra_outlet',
@@ -86,18 +81,19 @@ Game.data.buildings = [
     land: 0,
     produces: { electricity: 1.5 },
     consumes: {},
+    maxCount: { buildingId: 'sf_apartment', per: 1 }, // one extra circuit per apartment - there's only so many walls
   },
   {
     id: 'gpu_rack',
     name: 'Mining GPU Rack',
     icon: '🖥️',
     era: 'era2',
-    flavor: 'Eight GPUs, one janky shelf, zero fire code compliance.',
-    baseCost: { money: 300 },
+    flavor: 'Eight used enterprise GPUs on a steel shelf. Still cheaper than buying new.',
+    baseCost: { money: 9000 }, // ~$1,100/GPU used, 8 GPUs, plus rack/PSU/networking overhead
     costScale: 1.16,
     land: 1,
-    produces: { tokens: 120 }, // 0.6 gigaflops/s worth of inference, at 200 tokens/gigaflop
-    consumes: { electricity: 0.3 },
+    produces: { tokens: 300 }, // 8 GPUs running real inference workloads, not a laptop chip
+    consumes: { electricity: 2.8 }, // 8 x ~350W, realistic for enterprise-class cards under load
   },
   {
     id: 'land_plot',
@@ -117,37 +113,47 @@ Game.data.buildings = [
     name: 'Hire Lobbyist',
     icon: '🏛️',
     era: 'era3',
-    flavor: 'He knows a guy on the zoning board.',
-    baseCost: { money: 500 },
+    flavor: 'He knows a guy on the zoning board. $100k/yr, paid monthly, whether you win or lose.',
+    baseCost: { money: 1000 }, // retainer to sign them
     costScale: 1.2,
     land: 1,
     produces: { influence: 0.05 },
     consumes: {},
+    rentPerMonth: { money: 100000 / 12 }, // $100k/yr salary, billed monthly (12 * hoursPerMonth == hoursPerYear, so this bills out to exactly $100k/yr)
   },
   {
     id: 'diesel_generator',
     name: 'Diesel Generator',
     icon: '⛽',
     era: 'era3',
-    flavor: 'Loud, dirty, and reliably running at 3am.',
-    baseCost: { money: 700 },
+    flavor: 'Loud, dirty, and reliably running at 3am. Drinks diesel the whole time.',
+    baseCost: { money: 4000 }, // realistic for a quality ~5kW diesel unit
     costScale: 1.18,
     land: 1,
-    produces: { electricity: 6 },
+    produces: { electricity: 5 },
     consumes: {},
+    // Fuel cost, not metered against actual load (that'd need per-building
+    // electricity accounting) - flat monthly diesel bill for keeping it
+    // fueled and running, ballparked from ~0.45 L/kWh at 5kW continuous.
+    rentPerMonth: { money: 1500 },
   },
   {
     id: 'warehouse_lease',
     name: 'Warehouse Lease',
     icon: '🏭',
     era: 'era3',
-    flavor: 'Five acres of concrete and possibility.',
-    baseCost: { money: 1200, influence: 5 },
+    flavor: 'Five acres of concrete and possibility. Landlords don\'t lease to an individual - you need an LLC and someone who can talk to the zoning board.',
+    baseCost: { money: 50000, influence: 20 },
     costScale: 1.2,
     land: 0,
     produces: {},
     consumes: {},
     providesLandCap: 5,
+    rentPerMonth: { money: 5000 }, // industrial lease payment
+    requires: [
+      { type: 'upgrade', id: 'incorporate_business' },
+      { type: 'building', id: 'lobbyist', count: 1 },
+    ],
   },
   {
     id: 'publish_arxiv',

@@ -52,8 +52,9 @@ Game.engine = {
   _runElectricityBilling(dtSeconds) {
     const elec = Game.state.resources.electricity;
     const hours = dtSeconds / 3600;
-    const cost = elec.consumed * hours * Game.config.electricityPricePerKwh;
-    elec.billPerHour = elec.consumed * Game.config.electricityPricePerKwh;
+    const price = Game.state.electricityPricePerKwh;
+    const cost = elec.consumed * hours * price;
+    elec.billPerHour = elec.consumed * price;
     if (cost <= 0) return;
     Game.state_helpers.add('money', -cost);
     Game.state.stats.totalElectricityCost += cost;

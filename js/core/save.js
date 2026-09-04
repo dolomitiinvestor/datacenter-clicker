@@ -34,6 +34,7 @@ Game.save = {
     Object.assign(Game.state.stats, loaded.stats || {});
     Object.assign(Game.state.time, loaded.time || {});
     if (typeof loaded.clockSpeedMultiplier === 'number') Game.state.clockSpeedMultiplier = loaded.clockSpeedMultiplier;
+    if (typeof loaded.electricityPricePerKwh === 'number') Game.state.electricityPricePerKwh = loaded.electricityPricePerKwh;
     Object.assign(Game.state.freelance, loaded.freelance || {});
     Game.state.softwareJobEnabled = !!loaded.softwareJobEnabled;
     Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;

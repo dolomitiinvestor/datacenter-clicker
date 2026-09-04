@@ -29,13 +29,13 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'click_money', value: 2 }],
   },
   {
-    id: 'overclock_guide_1',
-    name: 'Overclocking Forum Guide',
-    icon: '📈',
-    era: 'era1',
-    flavor: 'A 200-reply thread from 2013 that still slaps.',
-    cost: { money: 300 },
-    effects: [{ type: 'mult', target: 'produce:gpu_gaming', value: 1.5 }],
+    id: 'incorporate_business',
+    name: 'Incorporate a Business',
+    icon: '⚖️',
+    era: 'era2',
+    flavor: "An LLC in Delaware. Now you're a real company - landlords, banks, and lawyers will actually talk to you.",
+    cost: { money: 500 },
+    effects: [], // pure gate flag - checked via requires: [{ type: 'upgrade', id: 'incorporate_business' }] on buildings like Warehouse Lease
   },
   {
     id: 'efficient_psu',

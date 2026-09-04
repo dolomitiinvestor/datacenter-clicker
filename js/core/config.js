@@ -5,8 +5,8 @@ Game.config = {
   tickMs: 200,           // engine tick interval (ms)
   autosaveMs: 15000,      // autosave interval (ms)
   baseFreeElectricity: 0, // kW available for free before any generator is built - nothing until you rent a place with power (see the SF Apartment building)
-  baseLandCap: 4,         // acres of land available before any more is leased
-  electricityPricePerKwh: 0.01, // $ per kWh actually drawn - your utility bill
+  baseLandCap: 0,         // acres of land available before any more is leased - nothing until you rent the SF Apartment (see its providesLandCap)
+  electricityPricePerKwhDefault: 0.10, // $ per kWh actually drawn, seeded into state.electricityPricePerKwh on a fresh game - editable live from the status bar, not a fixed constant
   saveKey: 'datacenter-clicker-save-v1',
 
   // The in-game clock: base pace is 1 real second = 1 in-game hour

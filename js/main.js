@@ -59,6 +59,12 @@ window.Game = window.Game || {};
       Game.ui.renderClockSpeedLabel();
     });
 
+    document.getElementById('elec-price-input').addEventListener('input', (e) => {
+      const val = Number(e.target.value);
+      Game.state.electricityPricePerKwh = isNaN(val) ? 0 : Math.max(0, val);
+      Game.ui.renderElectricity();
+    });
+
     document.getElementById('btn-save').addEventListener('click', () => {
       Game.save.save();
       flashMessage('Saved.');

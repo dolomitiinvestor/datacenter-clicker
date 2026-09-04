@@ -20,6 +20,7 @@ Game.ui = {
       btnSchmooze: document.getElementById('btn-schmooze'),
       clockSpeedSlider: document.getElementById('clock-speed-slider'),
       clockSpeedLabel: document.getElementById('clock-speed-label'),
+      elecPriceInput: document.getElementById('elec-price-input'),
       btnFreelance: document.getElementById('btn-freelance'),
       freelanceHint: document.getElementById('freelance-hint'),
       btnSoftwareJob: document.getElementById('btn-software-job'),
@@ -39,6 +40,7 @@ Game.ui = {
     this.renderTokenControls();
     this.renderClockSpeedLabel();
     if (this.els.clockSpeedSlider) this.els.clockSpeedSlider.value = Game.state.clockSpeedMultiplier;
+    if (this.els.elecPriceInput) this.els.elecPriceInput.value = Game.state.electricityPricePerKwh;
     this.renderFreelanceStatus();
     this.renderSoftwareJobStatus();
   },
@@ -154,7 +156,7 @@ Game.ui = {
     this.els.electricityBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (brownout ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
       '<div class="bar-label">' + Game.format.number(elec.consumed, 1) + ' / ' + Game.format.number(elec.generated, 1) + ' kW' +
-      ' • ' + Game.format.money(elec.billPerHour || 0) + '/hr @ ' + Game.format.money(Game.config.electricityPricePerKwh) + '/kWh' +
+      ' • ' + Game.format.money(elec.billPerHour || 0) + '/hr @ ' + Game.format.money(Game.state.electricityPricePerKwh) + '/kWh' +
       (brownout ? ' — BROWNOUT (' + Math.round(elec.throttle * 100) + '% output)' : '') + '</div>';
   },
 
@@ -164,7 +166,7 @@ Game.ui = {
 
   renderBuildings() {
     const unlocked = this.unlockedEraIds();
-    const visible = Game.data.buildings.filter((b) => unlocked.indexOf(b.era) !== -1);
+    const visible = Game.data.buildings.filter((b) => unlocked.indexOf(b.era) !== -1 && Game.actions.meetsRequirements(b.id));
     this.els.buildingsList.innerHTML = visible.map((b) => this.buildingCardHtml(b)).join('');
     this.bindBuildingButtons();
   },
@@ -176,19 +178,34 @@ Game.ui = {
     const produceHtml = this.rateSummaryHtml(b.produces);
     const consumeHtml = this.rateSummaryHtml(b.consumes);
     const landHtml = b.land ? '<span class="tag tag-land">' + b.land + ' acre' + (b.land === 1 ? '' : 's') + '</span>' : '';
-    const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + b.providesLandCap + ' acre' + (b.providesLandCap === 1 ? '' : 's') + ' cap</span>' : '';
+    const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + this.acresAndSqft(b.providesLandCap) + ' cap</span>' : '';
     const rentHtml = this.rentSummaryHtml(b.rentPerMonth);
     const payoutHtml = this.payoutSummaryHtml(b.payout);
+    const maxCountHtml = this.maxCountSummaryHtml(b.maxCount);
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
+  },
+
+  // Small acreages (e.g. a 200 sqft apartment's land cap) are unreadable as
+  // raw decimal acres, so always pair the acre figure with its sqft
+  // equivalent - same idea as the land resource's own secondaryUnit display.
+  acresAndSqft(acres) {
+    return Game.format.number(acres, 4) + ' acres (' + Game.format.number(acres * 43560, 0) + ' sqft)';
+  },
+
+  maxCountSummaryHtml(maxCount) {
+    if (!maxCount) return '';
+    const b = Game.data.buildingsById[maxCount.buildingId];
+    const label = maxCount.per === 1 ? '1 per ' + b.name : maxCount.per + ' per ' + b.name;
+    return '<span class="tag tag-rent">max ' + label + '</span>';
   },
 
   // payout is a one-time grant on purchase, not an ongoing rate - shown
@@ -275,6 +292,7 @@ Game.ui = {
         if (Game.actions.buyUpgrade(id)) {
           this.renderUpgrades();
           this.renderResources();
+          this.renderBuildings(); // an upgrade (e.g. Incorporate a Business) can unlock a building's `requires`
         }
       });
     });

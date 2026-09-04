@@ -25,6 +25,7 @@ Game.stateFactory = {
       erasUnlocked: { era1: true },
       time: { hours: 0 }, // elapsed in-game hours, ticks with dt (incl. dev speed) - the basis for time-based costs like electricity billing
       clockSpeedMultiplier: 1, // player-facing pace control on top of the base 1 real sec = 1 game hour clock (see config.baseGameSecondsPerRealSecond)
+      electricityPricePerKwh: Game.config.electricityPricePerKwhDefault, // $/kWh, editable live from the status bar (see engine._runElectricityBilling)
       freelance: { day: 0, clicksToday: 0 }, // Freelance (DoorDash) shift cap - day is Math.floor(time.hours / 24) of the last click, resets clicksToday on rollover
       softwareJobEnabled: false, // steady day job, pays config.softwareJobAnnualSalary continuously while on
       autoConvertEnabled: false, // tokens -> money/research points continuous conversion, split by trainAllocationPct

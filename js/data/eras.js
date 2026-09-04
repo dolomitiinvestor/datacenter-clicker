@@ -17,7 +17,7 @@ Game.data.eras = [
     id: 'era2',
     name: 'Garage Farm',
     flavor: 'The rigs spilled out of the bedroom and into the garage.',
-    check: (s) => (s.buildings.gpu_gaming || 0) >= 5 || s.stats.totalMoneyEarned >= 150,
+    check: (s) => (s.buildings.laptop || 0) + (s.buildings.macbook_m5 || 0) >= 3 || s.stats.totalMoneyEarned >= 150,
   },
   {
     id: 'era3',

@@ -74,8 +74,26 @@ Game.actions = {
     return cost;
   },
 
+  // Checks a building's `requires` array (upgrade purchased / other building
+  // owned in sufficient count), beyond the era gate. True if there's nothing
+  // to check.
+  meetsRequirements(buildingId) {
+    const def = Game.data.buildingsById[buildingId];
+    if (!def.requires) return true;
+    return def.requires.every((req) => {
+      if (req.type === 'upgrade') return !!Game.state.upgrades[req.id];
+      if (req.type === 'building') return (Game.state.buildings[req.id] || 0) >= (req.count || 1);
+      return true;
+    });
+  },
+
   canBuyBuilding(buildingId) {
     const def = Game.data.buildingsById[buildingId];
+    if (!this.meetsRequirements(buildingId)) return false;
+    if (def.maxCount) {
+      const limit = (Game.state.buildings[def.maxCount.buildingId] || 0) * (def.maxCount.per || 1);
+      if ((Game.state.buildings[buildingId] || 0) >= limit) return false;
+    }
     const cost = this.buildingCost(buildingId);
     if (!Game.state_helpers.canAfford(cost)) return false;
     if (def.land && Game.state_helpers.landAvailable() < def.land) return false;
