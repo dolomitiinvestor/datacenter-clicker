@@ -29,7 +29,7 @@ window.Game = window.Game || {};
 Game.dev = {
   speedMultiplier: 1,
   costMultiplier: 1,
-  costScalingEnabled: true,
+  costScalingEnabled: false,
   stateEditorOpen: false,
 
   setSpeed(mult) {

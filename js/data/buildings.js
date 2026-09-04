@@ -35,11 +35,11 @@ Game.data.buildings = [
     name: 'Rent SF Apartment',
     icon: '🏠',
     era: 'era1',
-    flavor: '200 square feet of Bay Area living space. The wifi is the only thing that scales here.',
+    flavor: '200 square feet of Bay Area living space, with a 15kW panel that\'s begging to be maxed out.',
     baseCost: { money: 2000 }, // deposit to move in
     costScale: 1.15,
     land: 0,
-    produces: {},
+    produces: { electricity: 15 }, // the unit's electrical panel capacity - 15kW max draw
     consumes: {},
     rentPerMonth: { money: 2000 }, // ongoing rent, billed hourly
     sqft: 200,
