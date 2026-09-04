@@ -65,6 +65,15 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'influence_gain', value: 1.5 }],
   },
   {
+    id: 'train_new_model',
+    name: 'Train New Model',
+    icon: '🧬',
+    era: 'era3',
+    flavor: "Fine-tuned on your own exhaust data. Somehow it's better.",
+    cost: { reputation: 30 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.5 }],
+  },
+  {
     id: 'data_broker_deal',
     name: 'Data Broker Contract',
     icon: '🤝',

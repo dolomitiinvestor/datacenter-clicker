@@ -20,7 +20,12 @@ Game.data.resources = [
   { id: 'tokens', name: 'Tokens', icon: '🔤', symbol: 'tokens', kind: 'stock', decimals: 0, showRate: true, unlockEra: 'era1' },
   { id: 'land', name: 'Land', icon: '🗺️', symbol: 'acres', kind: 'capacity', decimals: 0, secondaryUnit: { label: 'sqft', factor: 43560 }, unlockEra: 'era2' },
   { id: 'influence', name: 'Influence', icon: '🏛️', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
+  // Note: resource id 'reputation' is "Research Points" (RP) - a legacy id
+  // from before the rename. The separate id 'fame' below is the actual
+  // "Reputation" resource (industry prestige, spent from RP via the
+  // Publish arXiv Paper building) - don't confuse the two.
   { id: 'reputation', name: 'Research Points', icon: '⭐', symbol: 'RP', kind: 'stock', decimals: 0, unlockEra: 'era3' },
+  { id: 'fame', name: 'Reputation', icon: '🏆', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
 ];
 
 Game.data.resourcesById = {};

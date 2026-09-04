@@ -178,16 +178,28 @@ Game.ui = {
     const landHtml = b.land ? '<span class="tag tag-land">' + b.land + ' acre' + (b.land === 1 ? '' : 's') + '</span>' : '';
     const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + b.providesLandCap + ' acre' + (b.providesLandCap === 1 ? '' : 's') + ' cap</span>' : '';
     const rentHtml = this.rentSummaryHtml(b.rentPerMonth);
+    const payoutHtml = this.payoutSummaryHtml(b.payout);
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
+  },
+
+  // payout is a one-time grant on purchase, not an ongoing rate - shown
+  // with a "grants" prefix so it doesn't read like a /s production tag.
+  payoutSummaryHtml(payout) {
+    if (!payout) return '';
+    return Object.keys(payout).map((resId) => {
+      const r = Game.data.resourcesById[resId];
+      if (!r) return '';
+      return '<span class="tag tag-payout">grants ' + r.icon + Game.format.resourceValue(r, payout[resId]) + '</span>';
+    }).join('');
   },
 
   rateSummaryHtml(rates) {

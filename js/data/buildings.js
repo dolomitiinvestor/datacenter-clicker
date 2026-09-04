@@ -14,6 +14,12 @@ Game.data = Game.data || {};
 // rentPerMonth:  { resourceId: amount, ... } recurring monthly cost per unit
 //                owned, billed hourly (amount / config.hoursPerMonth) every
 //                tick regardless of production - see engine._runUpkeep.
+// payout:        { resourceId: amount, ... } granted once, immediately,
+//                each time a unit is bought (on top of any produces) - see
+//                actions.buyBuilding. Lets a "building" double as a
+//                repeatable milestone purchase (Publish arXiv Paper, Raise
+//                VC Money) with the same cost-scaling/afford-check plumbing
+//                as everything else, instead of a one-shot resource dump.
 // requires:      optional { buildingId, count } prerequisite beyond the era gate
 Game.data.buildings = [
   {
@@ -28,6 +34,19 @@ Game.data.buildings = [
     // 20,000 tokens/hour, expressed as the per-second rate the engine
     // expects (rate * dtSeconds each tick).
     produces: { tokens: 20000 / 3600 },
+    consumes: { electricity: 0.07 },
+  },
+  {
+    id: 'macbook_m5',
+    name: 'MacBook M5',
+    icon: '🍎',
+    era: 'era1',
+    flavor: "Cupertino's finest, quietly out-computing your entire GPU rack while sipping watts.",
+    baseCost: { money: 1400 },
+    costScale: 1.15,
+    land: 0,
+    // Double the Used Laptop's 20,000 tokens/hour, same power draw.
+    produces: { tokens: 40000 / 3600 },
     consumes: { electricity: 0.07 },
   },
   {
@@ -129,6 +148,32 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     providesLandCap: 5,
+  },
+  {
+    id: 'publish_arxiv',
+    name: 'Publish arXiv Paper',
+    icon: '📄',
+    era: 'era3',
+    flavor: 'Nobody reads it, but it counts. Spends Research Points, builds Reputation.',
+    baseCost: { reputation: 10 },
+    costScale: 1.3, // each paper needs more novel research than the last
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { fame: 5 },
+  },
+  {
+    id: 'raise_vc',
+    name: 'Raise VC Money',
+    icon: '🤑',
+    era: 'era3',
+    flavor: 'A partner nods slowly. A wire transfer follows. Spends Research Points, raises Cash.',
+    baseCost: { reputation: 50 },
+    costScale: 1.4, // each round needs more traction than the last
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 50000 },
   },
   {
     id: 'enterprise_cluster',

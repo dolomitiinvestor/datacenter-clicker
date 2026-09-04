@@ -4,7 +4,7 @@ window.Game = window.Game || {};
 Game.config = {
   tickMs: 200,           // engine tick interval (ms)
   autosaveMs: 15000,      // autosave interval (ms)
-  baseFreeElectricity: 2, // kW available for free before any generator is built
+  baseFreeElectricity: 0, // kW available for free before any generator is built - nothing until you rent a place with power (see the SF Apartment building)
   baseLandCap: 4,         // acres of land available before any more is leased
   electricityPricePerKwh: 0.01, // $ per kWh actually drawn - your utility bill
   saveKey: 'datacenter-clicker-save-v1',

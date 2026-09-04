@@ -90,6 +90,9 @@ Game.actions = {
     Game.state.resources.land.used += def.land || 0;
     Game.state.buildings[buildingId] = (Game.state.buildings[buildingId] || 0) + 1;
     Game.state_helpers.recalcLandCap();
+    if (def.payout) {
+      for (const resId in def.payout) Game.state_helpers.add(resId, def.payout[resId]);
+    }
     return true;
   },
 
