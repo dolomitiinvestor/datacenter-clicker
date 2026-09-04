@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datacenter Clicker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2214%22>🖥️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="top-bar">
+  <h1>Datacenter Clicker</h1>
+  <div id="era-banner"></div>
+</header>
+
+<div id="resource-bar"></div>
+<div id="electricity-bar"></div>
+
+<main>
+  <section id="actions-panel">
+    <h2>Actions</h2>
+    <div id="core-actions" class="action-row">
+      <button id="btn-freelance">💻 Freelance Gig<span class="hint">+cash per click</span></button>
+    </div>
+    <div id="compute-actions" class="action-row">
+      <button id="btn-sell-compute">💸 Sell Compute<span class="hint">compute → cash</span></button>
+      <button id="btn-train-model">🎯 Train Model<span class="hint">compute → reputation</span></button>
+    </div>
+    <div id="influence-actions" class="action-row">
+      <button id="btn-schmooze">🤝 Schmooze Politician<span class="hint">+influence per click</span></button>
+    </div>
+  </section>
+
+  <section id="buildings-panel">
+    <h2>Buildings</h2>
+    <div id="buildings-list" class="card-grid"></div>
+  </section>
+
+  <section id="upgrades-panel">
+    <h2>Upgrades</h2>
+    <div id="upgrades-list" class="card-grid"></div>
+  </section>
+
+  <section id="log-panel">
+    <h2>Log</h2>
+    <div id="log-list"></div>
+  </section>
+
+  <section id="save-panel">
+    <h2>Save</h2>
+    <div class="action-row">
+      <button id="btn-save">Save</button>
+      <button id="btn-export">Export</button>
+      <button id="btn-import">Import</button>
+      <button id="btn-reset">Reset Progress</button>
+    </div>
+    <textarea id="io-textarea" placeholder="Export/import save string goes here"></textarea>
+  </section>
+</main>
+
+<div id="flash-message"></div>
+
+<script src="js/core/config.js"></script>
+<script src="js/core/format.js"></script>
+<script src="js/data/resources.js"></script>
+<script src="js/data/eras.js"></script>
+<script src="js/data/buildings.js"></script>
+<script src="js/data/upgrades.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/effects.js"></script>
+<script src="js/core/engine.js"></script>
+<script src="js/core/actions.js"></script>
+<script src="js/core/save.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
