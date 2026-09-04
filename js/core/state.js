@@ -26,12 +26,13 @@ Game.stateFactory = {
       time: { hours: 0 }, // elapsed in-game hours, ticks with dt (incl. dev speed) - the basis for time-based costs like electricity billing
       clockSpeedMultiplier: 1, // player-facing pace control on top of the base 1 real sec = 1 game hour clock (see config.baseGameSecondsPerRealSecond)
       freelance: { day: 0, clicksToday: 0 }, // Freelance (DoorDash) shift cap - day is Math.floor(time.hours / 24) of the last click, resets clicksToday on rollover
-      autoConvertEnabled: false, // compute -> money/reputation continuous conversion, split by trainAllocationPct
-      trainAllocationPct: 50,    // 0 = all compute sold for cash, 100 = all compute trained into reputation
+      softwareJobEnabled: false, // steady day job, pays config.softwareJobAnnualSalary continuously while on
+      autoConvertEnabled: false, // tokens -> money/research points continuous conversion, split by trainAllocationPct
+      trainAllocationPct: 50,    // 0 = all tokens sold for cash, 100 = all tokens trained into research points
       log: [],
       stats: {
         totalMoneyEarned: 0,
-        totalComputeMade: 0,
+        totalTokensMade: 0,
         totalClicks: 0,
         totalElectricityCost: 0,
         totalRentCost: 0,

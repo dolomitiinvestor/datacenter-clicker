@@ -39,14 +39,14 @@ window.Game = window.Game || {};
       Game.ui.renderResources();
     });
 
-    document.getElementById('btn-auto-convert').addEventListener('click', () => {
-      Game.actions.toggleAutoConvert();
-      Game.ui.renderComputeControls();
+    document.getElementById('btn-software-job').addEventListener('click', () => {
+      Game.actions.toggleSoftwareJob();
+      Game.ui.renderSoftwareJobStatus();
     });
 
-    document.getElementById('btn-sell-tokens').addEventListener('click', () => {
-      Game.actions.sellTokens();
-      Game.ui.renderResources();
+    document.getElementById('btn-auto-convert').addEventListener('click', () => {
+      Game.actions.toggleAutoConvert();
+      Game.ui.renderTokenControls();
     });
 
     document.getElementById('alloc-slider').addEventListener('input', (e) => {

@@ -6,7 +6,7 @@ Game.ui = {
   cacheEls() {
     this.els = {
       statusTime: document.getElementById('status-time'),
-      statusFlops: document.getElementById('status-flops'),
+      statusTokens: document.getElementById('status-tokens'),
       resourceBar: document.getElementById('resource-bar'),
       electricityBar: document.getElementById('electricity-bar'),
       buildingsList: document.getElementById('buildings-list'),
@@ -22,7 +22,8 @@ Game.ui = {
       clockSpeedLabel: document.getElementById('clock-speed-label'),
       btnFreelance: document.getElementById('btn-freelance'),
       freelanceHint: document.getElementById('freelance-hint'),
-      btnSellTokens: document.getElementById('btn-sell-tokens'),
+      btnSoftwareJob: document.getElementById('btn-software-job'),
+      softwareJobHint: document.getElementById('software-job-hint'),
     };
   },
 
@@ -35,10 +36,11 @@ Game.ui = {
     this.renderUpgrades();
     this.renderLog();
     this.renderActionVisibility();
-    this.renderComputeControls();
+    this.renderTokenControls();
     this.renderClockSpeedLabel();
     if (this.els.clockSpeedSlider) this.els.clockSpeedSlider.value = Game.state.clockSpeedMultiplier;
     this.renderFreelanceStatus();
+    this.renderSoftwareJobStatus();
   },
 
   // Cheap per-frame refresh: numbers + afford-state only, no DOM rebuild.
@@ -55,13 +57,13 @@ Game.ui = {
       const gc = Game.format.gameClock(Game.state.time.hours);
       this.els.statusTime.textContent = '📅 Day ' + gc.daysPassed + ' • ' + gc.dateStr;
     }
-    if (this.els.statusFlops) {
-      const rate = Game.state.resources.compute.perSecond || 0;
-      this.els.statusFlops.textContent = '🧠 ' + Game.format.number(rate, 2) + ' FLOPS/s';
+    if (this.els.statusTokens) {
+      const rate = Game.state.resources.tokens.perSecond || 0;
+      this.els.statusTokens.textContent = '🔤 ' + Game.format.number(rate, 2) + ' tokens/s';
     }
   },
 
-  // Synced on full renders only (see renderComputeControls comment) -
+  // Synced on full renders only (see renderTokenControls comment) -
   // dragging the slider updates the label directly via main.js's 'input'
   // listener without going through here.
   renderClockSpeedLabel() {
@@ -76,14 +78,23 @@ Game.ui = {
     if (this.els.btnFreelance) this.els.btnFreelance.disabled = remaining <= 0;
   },
 
+  renderSoftwareJobStatus() {
+    const on = Game.state.softwareJobEnabled;
+    const hourly = Game.config.softwareJobAnnualSalary / Game.config.hoursPerYear;
+    if (this.els.btnSoftwareJob) this.els.btnSoftwareJob.classList.toggle('active', on);
+    if (this.els.softwareJobHint) {
+      this.els.softwareJobHint.textContent = '$' + Game.format.number(Game.config.softwareJobAnnualSalary, 0) + '/yr (' + Game.format.money(hourly) + '/hr) • ' + (on ? 'ON' : 'OFF');
+    }
+  },
+
   // trainAllocationPct/autoConvertEnabled sync to the DOM - called on full
   // renders (load, import, toggle) but not every tick, so it never fights
   // the player while they're dragging the slider.
-  renderComputeControls() {
+  renderTokenControls() {
     if (this.els.btnAutoConvert) {
       const on = Game.state.autoConvertEnabled;
       this.els.btnAutoConvert.classList.toggle('active', on);
-      this.els.btnAutoConvert.firstChild.textContent = '🔁 Auto-Convert Compute: ' + (on ? 'ON' : 'OFF');
+      this.els.btnAutoConvert.firstChild.textContent = '🔁 Auto-Convert Tokens: ' + (on ? 'ON' : 'OFF');
     }
     this.renderAllocLabels();
     if (this.els.allocSlider) this.els.allocSlider.value = Game.state.trainAllocationPct;
@@ -266,14 +277,12 @@ Game.ui = {
       const id = btn.getAttribute('data-upgrade');
       btn.disabled = !Game.actions.canBuyUpgrade(id);
     });
-    if (this.els.btnSellTokens) this.els.btnSellTokens.disabled = Game.state.resources.tokens.amount <= 0;
   },
 
   renderActionVisibility() {
-    const computeUnlocked = Game.state.erasUnlocked.era1;
+    const tokensUnlocked = Game.state.erasUnlocked.era1;
     const influenceUnlocked = Game.state.erasUnlocked.era3;
-    document.getElementById('compute-actions').style.display = computeUnlocked ? '' : 'none';
-    document.getElementById('token-actions').style.display = computeUnlocked ? '' : 'none';
+    document.getElementById('token-actions').style.display = tokensUnlocked ? '' : 'none';
     document.getElementById('influence-actions').style.display = influenceUnlocked ? '' : 'none';
   },
 

@@ -23,7 +23,7 @@ Game.data.eras = [
     id: 'era3',
     name: 'Warehouse Operation',
     flavor: 'Zoning laws exist for a reason, and you are about to learn why.',
-    check: (s) => (s.buildings.gpu_rack || 0) >= 3 || s.stats.totalComputeMade >= 200,
+    check: (s) => (s.buildings.gpu_rack || 0) >= 3 || s.stats.totalTokensMade >= 40000,
   },
   {
     id: 'era4',

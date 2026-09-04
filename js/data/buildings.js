@@ -25,9 +25,9 @@ Game.data.buildings = [
     baseCost: { money: 200 },
     costScale: 1.15,
     land: 0,
-    // 100 gigaflops/hour and 20,000 tokens/hour, expressed as the
-    // per-second rates the engine expects (rate * dtSeconds each tick).
-    produces: { compute: 100 / 3600, tokens: 20000 / 3600 },
+    // 20,000 tokens/hour, expressed as the per-second rate the engine
+    // expects (rate * dtSeconds each tick).
+    produces: { tokens: 20000 / 3600 },
     consumes: { electricity: 0.07 },
   },
   {
@@ -53,7 +53,7 @@ Game.data.buildings = [
     baseCost: { money: 15 },
     costScale: 1.15,
     land: 0,
-    produces: { compute: 0.1 },
+    produces: { tokens: 20 }, // 0.1 gigaflops/s worth of inference, at 200 tokens/gigaflop
     consumes: { electricity: 0.05 },
   },
   {
@@ -77,7 +77,7 @@ Game.data.buildings = [
     baseCost: { money: 300 },
     costScale: 1.16,
     land: 1,
-    produces: { compute: 0.6 },
+    produces: { tokens: 120 }, // 0.6 gigaflops/s worth of inference, at 200 tokens/gigaflop
     consumes: { electricity: 0.3 },
   },
   {
@@ -139,7 +139,7 @@ Game.data.buildings = [
     baseCost: { money: 6000 },
     costScale: 1.17,
     land: 2,
-    produces: { compute: 4 },
+    produces: { tokens: 800 }, // 4 gigaflops/s worth of inference, at 200 tokens/gigaflop
     consumes: { electricity: 2 },
   },
   {

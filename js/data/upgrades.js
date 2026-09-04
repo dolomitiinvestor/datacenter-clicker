@@ -15,8 +15,8 @@ Game.data = Game.data || {};
 //   consume:<buildingId>  multiplier on one building's electricity draw
 //   cost_all              multiplier on every building's purchase cost
 //   cost:<buildingId>      multiplier on one building's purchase cost
-//   sell_price              multiplier on the Sell Compute price
-//   train_ratio              multiplier on the Train Model compute->reputation ratio
+//   sell_price              multiplier on the token sell price (Auto-Convert)
+//   train_ratio              multiplier on the token->research points ratio (Auto-Convert)
 //   land_cap (add only)       flat bonus to land cap
 Game.data.upgrades = [
   {
@@ -69,8 +69,8 @@ Game.data.upgrades = [
     name: 'Data Broker Contract',
     icon: '🤝',
     era: 'era3',
-    flavor: 'Turns out compute time sells for more than you thought.',
-    cost: { compute: 100 },
+    flavor: 'Turns out your tokens sell for more than you thought.',
+    cost: { tokens: 20000 },
     effects: [{ type: 'mult', target: 'sell_price', value: 1.5 }],
   },
   {

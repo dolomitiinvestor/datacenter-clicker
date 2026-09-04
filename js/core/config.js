@@ -20,7 +20,11 @@ Game.config = {
   freelanceHourlyRate: 15,    // $ earned per Freelance (DoorDash) click
   freelanceMaxClicksPerDay: 12, // shift cap per rolling in-game 24h day (see state.time.hours)
 
-  tokensPricePerMillion: 5, // $ earned per 1,000,000 tokens sold (see actions.sellTokens)
+  tokensPricePerMillion: 5, // $ earned per 1,000,000 tokens sold via Auto-Convert (see engine._runTokenConversion)
+  tokensToResearchRatio: 0.0001, // research points earned per token trained via Auto-Convert (10,000 tokens = 1 RP)
 
   hoursPerMonth: 730, // 24 * 365/12, average - divides any monthly cost (rent, etc.) into an hourly billing rate
+  hoursPerYear: 8760,  // 24 * 365 - divides an annual salary into an hourly rate (see the Software Job toggle)
+
+  softwareJobAnnualSalary: 100000, // $/yr earned continuously while the Software Job toggle is on
 };

@@ -35,6 +35,7 @@ Game.save = {
     Object.assign(Game.state.time, loaded.time || {});
     if (typeof loaded.clockSpeedMultiplier === 'number') Game.state.clockSpeedMultiplier = loaded.clockSpeedMultiplier;
     Object.assign(Game.state.freelance, loaded.freelance || {});
+    Game.state.softwareJobEnabled = !!loaded.softwareJobEnabled;
     Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;
     if (typeof loaded.trainAllocationPct === 'number') Game.state.trainAllocationPct = loaded.trainAllocationPct;
     Game.state.log = loaded.log || [];

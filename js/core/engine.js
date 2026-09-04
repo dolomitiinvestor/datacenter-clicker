@@ -7,8 +7,9 @@ Game.engine = {
     this._runElectricity(dtSeconds);
     this._runElectricityBilling(dtSeconds);
     this._runUpkeep(dtSeconds);
+    this._runSoftwareJob(dtSeconds);
     this._runProduction(dtSeconds);
-    this._runComputeConversion();
+    this._runTokenConversion();
     this.checkEras();
   },
 
@@ -78,9 +79,20 @@ Game.engine = {
     });
   },
 
+  // A steady day job: while toggled on, pays out config.softwareJobAnnualSalary
+  // continuously (converted to an hourly rate), independent of any building.
+  _runSoftwareJob(dtSeconds) {
+    if (!Game.state.softwareJobEnabled) return;
+    const hours = dtSeconds / 3600;
+    const hourlyRate = Game.config.softwareJobAnnualSalary / Game.config.hoursPerYear;
+    const earned = hourlyRate * hours;
+    Game.state_helpers.add('money', earned);
+    Game.state.stats.totalMoneyEarned += earned;
+  },
+
   _runProduction(dtSeconds) {
     const throttle = Game.state.resources.electricity.throttle;
-    const rates = {}; // resourceId -> current FLOPS/$/etc per second, for display
+    const rates = {}; // resourceId -> current tokens/$/etc per second, for display
 
     Game.data.buildings.forEach((b) => {
       const count = Game.state.buildings[b.id] || 0;
@@ -99,7 +111,7 @@ Game.engine = {
         Game.state_helpers.add(resId, amount);
 
         if (resId === 'money') Game.state.stats.totalMoneyEarned += amount;
-        if (resId === 'compute') Game.state.stats.totalComputeMade += amount;
+        if (resId === 'tokens') Game.state.stats.totalTokensMade += amount;
       }
     });
 
@@ -109,31 +121,33 @@ Game.engine = {
     }
   },
 
-  // While auto-convert is on, compute is drained every tick instead of
-  // piling up, split between cash and reputation by trainAllocationPct
+  // While auto-convert is on, tokens are drained every tick instead of
+  // piling up, split between cash and research points by trainAllocationPct
   // (0 = all sold, 100 = all trained, anything between splits both ways).
-  _runComputeConversion() {
-    const compute = Game.state.resources.compute;
-    if (compute.amount <= 0 || !Game.state.autoConvertEnabled) return;
+  // At 100% sell with no upgrades, one Used Laptop (20,000 tokens/hr) nets
+  // $5 every 50 hours (1,000,000 tokens @ tokensPricePerMillion).
+  _runTokenConversion() {
+    const tokens = Game.state.resources.tokens;
+    if (tokens.amount <= 0 || !Game.state.autoConvertEnabled) return;
 
     const trainFrac = Game.state.trainAllocationPct / 100;
     const sellFrac = 1 - trainFrac;
 
-    const sellAmount = compute.amount * sellFrac;
-    const trainAmount = compute.amount * trainFrac;
+    const sellAmount = tokens.amount * sellFrac;
+    const trainAmount = tokens.amount * trainFrac;
 
     if (sellAmount > 0) {
-      const price = 0.5 * Game.effects.getMult('sell_price');
+      const price = (Game.config.tokensPricePerMillion / 1000000) * Game.effects.getMult('sell_price');
       const earned = sellAmount * price;
       Game.state_helpers.add('money', earned);
       Game.state.stats.totalMoneyEarned += earned;
     }
     if (trainAmount > 0) {
-      const ratio = 0.1 * Game.effects.getMult('train_ratio');
+      const ratio = Game.config.tokensToResearchRatio * Game.effects.getMult('train_ratio');
       Game.state_helpers.add('reputation', trainAmount * ratio);
     }
 
-    compute.amount -= sellAmount + trainAmount;
+    tokens.amount -= sellAmount + trainAmount;
   },
 
   checkEras() {

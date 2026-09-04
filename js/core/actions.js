@@ -37,33 +37,27 @@ Game.actions = {
     return amount;
   },
 
+  // Steady day job toggle: while on, the engine pays out
+  // config.softwareJobAnnualSalary continuously (see engine._runSoftwareJob)
+  // instead of requiring clicks.
+  toggleSoftwareJob() {
+    Game.state.softwareJobEnabled = !Game.state.softwareJobEnabled;
+    return Game.state.softwareJobEnabled;
+  },
+
   // Auto-convert is a toggle, not a one-shot action: while active the
-  // engine continuously converts compute into money/reputation every tick
-  // (see engine._runComputeConversion), split by trainAllocationPct,
+  // engine continuously converts tokens into money/research points every
+  // tick (see engine._runTokenConversion), split by trainAllocationPct,
   // instead of the player having to click to dump an accumulated pile.
   toggleAutoConvert() {
     Game.state.autoConvertEnabled = !Game.state.autoConvertEnabled;
     return Game.state.autoConvertEnabled;
   },
 
-  // pct: 0 = all compute sold for cash, 100 = all compute trained into
-  // reputation, anything between splits continuously both ways.
+  // pct: 0 = all tokens sold for cash, 100 = all tokens trained into
+  // research points, anything between splits continuously both ways.
   setTrainAllocation(pct) {
     Game.state.trainAllocationPct = Math.max(0, Math.min(100, pct));
-  },
-
-  // One-shot: dumps the entire token stockpile for cash at
-  // config.tokensPricePerMillion per 1,000,000 tokens. Returns the amount
-  // earned, or 0 if there were no tokens to sell.
-  sellTokens() {
-    const stock = Game.state.resources.tokens.amount;
-    if (stock <= 0) return 0;
-    const price = Game.config.tokensPricePerMillion / 1000000;
-    const earned = stock * price;
-    Game.state.resources.tokens.amount = 0;
-    Game.state_helpers.add('money', earned);
-    Game.state.stats.totalMoneyEarned += earned;
-    return earned;
   },
 
   // --- buying ---
