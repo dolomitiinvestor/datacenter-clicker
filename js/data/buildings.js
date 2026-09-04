@@ -7,10 +7,10 @@ Game.data = Game.data || {};
 //
 // baseCost:      { resourceId: amount, ... } cost of the 1st unit
 // costScale:     cost multiplier per unit already owned (compounding)
-// land:          land plots consumed per unit owned (permanent, freed on sell if that's added later)
+// land:          acres of land consumed per unit owned (permanent, freed on sell if that's added later)
 // produces:      { resourceId: amountPerSecond, ... }
 // consumes:      { resourceId: amountPerSecond, ... }
-// providesLandCap: flat increase to land cap per unit owned (optional)
+// providesLandCap: flat increase to land cap (in acres) per unit owned (optional)
 // requires:      optional { buildingId, count } prerequisite beyond the era gate
 Game.data.buildings = [
   {
@@ -54,7 +54,7 @@ Game.data.buildings = [
     name: 'Lease Land Plot',
     icon: '📜',
     era: 'era2',
-    flavor: 'A dusty half-acre behind the self-storage place.',
+    flavor: 'A dusty acre behind the self-storage place.',
     baseCost: { money: 100 },
     costScale: 1.25,
     land: 0,
@@ -91,7 +91,7 @@ Game.data.buildings = [
     name: 'Warehouse Lease',
     icon: '🏭',
     era: 'era3',
-    flavor: '40,000 square feet of concrete and possibility.',
+    flavor: 'Five acres of concrete and possibility.',
     baseCost: { money: 1200, influence: 5 },
     costScale: 1.2,
     land: 0,

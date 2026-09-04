@@ -20,6 +20,8 @@ Game.ui = {
       btnSchmooze: document.getElementById('btn-schmooze'),
       clockSpeedSlider: document.getElementById('clock-speed-slider'),
       clockSpeedLabel: document.getElementById('clock-speed-label'),
+      btnFreelance: document.getElementById('btn-freelance'),
+      freelanceHint: document.getElementById('freelance-hint'),
     };
   },
 
@@ -35,6 +37,7 @@ Game.ui = {
     this.renderComputeControls();
     this.renderClockSpeedLabel();
     if (this.els.clockSpeedSlider) this.els.clockSpeedSlider.value = Game.state.clockSpeedMultiplier;
+    this.renderFreelanceStatus();
   },
 
   // Cheap per-frame refresh: numbers + afford-state only, no DOM rebuild.
@@ -43,6 +46,7 @@ Game.ui = {
     this.renderResources();
     this.renderElectricity();
     this.refreshAffordability();
+    this.renderFreelanceStatus();
   },
 
   renderStatusBar() {
@@ -61,6 +65,14 @@ Game.ui = {
   // listener without going through here.
   renderClockSpeedLabel() {
     if (this.els.clockSpeedLabel) this.els.clockSpeedLabel.textContent = Game.state.clockSpeedMultiplier + 'x';
+  },
+
+  renderFreelanceStatus() {
+    const remaining = Game.actions.freelanceShiftsRemaining();
+    if (this.els.freelanceHint) {
+      this.els.freelanceHint.textContent = '$' + Game.config.freelanceHourlyRate + '/click • ' + remaining + '/' + Game.config.freelanceMaxClicksPerDay + ' shifts left today';
+    }
+    if (this.els.btnFreelance) this.els.btnFreelance.disabled = remaining <= 0;
   },
 
   // trainAllocationPct/autoConvertEnabled sync to the DOM - called on full
@@ -99,6 +111,10 @@ Game.ui = {
       let symbolHtml = '<span class="res-symbol">' + r.symbol + '</span>';
       if (r.kind === 'capacity') {
         valueHtml = Game.format.number(res.used, 0) + ' / ' + Game.format.number(res.cap, 0);
+        if (r.secondaryUnit) {
+          const f = r.secondaryUnit.factor;
+          valueHtml += ' <span class="rate-suffix">(' + Game.format.number(res.used * f, 0) + ' / ' + Game.format.number(res.cap * f, 0) + ' ' + r.secondaryUnit.label + ')</span>';
+        }
       } else if (r.kind === 'flow') {
         valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
       } else {
@@ -147,8 +163,8 @@ Game.ui = {
     const costHtml = this.costHtml(cost);
     const produceHtml = this.rateSummaryHtml(b.produces);
     const consumeHtml = this.rateSummaryHtml(b.consumes);
-    const landHtml = b.land ? '<span class="tag tag-land">' + b.land + ' land</span>' : '';
-    const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + b.providesLandCap + ' land cap</span>' : '';
+    const landHtml = b.land ? '<span class="tag tag-land">' + b.land + ' acre' + (b.land === 1 ? '' : 's') + '</span>' : '';
+    const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + b.providesLandCap + ' acre' + (b.providesLandCap === 1 ? '' : 's') + ' cap</span>' : '';
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +

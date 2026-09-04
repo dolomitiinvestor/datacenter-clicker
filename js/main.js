@@ -26,8 +26,12 @@ window.Game = window.Game || {};
 
   function bindStaticButtons() {
     document.getElementById('btn-freelance').addEventListener('click', () => {
-      Game.actions.freelanceGig();
+      const earned = Game.actions.freelanceGig();
+      if (earned === null) {
+        flashMessage("You're out of DoorDash shifts for today — come back tomorrow.");
+      }
       Game.ui.renderResources();
+      Game.ui.renderFreelanceStatus();
     });
 
     document.getElementById('btn-schmooze').addEventListener('click', () => {

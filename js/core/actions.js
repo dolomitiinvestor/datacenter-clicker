@@ -3,8 +3,28 @@ window.Game = window.Game || {};
 Game.actions = {
   // --- manual click actions ---
 
+  // Current day index for the freelance shift cap, and how many of
+  // today's shifts are left. Read-only - freelanceGig() below is the only
+  // thing that advances clicksToday.
+  freelanceShiftsRemaining() {
+    const day = Math.floor(Game.state.time.hours / 24);
+    const used = day === Game.state.freelance.day ? Game.state.freelance.clicksToday : 0;
+    return Game.config.freelanceMaxClicksPerDay - used;
+  },
+
+  // One DoorDash shift = one click = $15 (config.freelanceHourlyRate),
+  // capped at config.freelanceMaxClicksPerDay per rolling in-game day.
+  // Returns the amount earned, or null if today's shifts are used up.
   freelanceGig() {
-    const amount = 1 * Game.effects.getMult('click_money') * Game.dev.speedMultiplier;
+    const day = Math.floor(Game.state.time.hours / 24);
+    if (day !== Game.state.freelance.day) {
+      Game.state.freelance.day = day;
+      Game.state.freelance.clicksToday = 0;
+    }
+    if (Game.state.freelance.clicksToday >= Game.config.freelanceMaxClicksPerDay) return null;
+    Game.state.freelance.clicksToday++;
+
+    const amount = Game.config.freelanceHourlyRate * Game.effects.getMult('click_money') * Game.dev.speedMultiplier;
     Game.state_helpers.add('money', amount);
     Game.state.stats.totalMoneyEarned += amount;
     Game.state.stats.totalClicks++;
