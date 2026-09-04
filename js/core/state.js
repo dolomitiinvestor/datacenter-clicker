@@ -11,7 +11,7 @@ Game.stateFactory = {
       } else if (r.kind === 'flow') {
         resources[r.id] = { generated: 0, consumed: 0, throttle: 1 };
       } else {
-        resources[r.id] = { amount: 0 };
+        resources[r.id] = { amount: 0, perSecond: 0 };
       }
     });
 
@@ -23,13 +23,15 @@ Game.stateFactory = {
       buildings,
       upgrades: {}, // upgradeId -> true once purchased
       erasUnlocked: { era1: true },
-      autoSell: false,
-      autoTrain: false,
+      time: { hours: 0 }, // elapsed in-game hours, ticks with dt (incl. dev speed) - the basis for time-based costs like electricity billing
+      autoConvertEnabled: false, // compute -> money/reputation continuous conversion, split by trainAllocationPct
+      trainAllocationPct: 50,    // 0 = all compute sold for cash, 100 = all compute trained into reputation
       log: [],
       stats: {
         totalMoneyEarned: 0,
         totalComputeMade: 0,
         totalClicks: 0,
+        totalElectricityCost: 0,
         startedAt: Date.now(),
       },
     };

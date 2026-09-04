@@ -1,20 +1,32 @@
 window.Game = window.Game || {};
 
 // --- DEV MODE ---
-// Temporary playtesting speed multiplier. Intentionally NOT part of
-// Game.state (see save.js) so it never gets persisted and always resets
-// to 1x on load. Speeds up passive production (via tick dt) and manual
+// Temporary playtesting knobs. Intentionally NOT part of Game.state (see
+// save.js) so neither ever gets persisted - both always reset to 1x on
+// load.
+//
+// speedMultiplier speeds up passive production (via tick dt) and manual
 // click rewards equally, so testing progression doesn't distort the
 // balance between clicking and idling.
 //
+// costMultiplier scales every building/upgrade purchase price (see
+// actions.buildingCost / actions.upgradeCost), so you can make buying
+// things cheaper (rapid-test late buildings) or pricier (stress-test the
+// early economy) without touching the real cost curve in data/.
+//
 // To remove dev mode later: delete this file, its <script> tag in
 // index.html, the #dev-mode-panel block in index.html, the
-// `* Game.dev.speedMultiplier` factors in actions.js, and the
-// `* Game.dev.speedMultiplier` in main.js's loop().
+// `* Game.dev.speedMultiplier` / `* Game.dev.costMultiplier` factors in
+// actions.js and main.js.
 Game.dev = {
   speedMultiplier: 1,
+  costMultiplier: 1,
 
   setSpeed(mult) {
     this.speedMultiplier = mult;
+  },
+
+  setCostMultiplier(mult) {
+    this.costMultiplier = mult;
   },
 };

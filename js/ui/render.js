@@ -5,45 +5,69 @@ Game.ui = {
 
   cacheEls() {
     this.els = {
+      statusTime: document.getElementById('status-time'),
+      statusFlops: document.getElementById('status-flops'),
       resourceBar: document.getElementById('resource-bar'),
       electricityBar: document.getElementById('electricity-bar'),
       buildingsList: document.getElementById('buildings-list'),
       upgradesList: document.getElementById('upgrades-list'),
       logList: document.getElementById('log-list'),
       eraBanner: document.getElementById('era-banner'),
-      btnSellCompute: document.getElementById('btn-sell-compute'),
-      btnTrainModel: document.getElementById('btn-train-model'),
+      btnAutoConvert: document.getElementById('btn-auto-convert'),
+      allocSlider: document.getElementById('alloc-slider'),
+      allocSellPct: document.getElementById('alloc-sell-pct'),
+      allocTrainPct: document.getElementById('alloc-train-pct'),
       btnSchmooze: document.getElementById('btn-schmooze'),
     };
   },
 
   renderAll() {
     this.renderEraBanner();
+    this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
     this.renderBuildings();
     this.renderUpgrades();
     this.renderLog();
     this.renderActionVisibility();
-    this.renderComputeToggles();
+    this.renderComputeControls();
   },
 
   // Cheap per-frame refresh: numbers + afford-state only, no DOM rebuild.
   renderFrame() {
+    this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
     this.refreshAffordability();
   },
 
-  renderComputeToggles() {
-    if (this.els.btnSellCompute) {
-      this.els.btnSellCompute.classList.toggle('active', Game.state.autoSell);
-      this.els.btnSellCompute.firstChild.textContent = '💸 Auto-Sell Compute: ' + (Game.state.autoSell ? 'ON' : 'OFF');
+  renderStatusBar() {
+    if (this.els.statusTime) {
+      this.els.statusTime.textContent = '⏱ ' + Game.format.number(Game.state.time.hours, 1) + 'h elapsed';
     }
-    if (this.els.btnTrainModel) {
-      this.els.btnTrainModel.classList.toggle('active', Game.state.autoTrain);
-      this.els.btnTrainModel.firstChild.textContent = '🎯 Auto-Train Model: ' + (Game.state.autoTrain ? 'ON' : 'OFF');
+    if (this.els.statusFlops) {
+      const rate = Game.state.resources.compute.perSecond || 0;
+      this.els.statusFlops.textContent = '🧠 ' + Game.format.number(rate, 2) + ' FLOPS/s';
     }
+  },
+
+  // trainAllocationPct/autoConvertEnabled sync to the DOM - called on full
+  // renders (load, import, toggle) but not every tick, so it never fights
+  // the player while they're dragging the slider.
+  renderComputeControls() {
+    if (this.els.btnAutoConvert) {
+      const on = Game.state.autoConvertEnabled;
+      this.els.btnAutoConvert.classList.toggle('active', on);
+      this.els.btnAutoConvert.firstChild.textContent = '🔁 Auto-Convert Compute: ' + (on ? 'ON' : 'OFF');
+    }
+    this.renderAllocLabels();
+    if (this.els.allocSlider) this.els.allocSlider.value = Game.state.trainAllocationPct;
+  },
+
+  renderAllocLabels() {
+    const trainPct = Game.state.trainAllocationPct;
+    if (this.els.allocSellPct) this.els.allocSellPct.textContent = String(100 - trainPct);
+    if (this.els.allocTrainPct) this.els.allocTrainPct.textContent = String(trainPct);
   },
 
   renderEraBanner() {
@@ -60,18 +84,23 @@ Game.ui = {
       if (r.unlockEra && !Game.state.erasUnlocked[r.unlockEra]) return '';
       const res = Game.state.resources[r.id];
       let valueHtml;
+      let symbolHtml = '<span class="res-symbol">' + r.symbol + '</span>';
       if (r.kind === 'capacity') {
         valueHtml = Game.format.number(res.used, 0) + ' / ' + Game.format.number(res.cap, 0);
       } else if (r.kind === 'flow') {
         valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
       } else {
-        valueHtml = Game.format.number(res.amount, r.decimals);
+        valueHtml = Game.format.resourceValue(r, res.amount);
+        if (r.format === 'currency') symbolHtml = ''; // $ already embedded in the value
+        if (r.showRate) {
+          valueHtml += ' <span class="rate-suffix">(+' + Game.format.number(res.perSecond || 0, 2) + '/s)</span>';
+        }
       }
       return (
         '<div class="resource-chip" title="' + r.name + '">' +
         '<span class="res-icon">' + r.icon + '</span>' +
         '<span class="res-value">' + valueHtml + '</span>' +
-        '<span class="res-symbol">' + r.symbol + '</span>' +
+        symbolHtml +
         '</div>'
       );
     }).join('');
@@ -85,6 +114,7 @@ Game.ui = {
     this.els.electricityBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (brownout ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
       '<div class="bar-label">' + Game.format.number(elec.consumed, 1) + ' / ' + Game.format.number(elec.generated, 1) + ' kW' +
+      ' • ' + Game.format.money(elec.billPerHour || 0) + '/hr @ ' + Game.format.money(Game.config.electricityPricePerKwh) + '/kWh' +
       (brownout ? ' — BROWNOUT (' + Math.round(elec.throttle * 100) + '% output)' : '') + '</div>';
   },
 
@@ -124,14 +154,14 @@ Game.ui = {
     return Object.keys(rates).map((resId) => {
       const r = Game.data.resourcesById[resId];
       if (!r) return '';
-      return '<span class="tag">' + r.icon + Game.format.number(rates[resId], 2) + '/s</span>';
+      return '<span class="tag">' + r.icon + Game.format.resourceValue(r, rates[resId]) + '/s</span>';
     }).join('');
   },
 
   costHtml(cost) {
     return Object.keys(cost).map((resId) => {
       const r = Game.data.resourcesById[resId];
-      return r.icon + Game.format.number(cost[resId], resId === 'money' ? 2 : 0);
+      return r.icon + Game.format.resourceValue(r, cost[resId]);
     }).join(' ');
   },
 
@@ -160,7 +190,7 @@ Game.ui = {
   },
 
   upgradeCardHtml(u) {
-    const costHtml = this.costHtml(u.cost);
+    const costHtml = this.costHtml(Game.actions.upgradeCost(u.id));
     return (
       '<div class="card" data-upgrade="' + u.id + '">' +
       '<div class="card-head"><span class="card-icon">' + u.icon + '</span>' +

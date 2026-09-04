@@ -6,5 +6,6 @@ Game.config = {
   autosaveMs: 15000,      // autosave interval (ms)
   baseFreeElectricity: 2, // kW available for free before any generator is built
   baseLandCap: 4,         // land plots available before any land is leased
+  electricityPricePerKwh: 0.01, // $ per kWh actually drawn - your utility bill
   saveKey: 'datacenter-clicker-save-v1',
 };

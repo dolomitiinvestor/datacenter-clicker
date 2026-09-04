@@ -30,14 +30,14 @@ window.Game = window.Game || {};
       Game.ui.renderResources();
     });
 
-    document.getElementById('btn-sell-compute').addEventListener('click', () => {
-      Game.actions.toggleAutoSell();
-      Game.ui.renderComputeToggles();
+    document.getElementById('btn-auto-convert').addEventListener('click', () => {
+      Game.actions.toggleAutoConvert();
+      Game.ui.renderComputeControls();
     });
 
-    document.getElementById('btn-train-model').addEventListener('click', () => {
-      Game.actions.toggleAutoTrain();
-      Game.ui.renderComputeToggles();
+    document.getElementById('alloc-slider').addEventListener('input', (e) => {
+      Game.actions.setTrainAllocation(Number(e.target.value));
+      Game.ui.renderAllocLabels();
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
@@ -71,16 +71,28 @@ window.Game = window.Game || {};
       flashMessage('Progress reset.');
     });
 
-    bindDevSpeedButtons(); // DEV MODE
+    bindDevPanel(); // DEV MODE
   }
 
   // DEV MODE — remove this function and its call site to drop dev mode.
-  function bindDevSpeedButtons() {
-    const buttons = document.querySelectorAll('#dev-mode-panel button[data-speed]');
-    buttons.forEach((btn) => {
+  function bindDevPanel() {
+    const speedButtons = document.querySelectorAll('#dev-mode-panel button[data-speed]');
+    speedButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         Game.dev.setSpeed(Number(btn.getAttribute('data-speed')));
-        buttons.forEach((b) => b.classList.toggle('active', b === btn));
+        speedButtons.forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    const costButtons = document.querySelectorAll('#dev-mode-panel button[data-cost]');
+    costButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        Game.dev.setCostMultiplier(Number(btn.getAttribute('data-cost')));
+        costButtons.forEach((b) => b.classList.toggle('active', b === btn));
+        // costs are baked into the building/upgrade card markup, so a full
+        // rebuild is needed to show the new prices immediately.
+        Game.ui.renderBuildings();
+        Game.ui.renderUpgrades();
       });
     });
   }

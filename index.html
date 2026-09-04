@@ -12,15 +12,25 @@
      matching CSS, JS wiring, and devmode.js) to remove dev mode. -->
 <div id="dev-mode-panel">
   <span class="dev-label">⚙ DEV MODE</span>
+  <span class="dev-group-label">Speed</span>
   <button data-speed="1" class="active">1x</button>
   <button data-speed="10">10x</button>
   <button data-speed="100">100x</button>
+  <span class="dev-group-label">Costs</span>
+  <button data-cost="0.1">0.1x</button>
+  <button data-cost="1" class="active">1x</button>
+  <button data-cost="10">10x</button>
 </div>
 
 <header id="top-bar">
   <h1>Datacenter Clicker</h1>
   <div id="era-banner"></div>
 </header>
+
+<div id="status-bar">
+  <span id="status-time">⏱ 0h elapsed</span>
+  <span id="status-flops">🧠 0 FLOPS/s</span>
+</div>
 
 <div id="resource-bar"></div>
 <div id="electricity-bar"></div>
@@ -31,9 +41,12 @@
     <div id="core-actions" class="action-row">
       <button id="btn-freelance">💻 Freelance Gig<span class="hint">+cash per click</span></button>
     </div>
-    <div id="compute-actions" class="action-row">
-      <button id="btn-sell-compute" class="toggle-btn">💸 Auto-Sell Compute: OFF<span class="hint">continuously converts compute → cash</span></button>
-      <button id="btn-train-model" class="toggle-btn">🎯 Auto-Train Model: OFF<span class="hint">continuously converts compute → reputation</span></button>
+    <div id="compute-actions" class="action-row compute-alloc-row">
+      <button id="btn-auto-convert" class="toggle-btn">🔁 Auto-Convert Compute: OFF<span class="hint">continuously converts compute → cash/reputation</span></button>
+      <div id="alloc-slider-wrap">
+        <label for="alloc-slider">💸 Sell <span id="alloc-sell-pct">50</span>% &nbsp;/&nbsp; 🎯 Train <span id="alloc-train-pct">50</span>%</label>
+        <input type="range" id="alloc-slider" min="0" max="100" value="50" step="5">
+      </div>
     </div>
     <div id="influence-actions" class="action-row">
       <button id="btn-schmooze">🤝 Schmooze Politician<span class="hint">+influence per click</span></button>

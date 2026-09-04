@@ -6,12 +6,16 @@ Game.data = Game.data || {};
 //       'flow'      -> recomputed fresh every tick, not carried over (electricity)
 //
 // unlockEra: resource is hidden from the UI until this era is unlocked.
+// format: 'currency' -> always rendered as $0,000.00 (see format.money),
+//         never compacted to K/M/B. showRate: true -> the resource bar
+//         also shows its current production rate (see engine _runProduction
+//         and state.resources.<id>.perSecond).
 // Adding a brand new resource later = add an entry here + reference it from
 // buildings/upgrades/actions. Nothing else needs to know about it.
 Game.data.resources = [
-  { id: 'money', name: 'Cash', icon: '💵', symbol: '$', kind: 'stock', decimals: 2, unlockEra: null },
+  { id: 'money', name: 'Cash', icon: '💵', symbol: '$', kind: 'stock', decimals: 2, format: 'currency', unlockEra: null },
   { id: 'electricity', name: 'Electricity', icon: '⚡', symbol: 'kW', kind: 'flow', decimals: 2, unlockEra: null },
-  { id: 'compute', name: 'Compute', icon: '🧠', symbol: 'FLOPS', kind: 'stock', decimals: 1, unlockEra: 'era1' },
+  { id: 'compute', name: 'Compute', icon: '🧠', symbol: 'FLOPS', kind: 'stock', decimals: 1, showRate: true, unlockEra: 'era1' },
   { id: 'land', name: 'Land', icon: '🗺️', symbol: 'plots', kind: 'capacity', decimals: 0, unlockEra: 'era2' },
   { id: 'influence', name: 'Influence', icon: '🏛️', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
   { id: 'reputation', name: 'Reputation', icon: '⭐', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },

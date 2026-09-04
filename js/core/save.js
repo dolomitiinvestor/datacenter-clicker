@@ -32,8 +32,9 @@ Game.save = {
     Object.assign(Game.state.upgrades, loaded.upgrades || {});
     Object.assign(Game.state.erasUnlocked, loaded.erasUnlocked || {});
     Object.assign(Game.state.stats, loaded.stats || {});
-    Game.state.autoSell = !!loaded.autoSell;
-    Game.state.autoTrain = !!loaded.autoTrain;
+    Object.assign(Game.state.time, loaded.time || {});
+    Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;
+    if (typeof loaded.trainAllocationPct === 'number') Game.state.trainAllocationPct = loaded.trainAllocationPct;
     Game.state.log = loaded.log || [];
 
     if (loaded.resources) {

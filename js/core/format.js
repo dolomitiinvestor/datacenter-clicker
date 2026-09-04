@@ -32,4 +32,21 @@ Game.format = {
     const v = this.number(n, decimals);
     return (n >= 0 ? '+' : '') + v;
   },
+
+  // Full currency format, no compaction: $0,000.00 - always 2 decimals,
+  // comma thousands separators, for every money amount in the UI.
+  money(n) {
+    if (n === undefined || n === null || isNaN(n)) n = 0;
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  },
+
+  // Picks money vs compact-number formatting based on the resource's own
+  // data definition (see data/resources.js `format` field), so callers
+  // don't need to special-case resource ids themselves.
+  resourceValue(resourceDef, amount) {
+    if (resourceDef.format === 'currency') return this.money(amount);
+    return this.number(amount, resourceDef.decimals);
+  },
 };

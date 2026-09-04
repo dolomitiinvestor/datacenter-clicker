@@ -17,18 +17,19 @@ Game.actions = {
     return amount;
   },
 
-  // Auto-sell/auto-train are toggles, not one-shot actions: while active the
+  // Auto-convert is a toggle, not a one-shot action: while active the
   // engine continuously converts compute into money/reputation every tick
-  // (see engine._runComputeConversion) instead of the player having to
-  // click to dump an accumulated pile.
-  toggleAutoSell() {
-    Game.state.autoSell = !Game.state.autoSell;
-    return Game.state.autoSell;
+  // (see engine._runComputeConversion), split by trainAllocationPct,
+  // instead of the player having to click to dump an accumulated pile.
+  toggleAutoConvert() {
+    Game.state.autoConvertEnabled = !Game.state.autoConvertEnabled;
+    return Game.state.autoConvertEnabled;
   },
 
-  toggleAutoTrain() {
-    Game.state.autoTrain = !Game.state.autoTrain;
-    return Game.state.autoTrain;
+  // pct: 0 = all compute sold for cash, 100 = all compute trained into
+  // reputation, anything between splits continuously both ways.
+  setTrainAllocation(pct) {
+    Game.state.trainAllocationPct = Math.max(0, Math.min(100, pct));
   },
 
   // --- buying ---
@@ -37,7 +38,7 @@ Game.actions = {
     const def = Game.data.buildingsById[buildingId];
     const count = Game.state.buildings[buildingId] || 0;
     const scale = Math.pow(def.costScale, count);
-    const costMult = Game.effects.getMult('cost_all') * Game.effects.getMult('cost:' + buildingId);
+    const costMult = Game.effects.getMult('cost_all') * Game.effects.getMult('cost:' + buildingId) * Game.dev.costMultiplier;
     const cost = {};
     for (const resId in def.baseCost) {
       cost[resId] = def.baseCost[resId] * scale * costMult;
@@ -64,16 +65,24 @@ Game.actions = {
     return true;
   },
 
+  upgradeCost(upgradeId) {
+    const def = Game.data.upgradesById[upgradeId];
+    const cost = {};
+    for (const resId in def.cost) {
+      cost[resId] = def.cost[resId] * Game.dev.costMultiplier;
+    }
+    return cost;
+  },
+
   canBuyUpgrade(upgradeId) {
     if (Game.state.upgrades[upgradeId]) return false;
-    const def = Game.data.upgradesById[upgradeId];
-    return Game.state_helpers.canAfford(def.cost);
+    return Game.state_helpers.canAfford(this.upgradeCost(upgradeId));
   },
 
   buyUpgrade(upgradeId) {
     if (!this.canBuyUpgrade(upgradeId)) return false;
     const def = Game.data.upgradesById[upgradeId];
-    Game.state_helpers.spend(def.cost);
+    Game.state_helpers.spend(this.upgradeCost(upgradeId));
     Game.state.upgrades[upgradeId] = true;
     Game.state_helpers.recalcLandCap();
     Game.state_helpers.logEvent('Unlocked upgrade: ' + def.name);
