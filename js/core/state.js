@@ -34,6 +34,7 @@ Game.stateFactory = {
         totalComputeMade: 0,
         totalClicks: 0,
         totalElectricityCost: 0,
+        totalRentCost: 0,
         startedAt: Date.now(),
       },
     };

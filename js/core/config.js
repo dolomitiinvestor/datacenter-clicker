@@ -21,4 +21,6 @@ Game.config = {
   freelanceMaxClicksPerDay: 12, // shift cap per rolling in-game 24h day (see state.time.hours)
 
   tokensPricePerMillion: 5, // $ earned per 1,000,000 tokens sold (see actions.sellTokens)
+
+  hoursPerMonth: 730, // 24 * 365/12, average - divides any monthly cost (rent, etc.) into an hourly billing rate
 };

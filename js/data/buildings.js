@@ -11,6 +11,9 @@ Game.data = Game.data || {};
 // produces:      { resourceId: amountPerSecond, ... }
 // consumes:      { resourceId: amountPerSecond, ... }
 // providesLandCap: flat increase to land cap (in acres) per unit owned (optional)
+// rentPerMonth:  { resourceId: amount, ... } recurring monthly cost per unit
+//                owned, billed hourly (amount / config.hoursPerMonth) every
+//                tick regardless of production - see engine._runUpkeep.
 // requires:      optional { buildingId, count } prerequisite beyond the era gate
 Game.data.buildings = [
   {
@@ -26,6 +29,20 @@ Game.data.buildings = [
     // per-second rates the engine expects (rate * dtSeconds each tick).
     produces: { compute: 100 / 3600, tokens: 20000 / 3600 },
     consumes: { electricity: 0.07 },
+  },
+  {
+    id: 'sf_apartment',
+    name: 'Rent SF Apartment',
+    icon: '🏠',
+    era: 'era1',
+    flavor: '200 square feet of Bay Area living space. The wifi is the only thing that scales here.',
+    baseCost: { money: 2000 }, // deposit to move in
+    costScale: 1.15,
+    land: 0,
+    produces: {},
+    consumes: {},
+    rentPerMonth: { money: 2000 }, // ongoing rent, billed hourly
+    sqft: 200,
   },
   {
     id: 'gpu_gaming',

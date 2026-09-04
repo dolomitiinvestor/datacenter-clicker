@@ -346,6 +346,7 @@ button .hint {
 }
 
 .tag-land { color: var(--accent-2); }
+.tag-rent { color: var(--danger); }
 
 .card .buy-btn {
   width: 100%;

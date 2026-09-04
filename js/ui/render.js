@@ -166,13 +166,14 @@ Game.ui = {
     const consumeHtml = this.rateSummaryHtml(b.consumes);
     const landHtml = b.land ? '<span class="tag tag-land">' + b.land + ' acre' + (b.land === 1 ? '' : 's') + '</span>' : '';
     const landCapHtml = b.providesLandCap ? '<span class="tag tag-land">+' + b.providesLandCap + ' acre' + (b.providesLandCap === 1 ? '' : 's') + ' cap</span>' : '';
+    const rentHtml = this.rentSummaryHtml(b.rentPerMonth);
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
@@ -184,6 +185,19 @@ Game.ui = {
       const r = Game.data.resourcesById[resId];
       if (!r) return '';
       return '<span class="tag">' + r.icon + Game.format.resourceValue(r, rates[resId]) + '/s</span>';
+    }).join('');
+  },
+
+  // rentPerMonth is stored as a natural monthly figure - shown alongside
+  // the hourly rate it's actually billed at (config.hoursPerMonth).
+  rentSummaryHtml(rentPerMonth) {
+    if (!rentPerMonth) return '';
+    return Object.keys(rentPerMonth).map((resId) => {
+      const r = Game.data.resourcesById[resId];
+      if (!r) return '';
+      const monthly = rentPerMonth[resId];
+      const hourly = monthly / Game.config.hoursPerMonth;
+      return '<span class="tag tag-rent">' + r.icon + Game.format.resourceValue(r, monthly) + '/mo (' + Game.format.resourceValue(r, hourly) + '/hr)</span>';
     }).join('');
   },
 

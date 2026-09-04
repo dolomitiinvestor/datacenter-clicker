@@ -6,6 +6,7 @@ Game.engine = {
     this._runTime(dtSeconds);
     this._runElectricity(dtSeconds);
     this._runElectricityBilling(dtSeconds);
+    this._runUpkeep(dtSeconds);
     this._runProduction(dtSeconds);
     this._runComputeConversion();
     this.checkEras();
@@ -55,6 +56,26 @@ Game.engine = {
     if (cost <= 0) return;
     Game.state_helpers.add('money', -cost);
     Game.state.stats.totalElectricityCost += cost;
+  },
+
+  // Recurring building costs (rent, and anything else added with a
+  // rentPerMonth field later) - billed hourly regardless of production,
+  // same idea as electricity billing but generic to any resource/building.
+  _runUpkeep(dtSeconds) {
+    const hours = dtSeconds / 3600;
+
+    Game.data.buildings.forEach((b) => {
+      if (!b.rentPerMonth) return;
+      const count = Game.state.buildings[b.id] || 0;
+      if (!count) return;
+
+      for (const resId in b.rentPerMonth) {
+        const hourlyRate = b.rentPerMonth[resId] / Game.config.hoursPerMonth;
+        const cost = hourlyRate * count * hours;
+        Game.state_helpers.add(resId, -cost);
+        if (resId === 'money') Game.state.stats.totalRentCost += cost;
+      }
+    });
   },
 
   _runProduction(dtSeconds) {
