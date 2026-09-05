@@ -53,11 +53,22 @@ Game.format = {
     return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
   },
 
+  // Government/influence points: always exactly one decimal, never trimmed
+  // and never K/M/B-compacted, so the display doesn't jump precision as the
+  // per-hour rate (see render.js rateSummaryHtml) grows.
+  influenceRate(n) {
+    if (n === undefined || n === null || isNaN(n)) n = 0;
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    return sign + abs.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  },
+
   // Picks money vs compact-number formatting based on the resource's own
   // data definition (see data/resources.js `format` field), so callers
   // don't need to special-case resource ids themselves.
   resourceValue(resourceDef, amount) {
     if (resourceDef.format === 'currency') return this.money(amount);
+    if (resourceDef.id === 'influence') return this.influenceRate(amount);
     return this.number(amount, resourceDef.decimals);
   },
 

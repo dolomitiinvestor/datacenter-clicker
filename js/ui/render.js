@@ -25,6 +25,7 @@ Game.ui = {
       clockSpeedSlider: document.getElementById('clock-speed-slider'),
       clockSpeedLabel: document.getElementById('clock-speed-label'),
       elecPriceInput: document.getElementById('elec-price-input'),
+      tokenPriceInput: document.getElementById('token-price-input'),
       btnFreelance: document.getElementById('btn-freelance'),
       freelanceHint: document.getElementById('freelance-hint'),
       btnSoftwareJob: document.getElementById('btn-software-job'),
@@ -44,6 +45,7 @@ Game.ui = {
     this.renderClockSpeedLabel();
     if (this.els.clockSpeedSlider) this.els.clockSpeedSlider.value = Game.state.clockSpeedMultiplier;
     if (this.els.elecPriceInput) this.els.elecPriceInput.value = Game.state.electricityPricePerKwh;
+    if (this.els.tokenPriceInput) this.els.tokenPriceInput.value = Game.state.tokensPricePerMillion;
     this.renderFreelanceStatus();
     this.renderSoftwareJobStatus();
   },
@@ -195,10 +197,25 @@ Game.ui = {
 
   renderCatalog() {
     const unlocked = this.unlockedEraIds();
-    const visibleBuildings = Game.data.buildings.filter((b) =>
-      unlocked.indexOf(b.era) !== -1 && (b.blockOnRequirementFail || Game.actions.meetsRequirements(b.id))
+    // A building without blockOnRequirementFail is hidden outright (not
+    // shown-but-disabled) once it's unbuyable - either its `requires` gate
+    // isn't met, or it's hit its maxCount cap (e.g. Extra Power Outlet once
+    // you've already got one per SF Apartment).
+    const visibleBuildings = Game.data.buildings.filter((b) => {
+      if (unlocked.indexOf(b.era) === -1) return false;
+      if (b.blockOnRequirementFail) return true;
+      if (!Game.actions.meetsRequirements(b.id)) return false;
+      if (b.maxCount) {
+        const limit = (Game.state.buildings[b.maxCount.buildingId] || 0) * (b.maxCount.per || 1);
+        if ((Game.state.buildings[b.id] || 0) >= limit) return false;
+      }
+      return true;
+    });
+    const visibleUpgrades = Game.data.upgrades.filter((u) =>
+      unlocked.indexOf(u.era) !== -1 &&
+      !Game.state.upgrades[u.id] &&
+      (!u.requiresUpgrade || Game.state.upgrades[u.requiresUpgrade])
     );
-    const visibleUpgrades = Game.data.upgrades.filter((u) => unlocked.indexOf(u.era) !== -1 && !Game.state.upgrades[u.id]);
 
     this.CATALOG_CATEGORIES.forEach((cat) => {
       const container = this.els[cat + 'List'];
@@ -286,6 +303,12 @@ Game.ui = {
     return Object.keys(rates).map((resId) => {
       const r = Game.data.resourcesById[resId];
       if (!r) return '';
+      // Government/influence points are tiny per-second, so they're shown
+      // per-hour instead - always fixed to one decimal (see
+      // format.influenceRate) so the display never jumps precision.
+      if (resId === 'influence') {
+        return '<span class="tag">' + r.icon + Game.format.influenceRate(rates[resId] * 3600) + '/hr</span>';
+      }
       return '<span class="tag">' + r.icon + Game.format.resourceValue(r, rates[resId]) + '/s</span>';
     }).join('');
   },

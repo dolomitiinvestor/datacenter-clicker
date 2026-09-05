@@ -133,18 +133,20 @@ body {
 }
 
 #elec-price-wrap,
+#token-price-wrap,
 #clock-speed-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-#elec-price-wrap {
+#token-price-wrap {
   margin-left: auto;
 }
 
 #clock-speed-wrap label,
-#elec-price-wrap label {
+#elec-price-wrap label,
+#token-price-wrap label {
   color: var(--text-dim);
   white-space: nowrap;
 }
@@ -159,7 +161,8 @@ body {
   accent-color: var(--accent);
 }
 
-#elec-price-input {
+#elec-price-input,
+#token-price-input {
   width: 60px;
   background: var(--panel);
   color: var(--text);

@@ -138,7 +138,7 @@ Game.engine = {
     const trainAmount = tokens.amount * trainFrac;
 
     if (sellAmount > 0) {
-      const price = (Game.config.tokensPricePerMillion / 1000000) * Game.effects.getMult('sell_price');
+      const price = (Game.state.tokensPricePerMillion / 1000000) * Game.effects.getMult('sell_price');
       const earned = sellAmount * price;
       Game.state_helpers.add('money', earned);
       Game.state.stats.totalMoneyEarned += earned;

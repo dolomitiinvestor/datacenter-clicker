@@ -282,20 +282,6 @@ Game.data.buildings = [
     consumes: { electricity: 64 * 1.0 },
   },
   {
-    id: 'enterprise_cluster',
-    name: 'Enterprise GPU Cluster',
-    icon: '🧊',
-    era: 'era4',
-    category: 'compute',
-    flavor: 'Liquid-cooled, rack-mounted, and terrifyingly expensive.',
-    baseCost: { money: 6000 },
-    costScale: 1.17,
-    land: 0,
-    produces: { tokens: 800 }, // 4 gigaflops/s worth of inference, at 200 tokens/gigaflop
-    consumes: { electricity: 2 },
-  },
-
-  {
     id: 'diesel_generator',
     name: 'Diesel Generator',
     icon: '⛽',
@@ -321,7 +307,7 @@ Game.data.buildings = [
     flavor: 'He knows a guy on the zoning board. $100k/yr, paid monthly, whether you win or lose.',
     baseCost: { money: 1000 }, // retainer to sign them
     costScale: 1.2,
-    land: 1,
+    land: 0,
     produces: { influence: 0.05 },
     consumes: {},
     rentPerMonth: { money: 100000 / 12 }, // $100k/yr salary, billed monthly (12 * hoursPerMonth == hoursPerYear, so this bills out to exactly $100k/yr)
@@ -335,29 +321,9 @@ Game.data.buildings = [
     flavor: 'A whole floor dedicated to filling out permits.',
     baseCost: { money: 4000, influence: 10 },
     costScale: 1.22,
-    land: 1,
+    land: 0,
     produces: { influence: 0.3 },
     consumes: {},
-  },
-
-  {
-    id: 'warehouse_lease',
-    name: 'Warehouse Lease',
-    icon: '🏭',
-    era: 'era3',
-    category: 'buildings',
-    flavor: 'Five acres of concrete and possibility, with a 10MW utility service drop already on the meter. Landlords don\'t lease to an individual - you need an LLC and someone who can talk to the zoning board.',
-    baseCost: { money: 50000, influence: 20 },
-    costScale: 1.2,
-    land: 0,
-    produces: { electricity: 10000 }, // 10MW grid hookup - billed per kWh like any other draw, no generator needed up to this tier
-    consumes: {},
-    providesLandCap: 5,
-    rentPerMonth: { money: 5000 }, // industrial lease payment
-    requires: [
-      { type: 'upgrade', id: 'incorporate_business' },
-      { type: 'building', id: 'lobbyist', count: 1 },
-    ],
   },
 
   // --- Research spending. Both scale hard with costScale - these are meant
@@ -369,7 +335,7 @@ Game.data.buildings = [
     era: 'era3',
     category: 'research',
     flavor: 'Nobody reads it, but it counts. Spends Research Points, builds Reputation.',
-    baseCost: { reputation: 25 },
+    baseCost: { reputation: 25000 }, // 1000x - research points were badly miscaled at the old price
     costScale: 1.35, // each paper needs more novel research than the last
     land: 0,
     produces: {},
@@ -383,7 +349,7 @@ Game.data.buildings = [
     era: 'era3',
     category: 'research',
     flavor: 'A partner nods slowly. A wire transfer follows. Spends Research Points, raises Cash - this is a funding round, not a tip jar.',
-    baseCost: { reputation: 150 },
+    baseCost: { reputation: 150000 }, // 1000x - research points were badly miscaled at the old price
     costScale: 1.5, // each round needs more traction than the last
     land: 0,
     produces: {},

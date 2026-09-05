@@ -11,6 +11,10 @@ Game.data = Game.data || {};
 //           renderCatalog) - shared with buildings, grouped by this field
 //           rather than by data source, so e.g. Train New Model shows up
 //           in the Research column next to Publish arXiv Paper.
+// requiresUpgrade: optional upgradeId that must already be owned before this
+//           one is buyable or even shown - see actions.canBuyUpgrade and
+//           render.js renderCatalog's visibleUpgrades filter. Used to force
+//           the Train New Model chain to be bought strictly in order.
 //
 // Recognized target keys (see engine.js / actions.js for where each is read):
 //   click_money        multiplier on the "Freelance Gig" click
@@ -47,60 +51,75 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'sell_price', value: 1.5 }],
   },
 
-  // --- Research chain: each tier is a newer frontier model, following the
-  // real cadence of major-lab releases (loosely - the calendar in this
-  // game starts the same month ChatGPT shipped). Costs scale hard on
-  // purpose; each is a much bigger production boost than the last.
-  {
-    id: 'train_new_model',
-    name: 'Train New Model: GPT-4 Class',
-    icon: '🧬',
-    era: 'era3',
-    category: 'research',
-    flavor: "Fine-tuned on your own exhaust data. Somehow it's better.",
-    cost: { reputation: 30 },
-    effects: [{ type: 'mult', target: 'produce_all', value: 1.5 }],
-  },
-  {
-    id: 'train_new_model_2',
-    name: 'Train New Model: Claude 3 Class',
-    icon: '🧬',
-    era: 'era3',
-    category: 'research',
-    flavor: 'Constitutional AI, or your closest approximation of it on a Tuesday deadline.',
-    cost: { reputation: 100 },
-    effects: [{ type: 'mult', target: 'produce_all', value: 1.5 }],
-  },
-  {
-    id: 'train_new_model_3',
-    name: 'Train New Model: Gemini Class',
-    icon: '🧬',
-    era: 'era4',
-    category: 'research',
-    flavor: 'Multimodal from the ground up. Your infra was not built with this in mind.',
-    cost: { reputation: 300 },
-    effects: [{ type: 'mult', target: 'produce_all', value: 1.75 }],
-  },
-  {
-    id: 'train_new_model_4',
-    name: 'Train New Model: Llama Class',
-    icon: '🧬',
-    era: 'era4',
-    category: 'research',
-    flavor: 'Open weights. Everyone downloads it, including your competitors.',
-    cost: { reputation: 800 },
-    effects: [{ type: 'mult', target: 'produce_all', value: 1.75 }],
-  },
-  {
-    id: 'train_new_model_5',
-    name: 'Train New Model: Frontier Reasoning Class',
-    icon: '🧬',
-    era: 'era5',
-    category: 'research',
-    flavor: 'It thinks before it answers. Inference costs 10x, quality goes up, everyone acts surprised.',
-    cost: { reputation: 2000 },
-    effects: [{ type: 'mult', target: 'produce_all', value: 2 }],
-  },
+  // --- Research chain: each tier is a real (or near-future) frontier model
+  // release, in roughly chronological order, starting from the actual
+  // pre-ChatGPT era (GPT-1/BERT/GPT-2/GPT-3) through to purely speculative
+  // future tiers. Each tier requires the previous one to already be owned
+  // (requiresUpgrade - see canBuyUpgrade/renderCatalog), so the chain can
+  // only be bought in order. Cost is base * COST_GROWTH^index - Research
+  // Points were massively miscaled at the old flat prices, so this whole
+  // chain runs ~1000x higher than the original 5-tier version.
+  ...(function () {
+    const CHAIN = [
+      { name: 'GPT-1 (117M Parameters)', era: 'era3' },
+      { name: 'BERT (340M Parameters)', era: 'era3' },
+      { name: 'GPT-2 (1.5B Parameters)', era: 'era3' },
+      { name: 'GPT-3 (175B Parameters)', era: 'era3' },
+      { name: 'ChatGPT', era: 'era3' },
+      { name: 'LLaMA', era: 'era3' },
+      { name: 'GPT-4', era: 'era3' },
+      { name: 'Claude 1', era: 'era3' },
+      { name: 'Claude 2', era: 'era3' },
+      { name: 'Mistral 7B', era: 'era3' },
+      { name: 'Gemini 1.0', era: 'era4' },
+      { name: 'Claude 3 Opus', era: 'era4' },
+      { name: 'GPT-4o', era: 'era4' },
+      { name: 'Claude 3.5 Sonnet', era: 'era4' },
+      { name: 'DeepSeek V3', era: 'era4' },
+      { name: 'Claude Code', era: 'era4' },
+      { name: 'GPT-4.5', era: 'era4' },
+      { name: 'Claude Opus 4', era: 'era4' },
+      { name: 'GPT-5', era: 'era4' },
+      { name: 'GPT-5.1', era: 'era4' },
+      { name: 'Claude Opus 4.5', era: 'era5' },
+      { name: 'Claude Mythos', era: 'era5' },
+      { name: 'GPT-5.5', era: 'era5' },
+      { name: 'Claude Opus 4.8', era: 'era5' },
+      { name: 'Claude Opus 5', era: 'era5' },
+      { name: 'Claude Fable', era: 'era5' },
+      { name: 'GPT-6 Astra', era: 'era5' },
+      { name: 'Claude Kingdom', era: 'era5' },
+      { name: 'GPT-7', era: 'era5' },
+      { name: 'Claude Poseidon', era: 'era5' },
+      { name: 'GPT-8.2', era: 'era5' },
+      { name: 'Claude Renaissance', era: 'era5' },
+      { name: 'GPT-9', era: 'era5' },
+      { name: 'Claude OpenSky', era: 'era5' },
+      { name: 'GPT-10', era: 'era5' },
+      { name: 'Claude Space', era: 'era5' },
+      { name: 'GPT-11', era: 'era5' },
+      { name: 'Claude Milky Way', era: 'era5' },
+      { name: 'GPT-12', era: 'era5' },
+      { name: 'Claude Big Bang', era: 'era5' },
+      { name: 'GPT-13', era: 'era5' },
+      { name: 'Claude Hades', era: 'era5' },
+    ];
+    const BASE_COST = 30000; // 30 RP * 1000
+    const COST_GROWTH = 1.45;
+    const PRODUCE_MULT = 1.12; // per-tier produce_all multiplier - compounds hugely over 42 tiers
+
+    return CHAIN.map((m, i) => ({
+      id: 'train_new_model_' + (i + 1),
+      name: 'Train New Model: ' + m.name,
+      icon: '🧬',
+      era: m.era,
+      category: 'research',
+      flavor: 'Frontier model release #' + (i + 1) + '. Somehow the infra bill is always the surprise.',
+      cost: { reputation: Math.round(BASE_COST * Math.pow(COST_GROWTH, i)) },
+      effects: [{ type: 'mult', target: 'produce_all', value: PRODUCE_MULT }],
+      requiresUpgrade: i > 0 ? 'train_new_model_' + i : null,
+    }));
+  })(),
   {
     id: 'research_partnership',
     name: 'University Research Partnership',
@@ -108,7 +127,7 @@ Game.data.upgrades = [
     era: 'era4',
     category: 'research',
     flavor: 'Grad students, but make it corporate-sponsored.',
-    cost: { reputation: 20, money: 5000 },
+    cost: { reputation: 20000, money: 5000 }, // reputation leg raised 1000x along with the rest of the research-points economy
     effects: [{ type: 'mult', target: 'train_ratio', value: 2 }],
   },
 

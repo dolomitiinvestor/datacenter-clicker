@@ -78,6 +78,11 @@ window.Game = window.Game || {};
       Game.ui.renderElectricity();
     });
 
+    document.getElementById('token-price-input').addEventListener('input', (e) => {
+      const val = Number(e.target.value);
+      Game.state.tokensPricePerMillion = isNaN(val) ? 0 : Math.max(0, val);
+    });
+
     document.getElementById('btn-save').addEventListener('click', () => {
       Game.save.save();
       flashMessage('Saved.');

@@ -143,7 +143,9 @@ Game.actions = {
   },
 
   canBuyUpgrade(upgradeId) {
+    const def = Game.data.upgradesById[upgradeId];
     if (Game.state.upgrades[upgradeId]) return false;
+    if (def.requiresUpgrade && !Game.state.upgrades[def.requiresUpgrade]) return false;
     return Game.state_helpers.canAfford(this.upgradeCost(upgradeId));
   },
 
