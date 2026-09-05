@@ -251,7 +251,7 @@ Game.ui = {
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
       '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
-      '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
+      '<button class="buy-btn" data-building="' + b.id + '">' + (b.buyLabel || 'Buy') + ' — ' + costHtml + '</button>' +
       '</div>'
     );
   },

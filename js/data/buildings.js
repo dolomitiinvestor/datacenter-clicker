@@ -40,6 +40,9 @@ Game.data = Game.data || {};
 //                should discover by trying, not by the item just not being
 //                there (e.g. a land site blocked pending a permit).
 // blockedMessage: flavor text shown by the popup above.
+// buyLabel:      optional override for the Buy button's verb (e.g.
+//                'Security Deposit', 'Deposit') - defaults to 'Buy'. Purely
+//                cosmetic, doesn't change any purchase logic.
 Game.data.buildings = [
   {
     id: 'laptop',
@@ -85,6 +88,7 @@ Game.data.buildings = [
     rentPerMonth: { money: 2000 }, // ongoing rent, billed hourly
     sqft: 200,
     providesLandCap: 200 / 43560, // your land cap is literally the sqft you're renting, until you lease real land
+    buyLabel: 'Security Deposit',
   },
   {
     id: 'extra_outlet',
@@ -108,13 +112,14 @@ Game.data.buildings = [
     era: 'era2',
     category: 'buildings',
     flavor: 'A bare concrete shell with a roll-up door. No power hookup, but the rent is cheap and nobody asks questions.',
-    baseCost: { money: 15000 },
+    baseCost: { money: 40000 },
     costScale: 1.2,
     land: 0,
     produces: {},
     consumes: {},
     providesLandCap: 2,
-    rentPerMonth: { money: 800 },
+    rentPerMonth: { money: 20000 },
+    buyLabel: 'Deposit',
   },
   {
     id: 'abandoned_factory_10mw',
