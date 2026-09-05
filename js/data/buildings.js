@@ -91,18 +91,7 @@ Game.data.buildings = [
     produces: { electricity: 1.5 },
     consumes: {},
     maxCount: { buildingId: 'sf_apartment', per: 1 }, // one extra circuit per apartment - there's only so many walls
-  },
-  {
-    id: 'gpu_rack',
-    name: 'Mining GPU Rack',
-    icon: '🖥️',
-    era: 'era2',
-    flavor: 'Eight used enterprise GPUs on a steel shelf. Still cheaper than buying new.',
-    baseCost: { money: 9000 }, // ~$1,100/GPU used, 8 GPUs, plus rack/PSU/networking overhead
-    costScale: 1.16,
-    land: 1,
-    produces: { tokens: 300 }, // 8 GPUs running real inference workloads, not a laptop chip
-    consumes: { electricity: 2.8 }, // 8 x ~350W, realistic for enterprise-class cards under load
+    requires: [{ type: 'building', id: 'sf_apartment', count: 1 }], // nowhere to run the circuit without an apartment - hidden until you have one
   },
 
   // --- Named GPU classes. Real TDP and street-price tiers; per-card token

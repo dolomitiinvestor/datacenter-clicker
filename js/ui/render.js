@@ -101,10 +101,11 @@ Game.ui = {
 
   renderSoftwareJobStatus() {
     const on = Game.state.softwareJobEnabled;
-    const hourly = Game.config.softwareJobAnnualSalary / Game.config.hoursPerYear;
+    const salary = Game.actions.softwareJobSalary();
+    const hourly = salary / Game.config.hoursPerYear;
     if (this.els.btnSoftwareJob) this.els.btnSoftwareJob.classList.toggle('active', on);
     if (this.els.softwareJobHint) {
-      this.els.softwareJobHint.textContent = '$' + Game.format.number(Game.config.softwareJobAnnualSalary, 0) + '/yr (' + Game.format.money(hourly) + '/hr) • ' + (on ? 'ON' : 'OFF');
+      this.els.softwareJobHint.textContent = '$' + Game.format.number(salary, 0) + '/yr (' + Game.format.money(hourly) + '/hr) • ' + (on ? 'ON' : 'OFF');
     }
   },
 
@@ -324,6 +325,7 @@ Game.ui = {
           this.renderUpgrades();
           this.renderResources();
           this.renderBuildings(); // an upgrade (e.g. Incorporate a Business) can unlock a building's `requires`
+          this.renderSoftwareJobStatus(); // an upgrade (e.g. Mechanical Keyboard) can change the salary shown
         }
       });
     });

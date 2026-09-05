@@ -80,12 +80,12 @@ Game.engine = {
     });
   },
 
-  // A steady day job: while toggled on, pays out config.softwareJobAnnualSalary
+  // A steady day job: while toggled on, pays out actions.softwareJobSalary()
   // continuously (converted to an hourly rate), independent of any building.
   _runSoftwareJob(dtSeconds) {
     if (!Game.state.softwareJobEnabled) return;
     const hours = dtSeconds / 3600;
-    const hourlyRate = Game.config.softwareJobAnnualSalary / Game.config.hoursPerYear;
+    const hourlyRate = Game.actions.softwareJobSalary() / Game.config.hoursPerYear;
     const earned = hourlyRate * hours;
     Game.state_helpers.add('money', earned);
     Game.state.stats.totalMoneyEarned += earned;

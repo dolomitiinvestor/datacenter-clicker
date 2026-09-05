@@ -38,11 +38,16 @@ Game.actions = {
   },
 
   // Steady day job toggle: while on, the engine pays out
-  // config.softwareJobAnnualSalary continuously (see engine._runSoftwareJob)
-  // instead of requiring clicks.
+  // softwareJobSalary() continuously (see engine._runSoftwareJob) instead
+  // of requiring clicks.
   toggleSoftwareJob() {
     Game.state.softwareJobEnabled = !Game.state.softwareJobEnabled;
     return Game.state.softwareJobEnabled;
+  },
+
+  // Base salary plus any flat upgrades (e.g. Mechanical Keyboard's +$10k).
+  softwareJobSalary() {
+    return Game.config.softwareJobAnnualSalary + Game.effects.getAdd('software_job_salary');
   },
 
   // Auto-convert is a toggle, not a one-shot action: while active the

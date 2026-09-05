@@ -18,15 +18,16 @@ Game.data = Game.data || {};
 //   sell_price              multiplier on the token sell price (Auto-Convert)
 //   train_ratio              multiplier on the token->research points ratio (Auto-Convert)
 //   land_cap (add only)       flat bonus to land cap
+//   software_job_salary (add only) flat $/yr bonus to the Software Job salary
 Game.data.upgrades = [
   {
     id: 'mech_keyboard',
     name: 'Mechanical Keyboard',
     icon: '⌨️',
     era: 'era1',
-    flavor: 'Clicky switches, questionable productivity gains.',
+    flavor: 'Types clean commits at 3am. Your next performance review notices.',
     cost: { money: 100 },
-    effects: [{ type: 'mult', target: 'click_money', value: 2 }],
+    effects: [{ type: 'add', target: 'software_job_salary', value: 10000 }], // $100k -> $110k/yr
   },
   {
     id: 'incorporate_business',
@@ -36,24 +37,6 @@ Game.data.upgrades = [
     flavor: "An LLC in Delaware. Now you're a real company - landlords, banks, and lawyers will actually talk to you.",
     cost: { money: 500 },
     effects: [], // pure gate flag - checked via requires: [{ type: 'upgrade', id: 'incorporate_business' }] on buildings like Warehouse Lease
-  },
-  {
-    id: 'efficient_psu',
-    name: '80+ Gold PSUs',
-    icon: '🔋',
-    era: 'era2',
-    flavor: 'Fewer watts wasted as heat, more watts wasted on GPUs.',
-    cost: { money: 500 },
-    effects: [{ type: 'mult', target: 'consume_all', value: 0.8 }],
-  },
-  {
-    id: 'bulk_gpu_deal',
-    name: 'Bulk GPU Deal',
-    icon: '📦',
-    era: 'era2',
-    flavor: 'You know a guy who knows a guy at a mining warehouse liquidation.',
-    cost: { money: 800 },
-    effects: [{ type: 'mult', target: 'cost:gpu_rack', value: 0.85 }],
   },
   {
     id: 'campaign_donation',
