@@ -45,9 +45,12 @@ Game.actions = {
     return Game.state.softwareJobEnabled;
   },
 
-  // Base salary plus any flat upgrades (e.g. Mechanical Keyboard's +$10k).
+  // Base salary plus any flat upgrades (e.g. Mechanical Keyboard's +$10k),
+  // compounded by a 3% raise every in-game Jan 1 since start.
   softwareJobSalary() {
-    return Game.config.softwareJobAnnualSalary + Game.effects.getAdd('software_job_salary');
+    const base = Game.config.softwareJobAnnualSalary + Game.effects.getAdd('software_job_salary');
+    const years = Game.format.yearsSinceStart(Game.state.time.hours);
+    return base * Math.pow(1 + Game.config.softwareJobRaisePct, years);
   },
 
   // Auto-convert is a toggle, not a one-shot action: while active the

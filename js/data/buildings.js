@@ -5,6 +5,10 @@ Game.data = Game.data || {};
 // a building id (aside from era/unlock display) - it just reads these
 // fields. To add a new building: append an entry, pick an era, done.
 //
+// category:      'compute' | 'buildings' | 'research' | 'regulatory' | 'upgrades'
+//                which catalog column it's rendered in (see render.js
+//                renderCatalog) - buildings and upgrades share the same
+//                five columns, grouped by this field, not by data source.
 // baseCost:      { resourceId: amount, ... } cost of the 1st unit
 // costScale:     cost multiplier per unit already owned (compounding)
 // land:          acres of land consumed per unit owned (permanent, freed on sell if that's added later)
@@ -42,6 +46,7 @@ Game.data.buildings = [
     name: 'Used Laptop',
     icon: '💻',
     era: 'era1',
+    category: 'compute',
     flavor: 'A $200 Craigslist find, running inference jobs between browser tabs.',
     baseCost: { money: 200 },
     costScale: 1.15,
@@ -56,6 +61,7 @@ Game.data.buildings = [
     name: 'MacBook M5',
     icon: '🍎',
     era: 'era1',
+    category: 'compute',
     flavor: "Cupertino's finest, quietly out-computing your entire GPU rack while sipping watts.",
     baseCost: { money: 1400 },
     costScale: 1.15,
@@ -69,6 +75,7 @@ Game.data.buildings = [
     name: 'Rent SF Apartment',
     icon: '🏠',
     era: 'era1',
+    category: 'buildings',
     flavor: '200 square feet of Bay Area living space, with a 15kW panel that\'s begging to be maxed out.',
     baseCost: { money: 2000 }, // deposit to move in
     costScale: 1.15,
@@ -84,6 +91,7 @@ Game.data.buildings = [
     name: 'Extra Power Outlet',
     icon: '🔌',
     era: 'era2',
+    category: 'buildings',
     flavor: 'You called an electrician. Your landlord did not approve.',
     baseCost: { money: 120 },
     costScale: 1.2,
@@ -93,16 +101,49 @@ Game.data.buildings = [
     maxCount: { buildingId: 'sf_apartment', per: 1 }, // one extra circuit per apartment - there's only so many walls
     requires: [{ type: 'building', id: 'sf_apartment', count: 1 }], // nowhere to run the circuit without an apartment - hidden until you have one
   },
+  {
+    id: 'empty_warehouse',
+    name: 'Empty Warehouse',
+    icon: '📦',
+    era: 'era2',
+    category: 'buildings',
+    flavor: 'A bare concrete shell with a roll-up door. No power hookup, but the rent is cheap and nobody asks questions.',
+    baseCost: { money: 15000 },
+    costScale: 1.2,
+    land: 0,
+    produces: {},
+    consumes: {},
+    providesLandCap: 2,
+    rentPerMonth: { money: 800 },
+  },
+  {
+    id: 'abandoned_factory_10mw',
+    name: '10MW Abandoned Factory',
+    icon: '🏚️',
+    era: 'era3',
+    category: 'buildings',
+    flavor: 'Shuttered since the last recession, but the old industrial service drop is still live. Cheaper than a fresh lease - nobody\'s fighting you for it.',
+    baseCost: { money: 30000 },
+    costScale: 1.25,
+    land: 0,
+    produces: { electricity: 10000 }, // 10MW - the old grid connection, still on the books
+    consumes: {},
+    providesLandCap: 3,
+    rentPerMonth: { money: 1200 }, // property tax and a security guard
+  },
 
   // --- Named GPU classes. Real TDP and street-price tiers; per-card token
   // throughput is a game-balance approximation (actual LLM inference speed
   // varies hugely by model size/batching), scaled consistently across
   // classes so later cards are meaningfully better per watt and per dollar.
+  // No land cost - GPUs live inside whatever real estate you've already
+  // leased, they don't need their own acreage.
   {
     id: 'rtx_4090',
     name: 'GeForce RTX 4090',
     icon: '🎮',
     era: 'era2',
+    category: 'compute',
     flavor: 'Consumer flagship, 450W TDP. Not built for a rack, but it works.',
     baseCost: { money: 1800 },
     costScale: 1.15,
@@ -115,6 +156,7 @@ Game.data.buildings = [
     name: 'NVIDIA A100 80GB',
     icon: '🟩',
     era: 'era3',
+    category: 'compute',
     flavor: 'The card that started the arms race. 400W, and every cloud provider wants more of them.',
     baseCost: { money: 10000 },
     costScale: 1.15,
@@ -127,6 +169,7 @@ Game.data.buildings = [
     name: 'NVIDIA H100 80GB',
     icon: '🟩',
     era: 'era3',
+    category: 'compute',
     flavor: 'Hopper architecture, 700W. The card every lab is rationing.',
     baseCost: { money: 30000 },
     costScale: 1.15,
@@ -139,10 +182,11 @@ Game.data.buildings = [
     name: 'H100 Rack (x8)',
     icon: '🗄️',
     era: 'era3',
+    category: 'compute',
     flavor: 'Eight H100s, one chassis, one very serious power connector. A 5% bulk discount for buying by the rack.',
     baseCost: { money: 8 * 30000 * 0.95 },
     costScale: 1.15,
-    land: 1,
+    land: 0,
     produces: { tokens: 8 * 300 },
     consumes: { electricity: 8 * 0.7 },
   },
@@ -151,10 +195,11 @@ Game.data.buildings = [
     name: 'H100 Cluster (x64)',
     icon: '🧱',
     era: 'era4',
+    category: 'compute',
     flavor: 'Eight racks, networked, cooled, and insured. A 10% bulk discount over buying racks one at a time.',
     baseCost: { money: 64 * 30000 * 0.9 },
     costScale: 1.15,
-    land: 2,
+    land: 0,
     produces: { tokens: 64 * 300 },
     consumes: { electricity: 64 * 0.7 },
   },
@@ -163,6 +208,7 @@ Game.data.buildings = [
     name: 'NVIDIA H200',
     icon: '🟦',
     era: 'era4',
+    category: 'compute',
     flavor: 'Same 700W envelope as the H100, but HBM3e memory bandwidth means real throughput gains.',
     baseCost: { money: 35000 },
     costScale: 1.15,
@@ -175,10 +221,11 @@ Game.data.buildings = [
     name: 'H200 Rack (x8)',
     icon: '🗄️',
     era: 'era4',
+    category: 'compute',
     flavor: 'Eight H200s in one chassis. 5% bulk discount.',
     baseCost: { money: 8 * 35000 * 0.95 },
     costScale: 1.15,
-    land: 1,
+    land: 0,
     produces: { tokens: 8 * 380 },
     consumes: { electricity: 8 * 0.7 },
   },
@@ -187,10 +234,11 @@ Game.data.buildings = [
     name: 'H200 Cluster (x64)',
     icon: '🧱',
     era: 'era4',
+    category: 'compute',
     flavor: 'A full pod of H200 racks. 10% bulk discount.',
     baseCost: { money: 64 * 35000 * 0.9 },
     costScale: 1.15,
-    land: 2,
+    land: 0,
     produces: { tokens: 64 * 380 },
     consumes: { electricity: 64 * 0.7 },
   },
@@ -199,6 +247,7 @@ Game.data.buildings = [
     name: 'NVIDIA B200',
     icon: '🟪',
     era: 'era5',
+    category: 'compute',
     flavor: 'Blackwell. 1000W, roughly 2x an H100 for inference, and priced like it.',
     baseCost: { money: 60000 },
     costScale: 1.15,
@@ -211,10 +260,11 @@ Game.data.buildings = [
     name: 'B200 Rack (x8)',
     icon: '🗄️',
     era: 'era5',
+    category: 'compute',
     flavor: 'Eight B200s. The rack PDU alone needs its own permit. 5% bulk discount.',
     baseCost: { money: 8 * 60000 * 0.95 },
     costScale: 1.15,
-    land: 1,
+    land: 0,
     produces: { tokens: 8 * 750 },
     consumes: { electricity: 8 * 1.0 },
   },
@@ -223,44 +273,34 @@ Game.data.buildings = [
     name: 'B200 Cluster (x64)',
     icon: '🧱',
     era: 'era5',
+    category: 'compute',
     flavor: 'This is what the 50MW site was for. 10% bulk discount.',
     baseCost: { money: 64 * 60000 * 0.9 },
     costScale: 1.15,
-    land: 2,
+    land: 0,
     produces: { tokens: 64 * 750 },
     consumes: { electricity: 64 * 1.0 },
   },
   {
-    id: 'land_plot',
-    name: 'Lease Land Plot',
-    icon: '📜',
-    era: 'era2',
-    flavor: 'A dusty acre behind the self-storage place.',
-    baseCost: { money: 100 },
-    costScale: 1.25,
+    id: 'enterprise_cluster',
+    name: 'Enterprise GPU Cluster',
+    icon: '🧊',
+    era: 'era4',
+    category: 'compute',
+    flavor: 'Liquid-cooled, rack-mounted, and terrifyingly expensive.',
+    baseCost: { money: 6000 },
+    costScale: 1.17,
     land: 0,
-    produces: {},
-    consumes: {},
-    providesLandCap: 1,
+    produces: { tokens: 800 }, // 4 gigaflops/s worth of inference, at 200 tokens/gigaflop
+    consumes: { electricity: 2 },
   },
-  {
-    id: 'lobbyist',
-    name: 'Hire Lobbyist',
-    icon: '🏛️',
-    era: 'era3',
-    flavor: 'He knows a guy on the zoning board. $100k/yr, paid monthly, whether you win or lose.',
-    baseCost: { money: 1000 }, // retainer to sign them
-    costScale: 1.2,
-    land: 1,
-    produces: { influence: 0.05 },
-    consumes: {},
-    rentPerMonth: { money: 100000 / 12 }, // $100k/yr salary, billed monthly (12 * hoursPerMonth == hoursPerYear, so this bills out to exactly $100k/yr)
-  },
+
   {
     id: 'diesel_generator',
     name: 'Diesel Generator',
     icon: '⛽',
     era: 'era3',
+    category: 'buildings',
     flavor: 'Loud, dirty, and reliably running at 3am. Drinks diesel the whole time.',
     baseCost: { money: 4000 }, // realistic for a quality ~5kW diesel unit
     costScale: 1.18,
@@ -273,10 +313,39 @@ Game.data.buildings = [
     rentPerMonth: { money: 1500 },
   },
   {
+    id: 'lobbyist',
+    name: 'Hire Lobbyist',
+    icon: '🏛️',
+    era: 'era3',
+    category: 'regulatory',
+    flavor: 'He knows a guy on the zoning board. $100k/yr, paid monthly, whether you win or lose.',
+    baseCost: { money: 1000 }, // retainer to sign them
+    costScale: 1.2,
+    land: 1,
+    produces: { influence: 0.05 },
+    consumes: {},
+    rentPerMonth: { money: 100000 / 12 }, // $100k/yr salary, billed monthly (12 * hoursPerMonth == hoursPerYear, so this bills out to exactly $100k/yr)
+  },
+  {
+    id: 'policy_office',
+    name: 'Regulatory Affairs Office',
+    icon: '🏢',
+    era: 'era4',
+    category: 'regulatory',
+    flavor: 'A whole floor dedicated to filling out permits.',
+    baseCost: { money: 4000, influence: 10 },
+    costScale: 1.22,
+    land: 1,
+    produces: { influence: 0.3 },
+    consumes: {},
+  },
+
+  {
     id: 'warehouse_lease',
     name: 'Warehouse Lease',
     icon: '🏭',
     era: 'era3',
+    category: 'buildings',
     flavor: 'Five acres of concrete and possibility, with a 10MW utility service drop already on the meter. Landlords don\'t lease to an individual - you need an LLC and someone who can talk to the zoning board.',
     baseCost: { money: 50000, influence: 20 },
     costScale: 1.2,
@@ -290,67 +359,36 @@ Game.data.buildings = [
       { type: 'building', id: 'lobbyist', count: 1 },
     ],
   },
+
+  // --- Research spending. Both scale hard with costScale - these are meant
+  // to be occasional, meaningful events, not a repeatable farm.
   {
     id: 'publish_arxiv',
     name: 'Publish arXiv Paper',
     icon: '📄',
     era: 'era3',
+    category: 'research',
     flavor: 'Nobody reads it, but it counts. Spends Research Points, builds Reputation.',
-    baseCost: { reputation: 10 },
-    costScale: 1.3, // each paper needs more novel research than the last
+    baseCost: { reputation: 25 },
+    costScale: 1.35, // each paper needs more novel research than the last
     land: 0,
     produces: {},
     consumes: {},
-    payout: { fame: 5 },
+    payout: { fame: 50 },
   },
   {
     id: 'raise_vc',
     name: 'Raise VC Money',
     icon: '🤑',
     era: 'era3',
-    flavor: 'A partner nods slowly. A wire transfer follows. Spends Research Points, raises Cash.',
-    baseCost: { reputation: 50 },
-    costScale: 1.4, // each round needs more traction than the last
+    category: 'research',
+    flavor: 'A partner nods slowly. A wire transfer follows. Spends Research Points, raises Cash - this is a funding round, not a tip jar.',
+    baseCost: { reputation: 150 },
+    costScale: 1.5, // each round needs more traction than the last
     land: 0,
     produces: {},
     consumes: {},
-    payout: { money: 50000 },
-  },
-  {
-    id: 'enterprise_cluster',
-    name: 'Enterprise GPU Cluster',
-    icon: '🧊',
-    era: 'era4',
-    flavor: 'Liquid-cooled, rack-mounted, and terrifyingly expensive.',
-    baseCost: { money: 6000 },
-    costScale: 1.17,
-    land: 2,
-    produces: { tokens: 800 }, // 4 gigaflops/s worth of inference, at 200 tokens/gigaflop
-    consumes: { electricity: 2 },
-  },
-  {
-    id: 'solar_farm',
-    name: 'Solar Farm',
-    icon: '☀️',
-    era: 'era4',
-    flavor: 'Rows of panels where cornfields used to be.',
-    baseCost: { money: 5000 },
-    costScale: 1.2,
-    land: 3,
-    produces: { electricity: 15 },
-    consumes: {},
-  },
-  {
-    id: 'policy_office',
-    name: 'Regulatory Affairs Office',
-    icon: '🏢',
-    era: 'era4',
-    flavor: 'A whole floor dedicated to filling out permits.',
-    baseCost: { money: 4000, influence: 10 },
-    costScale: 1.22,
-    land: 1,
-    produces: { influence: 0.3 },
-    consumes: {},
+    payout: { money: 10000000 },
   },
 
   // --- Gigawatt-class land sites. None of these come with a grid
@@ -364,6 +402,7 @@ Game.data.buildings = [
     name: '50MW Land Site',
     icon: '🏞️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'A hundred acres of nothing, zoned for industrial power draw. On paper.',
     baseCost: { money: 5000000 },
     costScale: 1.5,
@@ -380,6 +419,7 @@ Game.data.buildings = [
     name: '100MW Land Site',
     icon: '🏞️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Two hundred acres. The city council can no longer approve this alone.',
     baseCost: { money: 15000000 },
     costScale: 1.5,
@@ -399,6 +439,7 @@ Game.data.buildings = [
     name: '500MW Land Site',
     icon: '🏞️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Eight hundred acres. This shows up on satellite photos.',
     baseCost: { money: 80000000 },
     costScale: 1.5,
@@ -419,6 +460,7 @@ Game.data.buildings = [
     name: '1GW Land Site',
     icon: '🏞️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Fifteen hundred acres. You are now a line item in the regional grid operator\'s planning docs.',
     baseCost: { money: 200000000 },
     costScale: 1.5,
@@ -440,6 +482,7 @@ Game.data.buildings = [
     name: '10GW Land Site',
     icon: '🏞️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Ten thousand acres. At this scale you are, functionally, a small country\'s power grid.',
     baseCost: { money: 2500000000 },
     costScale: 1.5,
@@ -460,25 +503,57 @@ Game.data.buildings = [
 
   // --- Self-generation. Required above 10MW (Warehouse Lease's grid
   // hookup is the ceiling for free-riding on the utility) - these are how
-  // you actually power a gigawatt-class site.
+  // you actually power a gigawatt-class site. Gas turbine costs scale
+  // linearly at ~$2,500/kW installed; fuel bill scales the same way as the
+  // original 50MW unit ($50/kW/month).
   {
-    id: 'gas_turbine_plant',
-    name: 'Gas Turbine Plant',
+    id: 'gas_turbine_small',
+    name: 'Small Gas Turbine (Reciprocating)',
     icon: '🔥',
     era: 'era5',
+    category: 'buildings',
+    flavor: 'A single reciprocating engine genset. 1MW, diesel-generator-sized but built to run on gas around the clock.',
+    baseCost: { money: 1000 * 2500 }, // $2,500/kW x 1,000kW
+    costScale: 1.25,
+    land: 1,
+    produces: { electricity: 1000 }, // 1MW
+    consumes: {},
+    rentPerMonth: { money: 1000 * 50 }, // natural gas fuel
+  },
+  {
+    id: 'gas_turbine_medium',
+    name: 'Medium Gas Turbine (Simple-Cycle)',
+    icon: '🔥',
+    era: 'era5',
+    category: 'buildings',
     flavor: 'A single industrial gas turbine, simple-cycle. Fast to build, hungry to feed.',
-    baseCost: { money: 40000000 }, // ~$800/kW installed for a 50MW simple-cycle unit
+    baseCost: { money: 50000 * 2500 }, // $2,500/kW x 50,000kW
     costScale: 1.3,
     land: 5,
     produces: { electricity: 50000 }, // 50MW
     consumes: {},
-    rentPerMonth: { money: 2500000 }, // natural gas fuel, running flat-out
+    rentPerMonth: { money: 50000 * 50 }, // natural gas fuel, running flat-out
+  },
+  {
+    id: 'gas_turbine_large_ccgt',
+    name: 'Large Gas Turbine (CCGT)',
+    icon: '🔥',
+    era: 'era5',
+    category: 'buildings',
+    flavor: 'Combined-cycle: a gas turbine plus a steam turbine catching its waste heat. Half a gigawatt, and meaningfully more fuel-efficient per MWh than simple-cycle.',
+    baseCost: { money: 500000 * 2500 }, // $2,500/kW x 500,000kW
+    costScale: 1.35,
+    land: 30,
+    produces: { electricity: 500000 }, // 500MW
+    consumes: {},
+    rentPerMonth: { money: 500000 * 50 }, // natural gas fuel
   },
   {
     id: 'utility_solar_farm',
     name: 'Utility-Scale Solar Farm',
     icon: '🌞',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Twenty megawatts of panels on land that used to grow something else.',
     baseCost: { money: 20000000 }, // ~$1/W installed, utility-scale
     costScale: 1.3,
@@ -492,6 +567,7 @@ Game.data.buildings = [
     name: 'Small Modular Reactor',
     icon: '☢️',
     era: 'era5',
+    category: 'buildings',
     flavor: 'Three hundred megawatts, baseload, and a stack of federal paperwork thicker than the containment wall.',
     baseCost: { money: 1000000000 },
     costScale: 1.4,

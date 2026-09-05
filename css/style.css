@@ -227,11 +227,22 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  max-width: 1100px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
-#actions-panel, #log-panel, #save-panel { grid-column: 1 / -1; }
+#actions-panel, #log-panel, #save-panel, #catalog-grid { grid-column: 1 / -1; }
+
+#catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.catalog-column .card-grid {
+  grid-template-columns: 1fr;
+}
 
 section h2 {
   font-size: 13px;
@@ -364,6 +375,7 @@ button .hint {
 .tag-land { color: var(--accent-2); }
 .tag-rent { color: var(--danger); }
 .tag-payout { color: var(--good); }
+.tag-efficiency { color: var(--accent); }
 
 .card .buy-btn {
   width: 100%;

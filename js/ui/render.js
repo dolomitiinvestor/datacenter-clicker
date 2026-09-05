@@ -10,7 +10,10 @@ Game.ui = {
       statusNet: document.getElementById('status-net'),
       resourceBar: document.getElementById('resource-bar'),
       electricityBar: document.getElementById('electricity-bar'),
+      computeList: document.getElementById('compute-list'),
       buildingsList: document.getElementById('buildings-list'),
+      researchList: document.getElementById('research-list'),
+      regulatoryList: document.getElementById('regulatory-list'),
       upgradesList: document.getElementById('upgrades-list'),
       logList: document.getElementById('log-list'),
       eraBanner: document.getElementById('era-banner'),
@@ -34,8 +37,7 @@ Game.ui = {
     this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
-    this.renderBuildings();
-    this.renderUpgrades();
+    this.renderCatalog();
     this.renderLog();
     this.renderActionVisibility();
     this.renderTokenControls();
@@ -184,13 +186,31 @@ Game.ui = {
     return Object.keys(Game.state.erasUnlocked).filter((id) => Game.state.erasUnlocked[id]);
   },
 
-  renderBuildings() {
+  // Buildings and upgrades are two different data sources but share one
+  // set of catalog columns (compute/buildings/research/regulatory/
+  // upgrades), grouped by each item's own `category` field - e.g. Train
+  // New Model (an upgrade) renders in the same Research column as Publish
+  // arXiv Paper (a building).
+  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'upgrades'],
+
+  renderCatalog() {
     const unlocked = this.unlockedEraIds();
-    const visible = Game.data.buildings.filter((b) =>
+    const visibleBuildings = Game.data.buildings.filter((b) =>
       unlocked.indexOf(b.era) !== -1 && (b.blockOnRequirementFail || Game.actions.meetsRequirements(b.id))
     );
-    this.els.buildingsList.innerHTML = visible.map((b) => this.buildingCardHtml(b)).join('');
+    const visibleUpgrades = Game.data.upgrades.filter((u) => unlocked.indexOf(u.era) !== -1 && !Game.state.upgrades[u.id]);
+
+    this.CATALOG_CATEGORIES.forEach((cat) => {
+      const container = this.els[cat + 'List'];
+      if (!container) return;
+      const html =
+        visibleBuildings.filter((b) => (b.category || 'buildings') === cat).map((b) => this.buildingCardHtml(b)).join('') +
+        visibleUpgrades.filter((u) => (u.category || 'upgrades') === cat).map((u) => this.upgradeCardHtml(u)).join('');
+      container.innerHTML = html || '<div class="empty-note">Nothing here yet.</div>';
+    });
+
     this.bindBuildingButtons();
+    this.bindUpgradeButtons();
   },
 
   buildingCardHtml(b) {
@@ -204,6 +224,7 @@ Game.ui = {
     const rentHtml = this.rentSummaryHtml(b.rentPerMonth);
     const payoutHtml = this.payoutSummaryHtml(b.payout);
     const maxCountHtml = this.maxCountSummaryHtml(b.maxCount);
+    const efficiencyHtml = this.tokenEfficiencyHtml(b, cost);
     const locked = b.blockOnRequirementFail && !Game.actions.meetsRequirements(b.id);
     const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
     return (
@@ -212,10 +233,27 @@ Game.ui = {
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + lockedHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
+  },
+
+  // Tokens/s per $ spent (at the current, cost-scaled price) and
+  // tokens/kWh consumed - shown on every token-generating item so
+  // efficiency is directly comparable across GPU classes.
+  tokenEfficiencyHtml(b, cost) {
+    if (!b.produces || !b.produces.tokens) return '';
+    let html = '';
+    if (cost.money > 0) {
+      const perDollar = b.produces.tokens / cost.money;
+      html += '<span class="tag tag-efficiency">' + Game.format.number(perDollar, 4) + ' tok/s per $</span>';
+    }
+    if (b.consumes && b.consumes.electricity) {
+      const perKwh = (b.produces.tokens * 3600) / b.consumes.electricity;
+      html += '<span class="tag tag-efficiency">' + Game.format.number(perKwh, 0) + ' tok/kWh</span>';
+    }
+    return html;
   },
 
   // Small acreages (e.g. a 200 sqft apartment's land cap) are unreadable as
@@ -273,8 +311,7 @@ Game.ui = {
   },
 
   bindBuildingButtons() {
-    const buttons = this.els.buildingsList.querySelectorAll('.buy-btn');
-    buttons.forEach((btn) => {
+    document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-building');
         const def = Game.data.buildingsById[id];
@@ -286,22 +323,11 @@ Game.ui = {
           return;
         }
         if (Game.actions.buyBuilding(id)) {
-          this.renderBuildings();
+          this.renderCatalog();
           this.renderResources();
         }
       });
     });
-  },
-
-  renderUpgrades() {
-    const unlocked = this.unlockedEraIds();
-    const visible = Game.data.upgrades.filter((u) => unlocked.indexOf(u.era) !== -1 && !Game.state.upgrades[u.id]);
-    if (visible.length === 0) {
-      this.els.upgradesList.innerHTML = '<div class="empty-note">No upgrades available yet.</div>';
-      return;
-    }
-    this.els.upgradesList.innerHTML = visible.map((u) => this.upgradeCardHtml(u)).join('');
-    this.bindUpgradeButtons();
   },
 
   upgradeCardHtml(u) {
@@ -317,14 +343,12 @@ Game.ui = {
   },
 
   bindUpgradeButtons() {
-    const buttons = this.els.upgradesList.querySelectorAll('.buy-btn');
-    buttons.forEach((btn) => {
+    document.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-upgrade');
         if (Game.actions.buyUpgrade(id)) {
-          this.renderUpgrades();
+          this.renderCatalog(); // an upgrade (e.g. Incorporate a Business) can unlock a building's `requires`, or reveal/consume other catalog items
           this.renderResources();
-          this.renderBuildings(); // an upgrade (e.g. Incorporate a Business) can unlock a building's `requires`
           this.renderSoftwareJobStatus(); // an upgrade (e.g. Mechanical Keyboard) can change the salary shown
         }
       });
@@ -332,11 +356,11 @@ Game.ui = {
   },
 
   refreshAffordability() {
-    this.els.buildingsList.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
+    document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       const id = btn.getAttribute('data-building');
       btn.disabled = Game.actions.buildingButtonDisabled(id);
     });
-    this.els.upgradesList.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
+    document.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       const id = btn.getAttribute('data-upgrade');
       btn.disabled = !Game.actions.canBuyUpgrade(id);
     });

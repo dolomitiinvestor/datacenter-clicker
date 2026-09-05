@@ -63,7 +63,9 @@ Game.format = {
 
   // Turns elapsed in-game hours into a day count + calendar date/time,
   // anchored at Game.config.startDate. Displayed in the status bar and
-  // usable as the basis for any future time-based cost/event.
+  // usable as the basis for any future time-based cost/event. Hour is
+  // always 2-digit so the status bar doesn't reflow width when it ticks
+  // from 9 to 10.
   gameClock(hoursElapsed) {
     const daysPassed = Math.floor(hoursElapsed / 24);
     const date = new Date(Game.config.startDate + hoursElapsed * 3600 * 1000);
@@ -72,9 +74,20 @@ Game.format = {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-      hour: 'numeric',
+      hour: '2-digit',
       minute: '2-digit',
     });
     return { daysPassed, dateStr };
+  },
+
+  // How many January 1sts have passed since Game.config.startDate - the
+  // basis for the Software Job's annual raise (see actions.softwareJobSalary).
+  // startDate is Nov 30, so this is 0 until the first New Year's Day, then
+  // increments every Jan 1 after that, purely as a function of elapsed
+  // game time (no state to track/desync).
+  yearsSinceStart(hoursElapsed) {
+    const date = new Date(Game.config.startDate + hoursElapsed * 3600 * 1000);
+    const startYear = new Date(Game.config.startDate).getUTCFullYear();
+    return Math.max(0, date.getUTCFullYear() - startYear);
   },
 };

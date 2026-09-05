@@ -27,4 +27,5 @@ Game.config = {
   hoursPerYear: 8760,  // 24 * 365 - divides an annual salary into an hourly rate (see the Software Job toggle)
 
   softwareJobAnnualSalary: 100000, // $/yr earned continuously while the Software Job toggle is on
+  softwareJobRaisePct: 0.03, // annual raise, compounding once per in-game Jan 1 (see actions.softwareJobSalary / format.yearsSinceStart)
 };

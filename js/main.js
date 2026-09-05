@@ -129,8 +129,7 @@ window.Game = window.Game || {};
         costButtons.forEach((b) => b.classList.toggle('active', b === btn));
         // costs are baked into the building/upgrade card markup, so a full
         // rebuild is needed to show the new prices immediately.
-        Game.ui.renderBuildings();
-        Game.ui.renderUpgrades();
+        Game.ui.renderCatalog();
       });
     });
 
@@ -138,7 +137,7 @@ window.Game = window.Game || {};
       const on = Game.dev.toggleCostScaling();
       e.currentTarget.classList.toggle('active', on);
       e.currentTarget.textContent = 'Cost Scaling: ' + (on ? 'ON' : 'OFF');
-      Game.ui.renderBuildings();
+      Game.ui.renderCatalog();
     });
 
     bindDevStateEditor();
