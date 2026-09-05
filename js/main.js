@@ -14,8 +14,17 @@ window.Game = window.Game || {};
     const gameDt = realDt * Game.config.baseGameSecondsPerRealSecond * Game.state.clockSpeedMultiplier * Game.dev.speedMultiplier;
 
     const erasBefore = Object.keys(Game.state.erasUnlocked).length;
+    const moneyBefore = Game.state.resources.money.amount;
     Game.engine.tick(gameDt);
     const erasAfter = Object.keys(Game.state.erasUnlocked).length;
+
+    // Net $/game-second from continuous flows only: clicks (Freelance,
+    // Schmooze) and one-off building payouts (Publish arXiv, Raise VC)
+    // happen outside engine.tick, so this delta only ever reflects rent,
+    // electricity billing, salaries, and token auto-convert.
+    if (gameDt > 0) {
+      Game.state.netMoneyPerSecond = (Game.state.resources.money.amount - moneyBefore) / gameDt;
+    }
 
     if (erasAfter !== erasBefore) {
       Game.ui.renderAll();
@@ -25,6 +34,10 @@ window.Game = window.Game || {};
   }
 
   function bindStaticButtons() {
+    document.getElementById('alert-ok-btn').addEventListener('click', () => {
+      Game.ui.hideAlert();
+    });
+
     document.getElementById('btn-freelance').addEventListener('click', () => {
       const earned = Game.actions.freelanceGig();
       if (earned === null) {

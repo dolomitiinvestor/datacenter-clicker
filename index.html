@@ -42,6 +42,7 @@
 <div id="status-bar">
   <span id="status-time">📅 Day 0 • Nov 30, 2022, 12:00 AM</span>
   <span id="status-tokens">🔤 0 tokens/s</span>
+  <span id="status-net">💰 Net: $0.00/s • ARR: $0.00</span>
   <div id="elec-price-wrap">
     <label for="elec-price-input">⚡ Price: $<input type="number" id="elec-price-input" min="0" step="0.01" value="0.10">/kWh</label>
   </div>
@@ -101,6 +102,16 @@
 </main>
 
 <div id="flash-message"></div>
+
+<!-- Generic alert popup - Game.ui.showAlert(title, message) from anywhere
+     (see main.js bindBuildingButtons for the "blocked purchase" use case). -->
+<div id="alert-overlay" hidden>
+  <div id="alert-box">
+    <div id="alert-title"></div>
+    <div id="alert-message"></div>
+    <button id="alert-ok-btn">OK</button>
+  </div>
+</div>
 
 <script src="js/core/config.js"></script>
 <script src="js/core/devmode.js"></script>

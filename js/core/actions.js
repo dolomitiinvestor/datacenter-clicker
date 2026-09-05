@@ -100,6 +100,17 @@ Game.actions = {
     return true;
   },
 
+  // What the Buy button's `disabled` state should be. Normally identical
+  // to !canBuyBuilding, except a blockOnRequirementFail building stays
+  // enabled while its requirements aren't met, so clicking it can still
+  // fire the one-time blocked-purchase popup (see render.js) instead of
+  // the button just doing nothing.
+  buildingButtonDisabled(buildingId) {
+    const def = Game.data.buildingsById[buildingId];
+    if (def.blockOnRequirementFail && !this.meetsRequirements(buildingId)) return false;
+    return !this.canBuyBuilding(buildingId);
+  },
+
   buyBuilding(buildingId) {
     if (!this.canBuyBuilding(buildingId)) return false;
     const def = Game.data.buildingsById[buildingId];

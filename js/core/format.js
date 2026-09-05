@@ -42,6 +42,17 @@ Game.format = {
     return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   },
 
+  // Same as money() but with 4 decimals instead of 2 - a per-second $ rate
+  // is often a few tenths of a cent, which money()'s 2 decimals would just
+  // round down to $0.00. Only for rate displays (e.g. net $/s); anything
+  // that's an actual balance should still use money().
+  moneyRate(n) {
+    if (n === undefined || n === null || isNaN(n)) n = 0;
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  },
+
   // Picks money vs compact-number formatting based on the resource's own
   // data definition (see data/resources.js `format` field), so callers
   // don't need to special-case resource ids themselves.

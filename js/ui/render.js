@@ -7,6 +7,7 @@ Game.ui = {
     this.els = {
       statusTime: document.getElementById('status-time'),
       statusTokens: document.getElementById('status-tokens'),
+      statusNet: document.getElementById('status-net'),
       resourceBar: document.getElementById('resource-bar'),
       electricityBar: document.getElementById('electricity-bar'),
       buildingsList: document.getElementById('buildings-list'),
@@ -54,6 +55,19 @@ Game.ui = {
     this.renderFreelanceStatus();
   },
 
+  // Generic popup alert - call from anywhere (Game.ui.showAlert('Title',
+  // 'message')) to interrupt the player with something they need to see,
+  // not just a blocked purchase. Dismissed via #alert-ok-btn in main.js.
+  showAlert(title, message) {
+    document.getElementById('alert-title').textContent = title;
+    document.getElementById('alert-message').textContent = message;
+    document.getElementById('alert-overlay').hidden = false;
+  },
+
+  hideAlert() {
+    document.getElementById('alert-overlay').hidden = true;
+  },
+
   renderStatusBar() {
     if (this.els.statusTime) {
       const gc = Game.format.gameClock(Game.state.time.hours);
@@ -62,6 +76,11 @@ Game.ui = {
     if (this.els.statusTokens) {
       const rate = Game.state.resources.tokens.perSecond || 0;
       this.els.statusTokens.textContent = '🔤 ' + Game.format.number(rate, 2) + ' tokens/s';
+    }
+    if (this.els.statusNet) {
+      const net = Game.state.netMoneyPerSecond || 0;
+      const arr = net * 3600 * Game.config.hoursPerYear; // $/game-second -> $/game-year
+      this.els.statusNet.textContent = '💰 Net: ' + Game.format.moneyRate(net) + '/s • ARR: ' + Game.format.money(arr);
     }
   },
 
@@ -166,7 +185,9 @@ Game.ui = {
 
   renderBuildings() {
     const unlocked = this.unlockedEraIds();
-    const visible = Game.data.buildings.filter((b) => unlocked.indexOf(b.era) !== -1 && Game.actions.meetsRequirements(b.id));
+    const visible = Game.data.buildings.filter((b) =>
+      unlocked.indexOf(b.era) !== -1 && (b.blockOnRequirementFail || Game.actions.meetsRequirements(b.id))
+    );
     this.els.buildingsList.innerHTML = visible.map((b) => this.buildingCardHtml(b)).join('');
     this.bindBuildingButtons();
   },
@@ -182,13 +203,15 @@ Game.ui = {
     const rentHtml = this.rentSummaryHtml(b.rentPerMonth);
     const payoutHtml = this.payoutSummaryHtml(b.payout);
     const maxCountHtml = this.maxCountSummaryHtml(b.maxCount);
+    const locked = b.blockOnRequirementFail && !Game.actions.meetsRequirements(b.id);
+    const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + lockedHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
@@ -253,6 +276,14 @@ Game.ui = {
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-building');
+        const def = Game.data.buildingsById[id];
+        if (def.blockOnRequirementFail && !Game.actions.meetsRequirements(id)) {
+          if (!Game.state.seenAlerts[id]) {
+            Game.state.seenAlerts[id] = true;
+            this.showAlert(def.name + ' — Blocked', def.blockedMessage || 'Not available yet.');
+          }
+          return;
+        }
         if (Game.actions.buyBuilding(id)) {
           this.renderBuildings();
           this.renderResources();
@@ -301,7 +332,7 @@ Game.ui = {
   refreshAffordability() {
     this.els.buildingsList.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       const id = btn.getAttribute('data-building');
-      btn.disabled = !Game.actions.canBuyBuilding(id);
+      btn.disabled = Game.actions.buildingButtonDisabled(id);
     });
     this.els.upgradesList.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       const id = btn.getAttribute('data-upgrade');

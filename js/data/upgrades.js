@@ -100,6 +100,56 @@ Game.data.upgrades = [
     cost: { reputation: 20, money: 5000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 2 }],
   },
+
+  // --- Political gating chain for gigawatt-class land sites
+  // (data/buildings.js site_50mw..site_10gw). Pure gate flags, same idea
+  // as incorporate_business - checked via `requires: [{ type: 'upgrade',
+  // id: '...' }]`, no permanent stat effect of their own.
+  {
+    id: 'permit_city_planning',
+    name: 'City Planning Approval',
+    icon: '🏙️',
+    era: 'era5',
+    flavor: 'A rezoning application, a public comment period, and a lot of donuts at the hearing.',
+    cost: { money: 50000, influence: 30 },
+    effects: [],
+  },
+  {
+    id: 'permit_state_puc',
+    name: 'State PUC Approval',
+    icon: '🗳️',
+    era: 'era5',
+    flavor: 'The state Public Utilities Commission signs off on your interconnection request.',
+    cost: { money: 500000, influence: 100 },
+    effects: [],
+  },
+  {
+    id: 'permit_federal_review',
+    name: 'Federal Environmental Review',
+    icon: '📋',
+    era: 'era5',
+    flavor: 'An environmental impact statement, several consultants, and eighteen months you don\'t get back.',
+    cost: { money: 5000000, influence: 300 },
+    effects: [],
+  },
+  {
+    id: 'permit_national_interest',
+    name: 'National Interest Energy Waiver',
+    icon: '🦅',
+    era: 'era5',
+    flavor: 'A gigawatt of demand gets you a seat at a much bigger table.',
+    cost: { money: 50000000, influence: 1000 },
+    effects: [],
+  },
+  {
+    id: 'permit_global_accord',
+    name: 'Global Compute Accord Waiver',
+    icon: '🌐',
+    era: 'era5',
+    flavor: 'Ten gigawatts is a treaty-level number. This is a treaty-level waiver.',
+    cost: { money: 500000000, influence: 3000 },
+    effects: [],
+  },
 ];
 
 Game.data.upgradesById = {};

@@ -37,6 +37,7 @@ Game.save = {
     if (typeof loaded.electricityPricePerKwh === 'number') Game.state.electricityPricePerKwh = loaded.electricityPricePerKwh;
     Object.assign(Game.state.freelance, loaded.freelance || {});
     Game.state.softwareJobEnabled = !!loaded.softwareJobEnabled;
+    Object.assign(Game.state.seenAlerts, loaded.seenAlerts || {});
     Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;
     if (typeof loaded.trainAllocationPct === 'number') Game.state.trainAllocationPct = loaded.trainAllocationPct;
     Game.state.log = loaded.log || [];

@@ -31,6 +31,12 @@ Game.data.eras = [
     flavor: 'Concrete, chain-link fences, and a very large power bill.',
     check: (s) => s.resources.influence.amount >= 25 || s.resources.reputation.amount >= 15,
   },
+  {
+    id: 'era5',
+    name: 'Hyperscale Campus',
+    flavor: 'You stopped renting servers and started buying zip codes.',
+    check: (s) => (s.buildings.h100_80gb || 0) >= 1 || s.stats.totalMoneyEarned >= 1000000,
+  },
 ];
 
 Game.data.erasById = {};

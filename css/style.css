@@ -430,6 +430,55 @@ button .hint {
   transform: translateY(0);
 }
 
+#alert-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+#alert-overlay[hidden] {
+  display: none;
+}
+
+#alert-box {
+  background: var(--panel);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+#alert-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 10px;
+}
+
+#alert-message {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+#alert-ok-btn {
+  width: 100%;
+  align-items: center;
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #2a0a08;
+  font-weight: 600;
+}
+
+.tag-locked { color: var(--danger); }
+
 @media (max-width: 700px) {
   main { grid-template-columns: 1fr; }
 }
