@@ -71,13 +71,30 @@ Game.actions = {
   // --- buying ---
 
   buildingCost(buildingId) {
+    return this.buildingCostForQty(buildingId, 1);
+  },
+
+  // Total cost to buy `qty` more of a building at once (see the Buy
+  // 10/100 buttons on compute cards in render.js). When dev mode's cost
+  // scaling is off (the normal-play default), a building's price is flat
+  // regardless of count owned, so this is just unitCost * qty. When cost
+  // scaling is on, each additional unit within the batch is priced at the
+  // next step of the compounding curve - a geometric series sum, not a
+  // flat multiply.
+  buildingCostForQty(buildingId, qty) {
     const def = Game.data.buildingsById[buildingId];
     const count = Game.state.buildings[buildingId] || 0;
-    const scale = Game.dev.costScalingEnabled ? Math.pow(def.costScale, count) : 1;
     const costMult = Game.effects.getMult('cost_all') * Game.effects.getMult('cost:' + buildingId) * Game.dev.costMultiplier;
     const cost = {};
     for (const resId in def.baseCost) {
-      cost[resId] = def.baseCost[resId] * scale * costMult;
+      let scaledUnits;
+      if (Game.dev.costScalingEnabled && def.costScale !== 1) {
+        const g = def.costScale;
+        scaledUnits = Math.pow(g, count) * (Math.pow(g, qty) - 1) / (g - 1);
+      } else {
+        scaledUnits = qty;
+      }
+      cost[resId] = def.baseCost[resId] * scaledUnits * costMult;
     }
     return cost;
   },
@@ -96,15 +113,21 @@ Game.actions = {
   },
 
   canBuyBuilding(buildingId) {
+    return this.canBuyBuildingQty(buildingId, 1);
+  },
+
+  canBuyBuildingQty(buildingId, qty) {
     const def = Game.data.buildingsById[buildingId];
     if (!this.meetsRequirements(buildingId)) return false;
+    const owned = Game.state.buildings[buildingId] || 0;
+    if (def.maxOwned !== undefined && owned + qty > def.maxOwned) return false;
     if (def.maxCount) {
       const limit = (Game.state.buildings[def.maxCount.buildingId] || 0) * (def.maxCount.per || 1);
-      if ((Game.state.buildings[buildingId] || 0) >= limit) return false;
+      if (owned + qty > limit) return false;
     }
-    const cost = this.buildingCost(buildingId);
+    const cost = this.buildingCostForQty(buildingId, qty);
     if (!Game.state_helpers.canAfford(cost)) return false;
-    if (def.land && Game.state_helpers.landAvailable() < def.land) return false;
+    if (def.land && Game.state_helpers.landAvailable() < def.land * qty) return false;
     return true;
   },
 
@@ -120,15 +143,19 @@ Game.actions = {
   },
 
   buyBuilding(buildingId) {
-    if (!this.canBuyBuilding(buildingId)) return false;
+    return this.buyBuildingQty(buildingId, 1);
+  },
+
+  buyBuildingQty(buildingId, qty) {
+    if (!this.canBuyBuildingQty(buildingId, qty)) return false;
     const def = Game.data.buildingsById[buildingId];
-    const cost = this.buildingCost(buildingId);
+    const cost = this.buildingCostForQty(buildingId, qty);
     Game.state_helpers.spend(cost);
-    Game.state.resources.land.used += def.land || 0;
-    Game.state.buildings[buildingId] = (Game.state.buildings[buildingId] || 0) + 1;
+    Game.state.resources.land.used += (def.land || 0) * qty;
+    Game.state.buildings[buildingId] = (Game.state.buildings[buildingId] || 0) + qty;
     Game.state_helpers.recalcLandCap();
     if (def.payout) {
-      for (const resId in def.payout) Game.state_helpers.add(resId, def.payout[resId]);
+      for (const resId in def.payout) Game.state_helpers.add(resId, def.payout[resId] * qty);
     }
     return true;
   },

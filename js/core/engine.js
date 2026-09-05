@@ -11,6 +11,7 @@ Game.engine = {
     this._runProduction(dtSeconds);
     this._runTokenConversion();
     this.checkEras();
+    this.checkMilestones();
   },
 
   // The in-game clock. Runs in hours so it can double as the basis for
@@ -157,6 +158,19 @@ Game.engine = {
       if (era.check(Game.state)) {
         Game.state.erasUnlocked[era.id] = true;
         Game.state_helpers.logEvent('New era: ' + era.name + ' — ' + era.flavor);
+      }
+    });
+  },
+
+  // One-time flavor popups (see data/milestones.js) - each fires at most
+  // once, guarded by the same state.seenAlerts store used for blocked
+  // purchases.
+  checkMilestones() {
+    Game.data.milestones.forEach((m) => {
+      if (Game.state.seenAlerts[m.id]) return;
+      if (m.check(Game.state)) {
+        Game.state.seenAlerts[m.id] = true;
+        Game.ui.showAlert(m.title, m.message);
       }
     });
   },

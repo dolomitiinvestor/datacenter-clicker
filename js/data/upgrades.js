@@ -6,7 +6,7 @@ Game.data = Game.data || {};
 //   { type: 'mult', target: '<key>', value: 1.5 }  -> multiplies stat by 1.5
 //   { type: 'add',  target: '<key>', value: 2 }    -> adds 2 to stat
 //
-// category: 'compute' | 'buildings' | 'research' | 'regulatory' | 'upgrades'
+// category: 'compute' | 'buildings' | 'research' | 'regulatory' | 'company' | 'upgrades'
 //           which catalog column it's rendered in (see render.js
 //           renderCatalog) - shared with buildings, grouped by this field
 //           rather than by data source, so e.g. Train New Model shows up
@@ -158,10 +158,10 @@ Game.data.upgrades = [
     id: 'tax_break',
     name: 'Corporate Tax Break',
     icon: '🧾',
-    era: 'era4',
+    era: 'era5', // moved much later - this is "an army of lobbyists rewrites the tax code," not a first-year LLC perk
     category: 'regulatory',
-    flavor: 'Somehow, legally, you now pay less than a small business.',
-    cost: { influence: 30 },
+    flavor: "You didn't find a loophole. You paid to have one written.",
+    cost: { influence: 1000, money: 10000000 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
   },
   {
@@ -213,6 +213,90 @@ Game.data.upgrades = [
     flavor: 'Ten gigawatts is a treaty-level number. This is a treaty-level waiver.',
     cost: { money: 500000000, influence: 3000 },
     effects: [],
+  },
+
+  // --- Company building: the org chart, not the org's servers. Each is a
+  // one-time hire/policy/perk with a permanent, generically modest effect -
+  // no single one is a game-changer, they're meant to stack.
+  {
+    id: 'hire_employee_intern',
+    name: 'Hire Employee #1: The Intern',
+    icon: '🧑‍💻',
+    era: 'era2',
+    category: 'company',
+    flavor: "Someone to babysit the laptops so you don't have to tab back every 20 minutes.",
+    cost: { money: 3000 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.05 }],
+  },
+  {
+    id: 'free_snacks',
+    name: 'Free Snacks & Kombucha',
+    icon: '🍪',
+    era: 'era2',
+    category: 'company',
+    flavor: 'Morale is up. So, mysteriously, is gig throughput.',
+    cost: { money: 2000 },
+    effects: [{ type: 'mult', target: 'click_money', value: 1.2 }],
+  },
+  {
+    id: 'company_handbook',
+    name: 'Write a Company Handbook',
+    icon: '📘',
+    era: 'era3',
+    category: 'company',
+    flavor: 'Forty pages on PTO policy nobody reads, but now HR exists and raises need a paper trail.',
+    cost: { money: 5000 },
+    effects: [{ type: 'add', target: 'software_job_salary', value: 5000 }],
+  },
+  {
+    id: 'hire_ops_manager',
+    name: 'Hire an Ops Manager',
+    icon: '📋',
+    era: 'era3',
+    category: 'company',
+    flavor: 'Negotiates every vendor contract you sign from now on. Ruthlessly.',
+    cost: { money: 15000 },
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
+  },
+  {
+    id: 'marketing_plan',
+    name: 'Marketing Plan: Content Blitz',
+    icon: '📣',
+    era: 'era3',
+    category: 'company',
+    flavor: 'A blog post, a Twitter thread, and a suspiciously well-timed Hacker News post drive real demand for your tokens.',
+    cost: { money: 20000 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.25 }],
+  },
+  {
+    id: 'employee_stock_options',
+    name: 'Employee Stock Options',
+    icon: '📈',
+    era: 'era4',
+    category: 'company',
+    flavor: 'Pay people in paper instead of cash. They believe in the mission. Mostly.',
+    cost: { money: 50000 },
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+  },
+  {
+    id: 'hire_sales_team',
+    name: 'Hire a Sales Team',
+    icon: '🤝',
+    era: 'era4',
+    category: 'company',
+    flavor: 'Quota-carrying reps who can sell tokens to a company that already makes its own.',
+    cost: { money: 100000, influence: 10 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.5 }],
+  },
+  {
+    id: 'hire_cfo',
+    name: 'Hire a CFO',
+    icon: '💼',
+    era: 'era5',
+    category: 'company',
+    flavor: 'Restructures every contract in the building. The lawyers bill more, everything else costs less.',
+    cost: { money: 2000000, influence: 50 },
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.85 }],
   },
 ];
 

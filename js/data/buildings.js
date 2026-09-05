@@ -5,7 +5,7 @@ Game.data = Game.data || {};
 // a building id (aside from era/unlock display) - it just reads these
 // fields. To add a new building: append an entry, pick an era, done.
 //
-// category:      'compute' | 'buildings' | 'research' | 'regulatory' | 'upgrades'
+// category:      'compute' | 'buildings' | 'research' | 'regulatory' | 'company' | 'upgrades'
 //                which catalog column it's rendered in (see render.js
 //                renderCatalog) - buildings and upgrades share the same
 //                five columns, grouped by this field, not by data source.
@@ -31,6 +31,12 @@ Game.data = Game.data || {};
 // maxCount:      { buildingId: '<id>', per } - caps how many of this
 //                building you can own at (per * count of buildingId owned),
 //                e.g. one Extra Power Outlet per SF Apartment.
+// maxOwned:      flat cap on how many of this building you can ever own,
+//                independent of any other building - e.g. each Raise VC
+//                Money funding round can only be closed once.
+// subtitle:      optional small label rendered under the title (see
+//                render.js buildingCardHtml) - e.g. the funding stage name
+//                ("Angel", "Series A", ...) on the Raise VC Money chain.
 // blockOnRequirementFail: true - the building stays VISIBLE (not hidden)
 //                even while `requires` isn't met, and its Buy button stays
 //                clickable; clicking it shows `blockedMessage` as a one-time
@@ -134,7 +140,7 @@ Game.data.buildings = [
     produces: { electricity: 10000 }, // 10MW - the old grid connection, still on the books
     consumes: {},
     providesLandCap: 3,
-    rentPerMonth: { money: 1200 }, // property tax and a security guard
+    rentPerMonth: { money: 50000 }, // property tax, security, and finally bringing the old service drop up to code
   },
 
   // --- Named GPU classes. Real TDP and street-price tiers; per-card token
@@ -153,7 +159,7 @@ Game.data.buildings = [
     baseCost: { money: 1800 },
     costScale: 1.15,
     land: 0,
-    produces: { tokens: 90 },
+    produces: { tokens: 15 },
     consumes: { electricity: 0.45 },
   },
   {
@@ -168,6 +174,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 140 },
     consumes: { electricity: 0.4 },
+    requires: [{ type: 'building', id: 'rtx_4090', count: 5 }], // graduate off consumer cards first
   },
   {
     id: 'h100_80gb',
@@ -181,6 +188,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 300 },
     consumes: { electricity: 0.7 },
+    requires: [{ type: 'building', id: 'a100_80gb', count: 5 }],
   },
   {
     id: 'h100_80gb_rack',
@@ -194,6 +202,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 8 * 300 },
     consumes: { electricity: 8 * 0.7 },
+    requires: [{ type: 'building', id: 'h100_80gb', count: 3 }],
   },
   {
     id: 'h100_80gb_cluster',
@@ -207,6 +216,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 64 * 300 },
     consumes: { electricity: 64 * 0.7 },
+    requires: [{ type: 'building', id: 'h100_80gb_rack', count: 2 }],
   },
   {
     id: 'h200',
@@ -220,6 +230,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 380 },
     consumes: { electricity: 0.7 },
+    requires: [{ type: 'building', id: 'h100_80gb', count: 5 }],
   },
   {
     id: 'h200_rack',
@@ -233,6 +244,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 8 * 380 },
     consumes: { electricity: 8 * 0.7 },
+    requires: [{ type: 'building', id: 'h200', count: 3 }],
   },
   {
     id: 'h200_cluster',
@@ -246,6 +258,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 64 * 380 },
     consumes: { electricity: 64 * 0.7 },
+    requires: [{ type: 'building', id: 'h200_rack', count: 2 }],
   },
   {
     id: 'b200',
@@ -259,6 +272,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 750 },
     consumes: { electricity: 1.0 },
+    requires: [{ type: 'building', id: 'h200', count: 5 }],
   },
   {
     id: 'b200_rack',
@@ -272,6 +286,7 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 8 * 750 },
     consumes: { electricity: 8 * 1.0 },
+    requires: [{ type: 'building', id: 'b200', count: 3 }],
   },
   {
     id: 'b200_cluster',
@@ -285,6 +300,91 @@ Game.data.buildings = [
     land: 0,
     produces: { tokens: 64 * 750 },
     consumes: { electricity: 64 * 1.0 },
+    requires: [{ type: 'building', id: 'b200_rack', count: 2 }],
+  },
+  {
+    id: 'gb200_superchip',
+    name: 'NVIDIA GB200 Superchip',
+    icon: '⬛',
+    era: 'era5',
+    category: 'compute',
+    flavor: 'Blackwell paired with a Grace CPU over NVLink-C2C. Ridiculous memory bandwidth, ridiculous power bill.',
+    baseCost: { money: 85000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 1400 },
+    consumes: { electricity: 1.35 },
+    requires: [{ type: 'building', id: 'b200', count: 5 }],
+  },
+  {
+    id: 'gb200_nvl72_rack',
+    name: 'GB200 NVL72 Rack (x72)',
+    icon: '🗄️',
+    era: 'era5',
+    category: 'compute',
+    flavor: 'Seventy-two Superchips as one liquid-cooled NVLink domain. This is the actual product photo from the keynote.',
+    baseCost: { money: 72 * 85000 * 0.9 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 72 * 1400 },
+    consumes: { electricity: 72 * 1.35 },
+    requires: [{ type: 'building', id: 'gb200_superchip', count: 3 }],
+  },
+  {
+    id: 'rubin',
+    name: 'NVIDIA Rubin',
+    icon: '🔷',
+    era: 'era5',
+    category: 'compute',
+    flavor: "Blackwell's successor, named for the astronomer who found dark matter. NVIDIA hasn't shipped this yet - you're buying off the roadmap slide.",
+    baseCost: { money: 110000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 2200 },
+    consumes: { electricity: 1.4 },
+    requires: [{ type: 'building', id: 'gb200_superchip', count: 5 }],
+  },
+  {
+    id: 'rubin_ultra',
+    name: 'NVIDIA Rubin Ultra',
+    icon: '🔷',
+    era: 'era5',
+    category: 'compute',
+    flavor: 'The bigger die, higher-power variant, same roadmap slide, further out.',
+    baseCost: { money: 160000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 3600 },
+    consumes: { electricity: 1.8 },
+    requires: [{ type: 'building', id: 'rubin', count: 5 }],
+  },
+  {
+    id: 'feynman',
+    name: 'NVIDIA Feynman',
+    icon: '💠',
+    era: 'era5',
+    category: 'compute',
+    flavor: "Two generations past Blackwell on the same keynote slide. Nobody outside NVIDIA has seen a spec sheet - this is entirely speculative.",
+    baseCost: { money: 250000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 6500 },
+    consumes: { electricity: 2.4 },
+    requires: [{ type: 'building', id: 'rubin_ultra', count: 5 }],
+  },
+  {
+    id: 'photonic_compute_node',
+    name: 'Photonic Compute Node',
+    icon: '✨',
+    era: 'era5',
+    category: 'compute',
+    flavor: "Light-speed interconnect, no known roadmap, no known vendor. Whoever ships this first wins the decade - right now that's you.",
+    baseCost: { money: 500000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 15000 },
+    consumes: { electricity: 3.5 },
+    requires: [{ type: 'building', id: 'feynman', count: 5 }],
   },
   {
     id: 'diesel_generator',
@@ -347,19 +447,145 @@ Game.data.buildings = [
     consumes: {},
     payout: { fame: 50 },
   },
+  // --- Raise VC Money: a chain of one-time funding rounds (maxOwned: 1
+  // each), not a repeatable farm - every round requires the previous one
+  // closed (requires: building/count 1) and pays out dramatically more
+  // cash for a dramatically bigger Research Point spend, same idea as the
+  // Train New Model chain in data/upgrades.js.
   {
-    id: 'raise_vc',
+    id: 'raise_vc_angel',
     name: 'Raise VC Money',
+    subtitle: 'Angel',
     icon: '🤑',
     era: 'era3',
     category: 'research',
-    flavor: 'A partner nods slowly. A wire transfer follows. Spends Research Points, raises Cash - this is a funding round, not a tip jar.',
-    baseCost: { reputation: 150000 }, // 1000x - research points were badly miscaled at the old price
-    costScale: 1.5, // each round needs more traction than the last
+    flavor: "A friend's rich uncle writes a check on a napkin. Spends Research Points, raises Cash.",
+    baseCost: { reputation: 50000 },
+    costScale: 1,
+    maxOwned: 1,
     land: 0,
     produces: {},
     consumes: {},
-    payout: { money: 10000000 },
+    payout: { money: 50000 },
+  },
+  {
+    id: 'raise_vc_series_a',
+    name: 'Raise VC Money',
+    subtitle: 'Series A',
+    icon: '🤑',
+    era: 'era3',
+    category: 'research',
+    flavor: 'A real term sheet, from a real fund, with a board seat attached.',
+    baseCost: { reputation: 150000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 500000 },
+    requires: [{ type: 'building', id: 'raise_vc_angel', count: 1 }],
+  },
+  {
+    id: 'raise_vc_series_b',
+    name: 'Raise VC Money',
+    subtitle: 'Series B',
+    icon: '🤑',
+    era: 'era3',
+    category: 'research',
+    flavor: 'Growth metrics slide goes up and to the right. Nobody checks the axis labels too closely.',
+    baseCost: { reputation: 400000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 3000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_a', count: 1 }],
+  },
+  {
+    id: 'raise_vc_series_c',
+    name: 'Raise VC Money',
+    subtitle: 'Series C',
+    icon: '🤑',
+    era: 'era4',
+    category: 'research',
+    flavor: 'A sovereign wealth fund joins the round. Someone mentions "the AI supercycle" unironically.',
+    baseCost: { reputation: 1000000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 15000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_b', count: 1 }],
+  },
+  {
+    id: 'raise_vc_series_d',
+    name: 'Raise VC Money',
+    subtitle: 'Series D',
+    icon: '🤑',
+    era: 'era4',
+    category: 'research',
+    flavor: 'The valuation is now a headline. The revenue is still a footnote.',
+    baseCost: { reputation: 3000000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 75000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_c', count: 1 }],
+  },
+  {
+    id: 'raise_vc_series_e',
+    name: 'Raise VC Money',
+    subtitle: 'Series E',
+    icon: '🤑',
+    era: 'era4',
+    category: 'research',
+    flavor: 'Every fund on Sand Hill Road wants an allocation. You let a few of them in.',
+    baseCost: { reputation: 8000000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 300000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_d', count: 1 }],
+  },
+  {
+    id: 'raise_vc_series_f',
+    name: 'Raise VC Money',
+    subtitle: 'Series F',
+    icon: '🤑',
+    era: 'era5',
+    category: 'research',
+    flavor: "This round is really a pre-IPO round wearing a Series F name tag.",
+    baseCost: { reputation: 20000000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 1000000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_e', count: 1 }],
+  },
+  {
+    id: 'raise_vc_ipo',
+    name: 'Raise VC Money',
+    subtitle: 'IPO',
+    icon: '🔔',
+    era: 'era5',
+    category: 'research',
+    flavor: 'You ring the bell. The stock pops. Somewhere, an intern from era1 becomes a paper millionaire.',
+    baseCost: { reputation: 50000000 },
+    costScale: 1,
+    maxOwned: 1,
+    land: 0,
+    produces: {},
+    consumes: {},
+    payout: { money: 5000000000 },
+    requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }],
   },
 
   // --- Gigawatt-class land sites. None of these come with a grid

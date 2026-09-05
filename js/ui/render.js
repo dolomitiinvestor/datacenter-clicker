@@ -14,6 +14,7 @@ Game.ui = {
       buildingsList: document.getElementById('buildings-list'),
       researchList: document.getElementById('research-list'),
       regulatoryList: document.getElementById('regulatory-list'),
+      companyList: document.getElementById('company-list'),
       upgradesList: document.getElementById('upgrades-list'),
       logList: document.getElementById('log-list'),
       eraBanner: document.getElementById('era-banner'),
@@ -193,7 +194,7 @@ Game.ui = {
   // upgrades), grouped by each item's own `category` field - e.g. Train
   // New Model (an upgrade) renders in the same Research column as Publish
   // arXiv Paper (a building).
-  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'upgrades'],
+  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'company', 'upgrades'],
 
   renderCatalog() {
     const unlocked = this.unlockedEraIds();
@@ -205,6 +206,7 @@ Game.ui = {
       if (unlocked.indexOf(b.era) === -1) return false;
       if (b.blockOnRequirementFail) return true;
       if (!Game.actions.meetsRequirements(b.id)) return false;
+      if (b.maxOwned !== undefined && (Game.state.buildings[b.id] || 0) >= b.maxOwned) return false;
       if (b.maxCount) {
         const limit = (Game.state.buildings[b.maxCount.buildingId] || 0) * (b.maxCount.per || 1);
         if ((Game.state.buildings[b.id] || 0) >= limit) return false;
@@ -244,16 +246,32 @@ Game.ui = {
     const efficiencyHtml = this.tokenEfficiencyHtml(b, cost);
     const locked = b.blockOnRequirementFail && !Game.actions.meetsRequirements(b.id);
     const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
+    const subtitleHtml = b.subtitle ? '<div class="card-subtitle">' + b.subtitle + '</div>' : '';
+    const bulkButtonsHtml = this.bulkBuyButtonsHtml(b);
     return (
       '<div class="card" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span></div>' +
+      subtitleHtml +
       '<div class="card-flavor">' + b.flavor + '</div>' +
       '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">' + (b.buyLabel || 'Buy') + ' — ' + costHtml + '</button>' +
+      bulkButtonsHtml +
       '</div>'
     );
+  },
+
+  // Buy 10 / Buy 100 shortcuts, compute cards only - GPUs are the items
+  // players actually stack by the dozen, unlike one-off buildings/upgrades.
+  BULK_BUY_QUANTITIES: [10, 100],
+
+  bulkBuyButtonsHtml(b) {
+    if (b.category !== 'compute') return '';
+    return this.BULK_BUY_QUANTITIES.map((qty) => {
+      const qtyCost = Game.actions.buildingCostForQty(b.id, qty);
+      return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '">Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
+    }).join('');
   },
 
   // Tokens/s per $ spent (at the current, cost-scaled price) and
@@ -337,15 +355,17 @@ Game.ui = {
     document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-building');
+        const qty = Number(btn.getAttribute('data-qty')) || 1;
         const def = Game.data.buildingsById[id];
-        if (def.blockOnRequirementFail && !Game.actions.meetsRequirements(id)) {
+        if (qty === 1 && def.blockOnRequirementFail && !Game.actions.meetsRequirements(id)) {
           if (!Game.state.seenAlerts[id]) {
             Game.state.seenAlerts[id] = true;
             this.showAlert(def.name + ' — Blocked', def.blockedMessage || 'Not available yet.');
           }
           return;
         }
-        if (Game.actions.buyBuilding(id)) {
+        const bought = qty === 1 ? Game.actions.buyBuilding(id) : Game.actions.buyBuildingQty(id, qty);
+        if (bought) {
           this.renderCatalog();
           this.renderResources();
         }
@@ -381,7 +401,8 @@ Game.ui = {
   refreshAffordability() {
     document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       const id = btn.getAttribute('data-building');
-      btn.disabled = Game.actions.buildingButtonDisabled(id);
+      const qty = Number(btn.getAttribute('data-qty')) || 1;
+      btn.disabled = qty === 1 ? Game.actions.buildingButtonDisabled(id) : !Game.actions.canBuyBuildingQty(id, qty);
     });
     document.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       const id = btn.getAttribute('data-upgrade');
