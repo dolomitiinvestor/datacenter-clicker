@@ -588,6 +588,29 @@ Game.data.buildings = [
     requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }],
   },
 
+  // --- Autonomous vehicle fleet, unlocked by the Create Autonomous
+  // Vehicles upgrade. Real fleet economics: $0.60 net profit/mile x
+  // 300,000 miles/yr = $180,000/yr profit per vehicle, expressed as the
+  // per-second rate the engine expects. Flat cost (no costScale) since
+  // real vehicles don't get more expensive the more you buy - the market
+  // itself caps out at 3.5M vehicles (maxOwned), representing total
+  // annual production capacity for the whole industry, not just you.
+  {
+    id: 'autonomous_vehicle_fleet',
+    name: 'Autonomous Truck & Taxi Fleet',
+    icon: '🚛',
+    era: 'era5',
+    category: 'buildings',
+    flavor: '$0.60/mile net profit, 300,000 miles a year, no driver, no union, no sleep.',
+    baseCost: { money: 300000 },
+    costScale: 1,
+    maxOwned: 3500000,
+    land: 0,
+    produces: { money: (0.6 * 300000) / (Game.config.hoursPerYear * 3600) }, // $180,000/yr profit, per second
+    consumes: {},
+    requires: [{ type: 'upgrade', id: 'create_autonomous_vehicles' }],
+  },
+
   // --- Gigawatt-class land sites. None of these come with a grid
   // connection (that ends at Warehouse Lease's 10MW) - producing 0
   // electricity here is deliberate, you self-generate (see the power

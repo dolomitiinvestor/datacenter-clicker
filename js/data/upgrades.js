@@ -357,6 +357,16 @@ Game.data.upgrades = [
     cost: { money: 2000000, influence: 50 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.85 }],
   },
+  {
+    id: 'create_autonomous_vehicles',
+    name: 'Create Autonomous Vehicles',
+    icon: '🚦',
+    era: 'era5',
+    category: 'company',
+    flavor: "A new division, a new org chart, and a whole new way to turn cash into more cash while you sleep. Unlocks the autonomous truck & taxi fleet - see Buildings.",
+    cost: { money: 10000000000 }, // $10B
+    effects: [], // pure gate flag - checked via requires: [{ type: 'upgrade', id: 'create_autonomous_vehicles' }] on the fleet building in data/buildings.js
+  },
 
   // --- Buy the entire company. Real market caps, snapshotted August 2026 -
   // obviously these move every trading day in reality, this is a one-time
