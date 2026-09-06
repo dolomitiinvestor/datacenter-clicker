@@ -101,15 +101,31 @@ Game.actions = {
 
   // Checks a building's `requires` array (upgrade purchased / other building
   // owned in sufficient count), beyond the era gate. True if there's nothing
-  // to check.
-  meetsRequirements(buildingId) {
+  // to check. `list` defaults to def.requires but can be overridden (see
+  // meetsHardRequirements) to check a different gate array against the
+  // same upgrade/building-ownership logic.
+  meetsRequirements(buildingId, list) {
     const def = Game.data.buildingsById[buildingId];
-    if (!def.requires) return true;
-    return def.requires.every((req) => {
+    const reqs = list || def.requires;
+    if (!reqs) return true;
+    return reqs.every((req) => {
       if (req.type === 'upgrade') return !!Game.state.upgrades[req.id];
       if (req.type === 'building') return (Game.state.buildings[req.id] || 0) >= (req.count || 1);
       return true;
     });
+  },
+
+  // hardRequires is a second, independent gate from `requires`: unlike
+  // `requires` (which a blockOnRequirementFail building can fail while
+  // staying visible-but-locked, see render.js), failing hardRequires
+  // always hides the card outright - no popup, it just isn't offered yet.
+  // Used for the land-site chain (data/buildings.js) so a bigger site
+  // isn't even shown until you've actually built the smaller one, on top
+  // of - not instead of - the political permit gate.
+  meetsHardRequirements(buildingId) {
+    const def = Game.data.buildingsById[buildingId];
+    if (!def.hardRequires) return true;
+    return this.meetsRequirements(buildingId, def.hardRequires);
   },
 
   canBuyBuilding(buildingId) {
@@ -118,6 +134,7 @@ Game.actions = {
 
   canBuyBuildingQty(buildingId, qty) {
     const def = Game.data.buildingsById[buildingId];
+    if (!this.meetsHardRequirements(buildingId)) return false;
     if (!this.meetsRequirements(buildingId)) return false;
     const owned = Game.state.buildings[buildingId] || 0;
     if (def.maxOwned !== undefined && owned + qty > def.maxOwned) return false;

@@ -34,6 +34,13 @@ Game.data = Game.data || {};
 // maxOwned:      flat cap on how many of this building you can ever own,
 //                independent of any other building - e.g. each Raise VC
 //                Money funding round can only be closed once.
+// hardRequires:  a second, independent gate from `requires` - same shape
+//                ({type:'upgrade'|'building', id, count?}), but failing it
+//                always hides the card outright, even on a
+//                blockOnRequirementFail building. Used for the land-site
+//                chain below so the 100MW site isn't even offered until
+//                you've actually built the 50MW one, on top of - not
+//                instead of - the political permit gate.
 // subtitle:      optional small label rendered under the title (see
 //                render.js buildingCardHtml) - e.g. the funding stage name
 //                ("Angel", "Series A", ...) on the Raise VC Money chain.
@@ -141,6 +148,21 @@ Game.data.buildings = [
     consumes: {},
     providesLandCap: 3,
     rentPerMonth: { money: 50000 }, // property tax, security, and finally bringing the old service drop up to code
+  },
+  {
+    id: 'corporate_campus_lease',
+    name: 'Corporate Campus Lease',
+    icon: '🏢',
+    era: 'era4', // bridges the era3->era5 jump: nothing else sits between the $30k Abandoned Factory and the $5M 50MW Land Site
+    category: 'buildings',
+    flavor: 'A proper corporate campus lease - real conference rooms, a real lobby, and a real property manager who returns calls.',
+    baseCost: { money: 400000 },
+    costScale: 1.2,
+    land: 0,
+    produces: {},
+    consumes: {},
+    providesLandCap: 10,
+    rentPerMonth: { money: 20000 },
   },
 
   // --- Named GPU classes. Real TDP and street-price tiers; per-card token
@@ -612,11 +634,15 @@ Game.data.buildings = [
   },
 
   // --- Gigawatt-class land sites. None of these come with a grid
-  // connection (that ends at Warehouse Lease's 10MW) - producing 0
+  // connection (that ends at the 10MW Abandoned Factory) - producing 0
   // electricity here is deliberate, you self-generate (see the power
-  // plants below). Each is gated behind an escalating chain of political
-  // upgrades (data/upgrades.js) and, until met, stays visible with a
-  // one-time blocked-purchase popup instead of hiding outright.
+  // plants below). Two independent gates stack on each site after the
+  // first: the political permit chain (requires + blockOnRequirementFail -
+  // visible but locked, with a one-time popup explaining the holdup) AND
+  // hardRequires - you don't even get OFFERED the next size up until
+  // you've actually built the one below it. That's the literal "bridge"
+  // from one site to the next: 50MW -> 100MW -> 500MW -> 1GW -> 10GW, cost
+  // roughly 4x per step instead of the old uneven 3x/5x/2.5x/12x jumps.
   {
     id: 'site_50mw',
     name: '50MW Land Site',
@@ -640,8 +666,8 @@ Game.data.buildings = [
     icon: '🏞️',
     era: 'era5',
     category: 'buildings',
-    flavor: 'Two hundred acres. The city council can no longer approve this alone.',
-    baseCost: { money: 15000000 },
+    flavor: 'Two hundred acres, right next door to the 50MW site. The broker calls it "the natural next parcel."',
+    baseCost: { money: 20000000 },
     costScale: 1.5,
     land: 0,
     produces: {},
@@ -651,6 +677,7 @@ Game.data.buildings = [
       { type: 'upgrade', id: 'permit_city_planning' },
       { type: 'upgrade', id: 'permit_state_puc' },
     ],
+    hardRequires: [{ type: 'building', id: 'site_50mw', count: 1 }],
     blockOnRequirementFail: true,
     blockedMessage: 'The state Public Utilities Commission flags your interconnection request for review. You\'ll need State PUC Approval first.',
   },
@@ -672,6 +699,7 @@ Game.data.buildings = [
       { type: 'upgrade', id: 'permit_state_puc' },
       { type: 'upgrade', id: 'permit_federal_review' },
     ],
+    hardRequires: [{ type: 'building', id: 'site_100mw', count: 1 }],
     blockOnRequirementFail: true,
     blockedMessage: 'A site this size triggers a mandatory federal environmental impact review. Come back with a Federal Environmental Review in hand.',
   },
@@ -682,7 +710,7 @@ Game.data.buildings = [
     era: 'era5',
     category: 'buildings',
     flavor: 'Fifteen hundred acres. You are now a line item in the regional grid operator\'s planning docs.',
-    baseCost: { money: 200000000 },
+    baseCost: { money: 320000000 },
     costScale: 1.5,
     land: 0,
     produces: {},
@@ -694,6 +722,7 @@ Game.data.buildings = [
       { type: 'upgrade', id: 'permit_federal_review' },
       { type: 'upgrade', id: 'permit_national_interest' },
     ],
+    hardRequires: [{ type: 'building', id: 'site_500mw', count: 1 }],
     blockOnRequirementFail: true,
     blockedMessage: 'A full gigawatt of demand gets you a polite call from Washington. You\'ll need a National Interest Energy Waiver.',
   },
@@ -704,7 +733,7 @@ Game.data.buildings = [
     era: 'era5',
     category: 'buildings',
     flavor: 'Ten thousand acres. At this scale you are, functionally, a small country\'s power grid.',
-    baseCost: { money: 2500000000 },
+    baseCost: { money: 1280000000 },
     costScale: 1.5,
     land: 0,
     produces: {},
@@ -717,6 +746,7 @@ Game.data.buildings = [
       { type: 'upgrade', id: 'permit_national_interest' },
       { type: 'upgrade', id: 'permit_global_accord' },
     ],
+    hardRequires: [{ type: 'building', id: 'site_1gw', count: 1 }],
     blockOnRequirementFail: true,
     blockedMessage: 'Ten gigawatts is a treaty-level ask. Nothing happens here without a Global Compute Accord Waiver.',
   },

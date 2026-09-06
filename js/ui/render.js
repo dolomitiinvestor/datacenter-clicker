@@ -204,6 +204,7 @@ Game.ui = {
     // you've already got one per SF Apartment).
     const visibleBuildings = Game.data.buildings.filter((b) => {
       if (unlocked.indexOf(b.era) === -1) return false;
+      if (!Game.actions.meetsHardRequirements(b.id)) return false;
       if (b.blockOnRequirementFail) return true;
       if (!Game.actions.meetsRequirements(b.id)) return false;
       if (b.maxOwned !== undefined && (Game.state.buildings[b.id] || 0) >= b.maxOwned) return false;

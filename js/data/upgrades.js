@@ -46,9 +46,20 @@ Game.data.upgrades = [
     icon: '🤝',
     era: 'era3',
     category: 'upgrades',
-    flavor: 'Turns out your tokens sell for more than you thought.',
+    flavor: "Turns out your tokens sell for more than you thought - once there's an actual legal entity to sign the contract.",
     cost: { tokens: 20000 },
     effects: [{ type: 'mult', target: 'sell_price', value: 1.5 }],
+    requiresUpgrade: 'incorporate_business',
+  },
+  {
+    id: 'buy_ai_domain',
+    name: "Buy the .ai Domain",
+    icon: '🌐',
+    era: 'era1',
+    category: 'upgrades',
+    flavor: "Anguilla's national budget thanks you personally.",
+    cost: { money: 150 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.05 }],
   },
 
   // --- Research chain: each tier is a real (or near-future) frontier model
@@ -201,9 +212,10 @@ Game.data.upgrades = [
     requiresUpgrade: 'buy_stanford', // last link in the university chain - owning it implies all five are already bought
   },
 
-  // --- Regulatory / political. incorporate_business and campaign_donation
-  // are early gates; the permit_* chain (era5) gates the gigawatt-class
-  // land sites in data/buildings.js.
+  // --- Regulatory / political. incorporate_business is the first legal
+  // gate - it unlocks Data Broker Contract and Campaign Donations below,
+  // since neither makes sense for a sole proprietor; the permit_* chain
+  // (era5) gates the gigawatt-class land sites in data/buildings.js.
   {
     id: 'incorporate_business',
     name: 'Incorporate a Business',
@@ -212,7 +224,7 @@ Game.data.upgrades = [
     category: 'regulatory',
     flavor: "An LLC in Delaware. Now you're a real company - landlords, banks, and lawyers will actually talk to you.",
     cost: { money: 500 },
-    effects: [], // pure gate flag - checked via requires: [{ type: 'upgrade', id: 'incorporate_business' }] on buildings like Warehouse Lease
+    effects: [], // pure gate flag - checked via requiresUpgrade on data_broker_deal/campaign_donation above/below
   },
   {
     id: 'campaign_donation',
@@ -220,9 +232,10 @@ Game.data.upgrades = [
     icon: '💰',
     era: 'era3',
     category: 'regulatory',
-    flavor: 'Democracy: now with a suggested donation amount.',
+    flavor: "Democracy: now with a suggested donation amount, and a corporate entity willing to write the check.",
     cost: { money: 1500, influence: 5 },
     effects: [{ type: 'mult', target: 'influence_gain', value: 1.5 }],
+    requiresUpgrade: 'incorporate_business',
   },
   {
     id: 'tax_break',
@@ -233,6 +246,16 @@ Game.data.upgrades = [
     flavor: "You didn't find a loophole. You paid to have one written.",
     cost: { influence: 1000, money: 10000000 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+  },
+  {
+    id: 'patent_troll_insurance',
+    name: 'Patent Troll Insurance',
+    icon: '🛡️',
+    era: 'era4',
+    category: 'regulatory',
+    flavor: "You're not being sued this quarter. That's the whole product.",
+    cost: { money: 250000, influence: 20 },
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
   },
   {
     id: 'permit_city_planning',
@@ -289,6 +312,16 @@ Game.data.upgrades = [
   // one-time hire/policy/perk with a permanent, generically modest effect -
   // no single one is a game-changer, they're meant to stack.
   {
+    id: 'emotional_support_succulent',
+    name: 'Emotional Support Succulent',
+    icon: '🪴',
+    era: 'era1',
+    category: 'company',
+    flavor: 'Provides no calculable benefit. You keep it anyway.',
+    cost: { money: 25 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.01 }],
+  },
+  {
     id: 'hire_employee_intern',
     name: 'Hire Employee #1: The Intern',
     icon: '🧑‍💻',
@@ -309,6 +342,26 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'click_money', value: 1.2 }],
   },
   {
+    id: 'aeron_chair',
+    name: 'Aeron Chair',
+    icon: '🪑',
+    era: 'era2',
+    category: 'company',
+    flavor: 'Ergonomically perfect for eight more hours of gig-clicking than your back was ready for.',
+    cost: { money: 1200 },
+    effects: [{ type: 'mult', target: 'click_money', value: 1.1 }],
+  },
+  {
+    id: 'rebrand_ai_company',
+    name: "Rebrand as an \"AI Company\"",
+    icon: '✨',
+    era: 'era2',
+    category: 'company',
+    flavor: 'Nothing about the product changed. Everything about the pitch deck did.',
+    cost: { money: 500 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.1 }],
+  },
+  {
     id: 'company_handbook',
     name: 'Write a Company Handbook',
     icon: '📘',
@@ -327,6 +380,28 @@ Game.data.upgrades = [
     flavor: 'Negotiates every vendor contract you sign from now on. Ruthlessly.',
     cost: { money: 15000 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
+    requiresUpgrade: 'hire_employee_intern', // nothing for an ops manager to manage without employee #1
+  },
+  {
+    id: 'office_dog',
+    name: 'Office Dog',
+    icon: '🐕',
+    era: 'era3',
+    category: 'company',
+    flavor: 'Karl has no equity, exceptional morale impact, and strong opinions about the thermostat.',
+    cost: { money: 2000 },
+    effects: [{ type: 'mult', target: 'influence_gain', value: 1.1 }],
+    requiresUpgrade: 'hire_employee_intern', // someone has to walk him
+  },
+  {
+    id: 'ping_pong_table',
+    name: 'Ping Pong Table',
+    icon: '🏓',
+    era: 'era3',
+    category: 'company',
+    flavor: 'A Silicon Valley cliche, purchased unironically, that somehow does help morale.',
+    cost: { money: 3000 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.05 }],
   },
   {
     id: 'marketing_plan',
@@ -347,6 +422,7 @@ Game.data.upgrades = [
     flavor: 'Pay people in paper instead of cash. They believe in the mission. Mostly.',
     cost: { money: 50000 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+    requiresUpgrade: 'hire_employee_intern', // can't hand out equity with no headcount to hand it to
   },
   {
     id: 'hire_sales_team',
@@ -357,6 +433,7 @@ Game.data.upgrades = [
     flavor: 'Quota-carrying reps who can sell tokens to a company that already makes its own.',
     cost: { money: 100000, influence: 10 },
     effects: [{ type: 'mult', target: 'sell_price', value: 1.5 }],
+    requiresUpgrade: 'marketing_plan', // nothing to sell against without a brand first
   },
   {
     id: 'hire_cfo',
@@ -367,6 +444,7 @@ Game.data.upgrades = [
     flavor: 'Restructures every contract in the building. The lawyers bill more, everything else costs less.',
     cost: { money: 2000000, influence: 50 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.85 }],
+    requiresUpgrade: 'employee_stock_options', // you don't get a CFO before the cap table exists
   },
   {
     id: 'create_autonomous_vehicles',
