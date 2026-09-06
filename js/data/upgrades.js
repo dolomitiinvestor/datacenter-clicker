@@ -124,17 +124,17 @@ Game.data.upgrades = [
     id: 'research_partnership',
     name: 'University Research Partnership',
     icon: '🎓',
-    era: 'era4',
+    era: 'era4', // a midgame stepping stone toward outright buying a school (below) - its old 20k RP price was laughably cheap next to same-era Train New Model tiers costing 1M+ RP
     category: 'research',
-    flavor: 'Grad students, but make it corporate-sponsored.',
-    cost: { reputation: 20000, money: 5000 }, // reputation leg raised 1000x along with the rest of the research-points economy
+    flavor: "Grad students, but make it corporate-sponsored - a partnership, not a hostile takeover. That comes later.",
+    cost: { reputation: 1500000, money: 250000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 2 }],
   },
 
   // --- Buy the whole university. A partnership rents grad students; this
-  // buys the endowment, the faculty, and the naming rights outright. Each
-  // is independent (no chain, no ordering) and stacks its own train_ratio
-  // multiplier on top of everything else, including Research Partnership.
+  // buys the endowment, the faculty, and the naming rights outright. Bought
+  // strictly in order (requiresUpgrade) - you don't get offered Stanford
+  // until you've already closed on Georgia Tech, Berkeley, and CMU.
   {
     id: 'buy_georgia_tech',
     name: 'Buy Georgia Tech',
@@ -142,7 +142,7 @@ Game.data.upgrades = [
     era: 'era5',
     category: 'research',
     flavor: 'The whole College of Computing, plus a very confused Yellow Jacket mascot, now reports to you.',
-    cost: { money: 1000000000 },
+    cost: { money: 5000000000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.15 }],
   },
   {
@@ -152,8 +152,9 @@ Game.data.upgrades = [
     era: 'era5',
     category: 'research',
     flavor: 'The state legislature is furious. The AI lab is now a wholly-owned subsidiary.',
-    cost: { money: 2000000000 },
+    cost: { money: 10000000000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.2 }],
+    requiresUpgrade: 'buy_georgia_tech',
   },
   {
     id: 'buy_carnegie_mellon',
@@ -162,8 +163,9 @@ Game.data.upgrades = [
     era: 'era5',
     category: 'research',
     flavor: 'The robotics department alone was worth the sticker price. The rest of the campus came free with it.',
-    cost: { money: 4000000000 },
+    cost: { money: 20000000000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.25 }],
+    requiresUpgrade: 'buy_uc_berkeley',
   },
   {
     id: 'buy_mit',
@@ -172,8 +174,9 @@ Game.data.upgrades = [
     era: 'era5',
     category: 'research',
     flavor: "CSAIL's entire org chart now has your logo on its slide deck.",
-    cost: { money: 8000000000 },
+    cost: { money: 50000000000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.3 }],
+    requiresUpgrade: 'buy_carnegie_mellon',
   },
   {
     id: 'buy_stanford',
@@ -182,8 +185,9 @@ Game.data.upgrades = [
     era: 'era5',
     category: 'research',
     flavor: "You didn't just hire the founders. You bought the building they dropped out of.",
-    cost: { money: 15000000000 },
+    cost: { money: 100000000000 },
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.4 }],
+    requiresUpgrade: 'buy_mit',
   },
 
   // --- Regulatory / political. incorporate_business and campaign_donation
