@@ -149,7 +149,11 @@ Game.engine = {
       Game.state_helpers.add('reputation', trainAmount * ratio);
     }
 
-    tokens.amount -= sellAmount + trainAmount;
+    // sellAmount and trainAmount are rounded separately, so their sum can
+    // drift a hair above/below tokens.amount - clamp to 0 instead of
+    // leaving a tiny negative residual (which briefly flashes a "-" sign
+    // in the UI - see format.number).
+    tokens.amount = Math.max(0, tokens.amount - sellAmount - trainAmount);
   },
 
   checkEras() {

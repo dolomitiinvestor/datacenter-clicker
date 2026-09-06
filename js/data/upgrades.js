@@ -357,6 +357,101 @@ Game.data.upgrades = [
     cost: { money: 2000000, influence: 50 },
     effects: [{ type: 'mult', target: 'cost_all', value: 0.85 }],
   },
+
+  // --- Buy the entire company. Real market caps, snapshotted August 2026 -
+  // obviously these move every trading day in reality, this is a one-time
+  // game-balance snapshot, not a live feed. Bought strictly in ascending
+  // order of price (requiresUpgrade), same pattern as the university chain.
+  {
+    id: 'buy_meta',
+    name: 'Buy Meta Platforms',
+    icon: '📱',
+    era: 'era5',
+    category: 'company',
+    flavor: "The Like button, the metaverse, and Llama all report to you now. Zuck keeps an office, out of respect.",
+    cost: { money: 1460000000000 }, // ~$1.46T, Aug 2026
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.15 }],
+  },
+  {
+    id: 'buy_broadcom',
+    name: 'Buy Broadcom',
+    icon: '🔗',
+    era: 'era5',
+    category: 'company',
+    flavor: "Custom AI silicon, networking chips, and the enterprise software empire nobody outside IT has heard of.",
+    cost: { money: 1760000000000 }, // ~$1.76T, Aug 2026
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
+    requiresUpgrade: 'buy_meta',
+  },
+  {
+    id: 'buy_tsmc',
+    name: 'Buy TSMC',
+    icon: '🏭',
+    era: 'era5',
+    category: 'company',
+    flavor: "Every GPU on this entire spreadsheet came out of one of their fabs. Now the fabs are yours.",
+    cost: { money: 1930000000000 }, // ~$1.93T, Aug 2026
+    effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+    requiresUpgrade: 'buy_broadcom',
+  },
+  {
+    id: 'buy_amazon',
+    name: 'Buy Amazon',
+    icon: '📦',
+    era: 'era5',
+    category: 'company',
+    flavor: "AWS's entire fleet of datacenters, plus a logistics network that could ship your GPUs overnight.",
+    cost: { money: 3000000000000 }, // ~$3.0T, Aug 2026
+    effects: [{ type: 'mult', target: 'consume_all', value: 0.9 }],
+    requiresUpgrade: 'buy_tsmc',
+  },
+  {
+    id: 'buy_microsoft',
+    name: 'Buy Microsoft',
+    icon: '🪟',
+    era: 'era5',
+    category: 'company',
+    flavor: "Azure, Windows, and the world's most valuable OpenAI stake, all under one roof. Your roof, now.",
+    cost: { money: 3700000000000 }, // ~$3.7T, Aug 2026
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.2 }],
+    requiresUpgrade: 'buy_amazon',
+  },
+  {
+    id: 'buy_apple',
+    name: 'Buy Apple',
+    icon: '🍏',
+    era: 'era5',
+    category: 'company',
+    flavor: "Every phone on Earth just became a distribution channel for whatever you decide to ship next.",
+    cost: { money: 4400000000000 }, // ~$4.4T, Aug 2026
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.3 }],
+    requiresUpgrade: 'buy_microsoft',
+  },
+  {
+    id: 'buy_alphabet',
+    name: 'Buy Alphabet',
+    icon: '🔍',
+    era: 'era5',
+    category: 'company',
+    flavor: "Search, YouTube, and DeepMind's entire research org. The antitrust lawyers already have a group chat about this.",
+    cost: { money: 4530000000000 }, // ~$4.53T, Aug 2026
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.5 }],
+    requiresUpgrade: 'buy_apple',
+  },
+  {
+    id: 'buy_nvidia',
+    name: 'Buy Nvidia',
+    icon: '🟩',
+    era: 'era5',
+    category: 'company',
+    flavor: "The most valuable company on the planet, and every GPU on this screen was theirs before you bought the whole thing.",
+    cost: { money: 5310000000000 }, // ~$5.31T, Aug 2026 - the world's largest company
+    effects: [
+      { type: 'mult', target: 'produce_all', value: 1.5 },
+      { type: 'mult', target: 'cost_all', value: 0.75 },
+    ],
+    requiresUpgrade: 'buy_alphabet',
+  },
 ];
 
 Game.data.upgradesById = {};

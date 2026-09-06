@@ -7,12 +7,18 @@ Game.format = {
   number(n, decimals) {
     if (decimals === undefined) decimals = 1;
     if (n === undefined || n === null || isNaN(n)) return '0';
-    const sign = n < 0 ? '-' : '';
     const abs = Math.abs(n);
     if (abs < 1000) {
-      const fixed = abs.toFixed(decimals);
-      return sign + this._trimZeros(fixed);
+      const fixed = this._trimZeros(abs.toFixed(decimals));
+      // Floating-point noise (e.g. auto-convert draining tokens to
+      // -0.0000001) rounds to "0" but n is still technically negative -
+      // without this check that flashes a "-" sign for one frame and
+      // back, jittering the layout. Only show the sign once the rounded
+      // display value is actually nonzero.
+      const sign = n < 0 && fixed !== '0' ? '-' : '';
+      return sign + fixed;
     }
+    const sign = n < 0 ? '-' : '';
     const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
     let value = abs;
     let unitIndex = -1;
