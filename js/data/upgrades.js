@@ -189,6 +189,17 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.4 }],
     requiresUpgrade: 'buy_mit',
   },
+  {
+    id: 'develop_humanoid_robots',
+    name: 'Develop Humanoid Robots',
+    icon: '🤖',
+    era: 'era5',
+    category: 'research',
+    flavor: "Five campuses' worth of robotics departments, mechanical engineers, and grad students who all had the same idea at once.",
+    cost: { money: 100000000000 }, // $100B
+    effects: [{ type: 'mult', target: 'produce_all', value: 2 }],
+    requiresUpgrade: 'buy_stanford', // last link in the university chain - owning it implies all five are already bought
+  },
 
   // --- Regulatory / political. incorporate_business and campaign_donation
   // are early gates; the permit_* chain (era5) gates the gigawatt-class
