@@ -59,4 +59,30 @@ Game.data.milestones = [
     message: 'You could quit the day job any time now. You don\'t. Old habits.',
     check: (s) => s.softwareJobEnabled && s.stats.totalMoneyEarned >= 10000000,
   },
+  {
+    id: 'jensen_calls',
+    title: 'A Familiar Voice',
+    message: 'Jensen Huang starts dialing your personal number directly. He skips the small talk and asks about next quarter\'s order.',
+    check: (s) => Game.data.buildings
+      .filter((b) => b.category === 'compute' && b.id !== 'laptop' && b.id !== 'macbook_m5')
+      .reduce((sum, b) => sum + (s.buildings[b.id] || 0), 0) >= 500,
+  },
+  {
+    id: 'tsmc_christmas_card',
+    title: 'Season\'s Greetings',
+    message: 'TSMC sends a christmas card. It is addressed to you personally, and it is signed by more people than work at your first office.',
+    check: (s) => !!s.upgrades.buy_tsmc,
+  },
+  {
+    id: 'president_speech',
+    title: 'A Prime-Time Address',
+    message: 'The President gives a national address on "the dangers of artificial intelligence." Nobody says your name. Everybody knows.',
+    check: (s) => !!s.upgrades.develop_humanoid_robots,
+  },
+  {
+    id: 'nation_states_crack_phone',
+    title: 'Unknown Callers',
+    message: 'Three separate nation-states are now trying to crack your phone. One of them is, embarrassingly, an ally.',
+    check: (s) => !!s.upgrades.develop_quantum_computer,
+  },
 ];

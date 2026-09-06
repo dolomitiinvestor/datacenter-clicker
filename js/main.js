@@ -83,6 +83,11 @@ window.Game = window.Game || {};
       Game.state.tokensPricePerMillion = isNaN(val) ? 0 : Math.max(0, val);
     });
 
+    document.getElementById('btn-toggle-hidden').addEventListener('click', () => {
+      Game.ui.showHidden = !Game.ui.showHidden;
+      Game.ui.renderCatalog();
+    });
+
     document.getElementById('btn-save').addEventListener('click', () => {
       Game.save.save();
       flashMessage('Saved.');

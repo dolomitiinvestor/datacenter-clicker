@@ -5,7 +5,7 @@ Game.data = Game.data || {};
 // a building id (aside from era/unlock display) - it just reads these
 // fields. To add a new building: append an entry, pick an era, done.
 //
-// category:      'compute' | 'buildings' | 'research' | 'regulatory' | 'company' | 'upgrades'
+// category:      'compute' | 'buildings' | 'research' | 'regulatory' | 'company' | 'quantum' | 'configurations' | 'upgrades'
 //                which catalog column it's rendered in (see render.js
 //                renderCatalog) - buildings and upgrades share the same
 //                five columns, grouped by this field, not by data source.
@@ -135,16 +135,34 @@ Game.data.buildings = [
     buyLabel: 'Deposit',
   },
   {
-    id: 'abandoned_factory_10mw',
-    name: '10MW Abandoned Factory',
+    id: 'substation_upgrade',
+    name: 'Substation Upgrade',
+    icon: '🔋',
+    era: 'era2',
+    category: 'buildings',
+    flavor: 'A dedicated transformer and a very patient utility contractor. Buys you real headroom before the next brownout.',
+    baseCost: { money: 8000 },
+    costScale: 1.2,
+    land: 0,
+    produces: { electricity: 300 }, // 300kW
+    consumes: {},
+    rentPerMonth: { money: 2000 },
+  },
+  {
+    id: 'abandoned_factory_4mw',
+    name: '4MW Abandoned Factory',
     icon: '🏚️',
     era: 'era3',
     category: 'buildings',
+    // Was a 10MW connection - repriced down to 4MW as part of making power
+    // an actual ongoing constraint instead of one purchase solving it for
+    // the rest of the game (see substation_upgrade above and the GPU power
+    // draws below, all bumped ~1.5x the same round).
     flavor: 'Shuttered since the last recession, but the old industrial service drop is still live. Cheaper than a fresh lease - nobody\'s fighting you for it.',
     baseCost: { money: 30000 },
     costScale: 1.25,
     land: 0,
-    produces: { electricity: 10000 }, // 10MW - the old grid connection, still on the books
+    produces: { electricity: 4000 }, // 4MW - the old grid connection, still on the books
     consumes: {},
     providesLandCap: 3,
     rentPerMonth: { money: 50000 }, // property tax, security, and finally bringing the old service drop up to code
@@ -182,7 +200,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 15 },
-    consumes: { electricity: 0.45 },
+    consumes: { electricity: 0.7 },
   },
   {
     id: 'a100_80gb',
@@ -195,7 +213,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 140 },
-    consumes: { electricity: 0.4 },
+    consumes: { electricity: 0.65 },
     requires: [{ type: 'building', id: 'rtx_4090', count: 5 }], // graduate off consumer cards first
   },
   {
@@ -204,12 +222,15 @@ Game.data.buildings = [
     icon: '🟩',
     era: 'era3',
     category: 'compute',
+    // High-density tier: this and everything below draws water for
+    // cooling on top of electricity (see engine._runWater) - roughly
+    // 0.3 gal/s per kW drawn. Air-cooled consumer/entry cards above don't.
     flavor: 'Hopper architecture, 700W. The card every lab is rationing.',
     baseCost: { money: 30000 },
     costScale: 1.15,
     land: 0,
     produces: { tokens: 300 },
-    consumes: { electricity: 0.7 },
+    consumes: { electricity: 1.1, water: 0.33 },
     requires: [{ type: 'building', id: 'a100_80gb', count: 5 }],
   },
   {
@@ -223,7 +244,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 8 * 300 },
-    consumes: { electricity: 8 * 0.7 },
+    consumes: { electricity: 8 * 1.1, water: 8 * 0.33 },
     requires: [{ type: 'building', id: 'h100_80gb', count: 3 }],
   },
   {
@@ -237,7 +258,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 64 * 300 },
-    consumes: { electricity: 64 * 0.7 },
+    consumes: { electricity: 64 * 1.1, water: 64 * 0.33 },
     requires: [{ type: 'building', id: 'h100_80gb_rack', count: 2 }],
   },
   {
@@ -251,7 +272,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 380 },
-    consumes: { electricity: 0.7 },
+    consumes: { electricity: 1.1, water: 0.33 },
     requires: [{ type: 'building', id: 'h100_80gb', count: 5 }],
   },
   {
@@ -265,7 +286,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 8 * 380 },
-    consumes: { electricity: 8 * 0.7 },
+    consumes: { electricity: 8 * 1.1, water: 8 * 0.33 },
     requires: [{ type: 'building', id: 'h200', count: 3 }],
   },
   {
@@ -279,7 +300,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 64 * 380 },
-    consumes: { electricity: 64 * 0.7 },
+    consumes: { electricity: 64 * 1.1, water: 64 * 0.33 },
     requires: [{ type: 'building', id: 'h200_rack', count: 2 }],
   },
   {
@@ -293,7 +314,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 750 },
-    consumes: { electricity: 1.0 },
+    consumes: { electricity: 1.6, water: 0.48 },
     requires: [{ type: 'building', id: 'h200', count: 5 }],
   },
   {
@@ -307,7 +328,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 8 * 750 },
-    consumes: { electricity: 8 * 1.0 },
+    consumes: { electricity: 8 * 1.6, water: 8 * 0.48 },
     requires: [{ type: 'building', id: 'b200', count: 3 }],
   },
   {
@@ -321,7 +342,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 64 * 750 },
-    consumes: { electricity: 64 * 1.0 },
+    consumes: { electricity: 64 * 1.6, water: 64 * 0.48 },
     requires: [{ type: 'building', id: 'b200_rack', count: 2 }],
   },
   {
@@ -335,7 +356,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 1400 },
-    consumes: { electricity: 1.35 },
+    consumes: { electricity: 2.1, water: 0.63 },
     requires: [{ type: 'building', id: 'b200', count: 5 }],
   },
   {
@@ -349,7 +370,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 72 * 1400 },
-    consumes: { electricity: 72 * 1.35 },
+    consumes: { electricity: 72 * 2.1, water: 72 * 0.63 },
     requires: [{ type: 'building', id: 'gb200_superchip', count: 3 }],
   },
   {
@@ -363,7 +384,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 2200 },
-    consumes: { electricity: 1.4 },
+    consumes: { electricity: 2.2, water: 0.66 },
     requires: [{ type: 'building', id: 'gb200_superchip', count: 5 }],
   },
   {
@@ -377,7 +398,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 3600 },
-    consumes: { electricity: 1.8 },
+    consumes: { electricity: 2.8, water: 0.84 },
     requires: [{ type: 'building', id: 'rubin', count: 5 }],
   },
   {
@@ -391,7 +412,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 6500 },
-    consumes: { electricity: 2.4 },
+    consumes: { electricity: 3.7, water: 1.11 },
     requires: [{ type: 'building', id: 'rubin_ultra', count: 5 }],
   },
   {
@@ -405,7 +426,7 @@ Game.data.buildings = [
     costScale: 1.15,
     land: 0,
     produces: { tokens: 15000 },
-    consumes: { electricity: 3.5 },
+    consumes: { electricity: 5.4, water: 1.62 },
     requires: [{ type: 'building', id: 'feynman', count: 5 }],
   },
   {
@@ -451,6 +472,123 @@ Game.data.buildings = [
     land: 0,
     produces: { influence: 0.3 },
     consumes: {},
+  },
+
+  // --- Workforce: repeatable hires whose real job is often just existing
+  // in sufficient numbers to gate other content (see requires: [{type:
+  // 'building', id: 'ai_research_engineer', count: N}] on the
+  // Configurations upgrades and Develop Quantum Computer). Each also
+  // produces a small amount on its own so hiring them isn't pure overhead.
+  {
+    id: 'ai_research_engineer',
+    name: 'Hire AI Research Engineer',
+    icon: '🧑‍🔬',
+    era: 'era3',
+    category: 'research',
+    flavor: 'PhD, three job offers, took yours for the compute budget. Ships small wins constantly.',
+    baseCost: { money: 180000 },
+    costScale: 1.08,
+    land: 0,
+    produces: { reputation: 0.02 },
+    consumes: {},
+    rentPerMonth: { money: 15000 }, // salary, billed like any other headcount
+  },
+  {
+    id: 'business_person',
+    name: 'Hire Business Development Person',
+    icon: '🧑‍💼',
+    era: 'era3',
+    category: 'company',
+    flavor: 'Owns a relationship with three procurement departments and a very good expense account.',
+    baseCost: { money: 120000 },
+    costScale: 1.08,
+    land: 0,
+    produces: { influence: 0.01 },
+    consumes: {},
+    rentPerMonth: { money: 12000 },
+  },
+
+  // --- Water. A flow resource exactly like electricity (see
+  // engine._runWater) - high-density compute (H100 tier and up, see
+  // above) draws it for cooling on top of power. None of these come with
+  // a hard "next tier" gate the way land sites do; they're priced to be
+  // bought in the same rough order as their power-supply counterparts.
+  {
+    id: 'municipal_water_hookup',
+    name: 'Municipal Water Hookup',
+    icon: '🚰',
+    era: 'era3',
+    category: 'buildings',
+    flavor: 'A standard commercial tap. The water utility does not yet know what you\'re planning to do with it.',
+    baseCost: { money: 12000 },
+    costScale: 1.2,
+    land: 0,
+    produces: { water: 20 },
+    consumes: {},
+    rentPerMonth: { money: 1500 },
+  },
+  {
+    id: 'aquifer_water_rights',
+    name: 'Aquifer Water Rights',
+    icon: '🕳️',
+    era: 'era4',
+    category: 'buildings',
+    flavor: 'You now own the right to pump groundwater that took ten thousand years to accumulate. A local farmer is not thrilled.',
+    baseCost: { money: 250000 },
+    costScale: 1.25,
+    land: 0,
+    produces: { water: 150 },
+    consumes: {},
+    rentPerMonth: { money: 10000 },
+  },
+  {
+    id: 'hoover_dam_water_allocation',
+    name: 'Hoover Dam Water Allocation',
+    icon: '🌊',
+    era: 'era5',
+    category: 'buildings',
+    flavor: 'A slice of the Colorado River Compact, renegotiated in your favor by people who bill by the hour. Seven states are furious.',
+    baseCost: { money: 500000000 },
+    costScale: 1.4,
+    land: 0,
+    produces: { water: 5000 },
+    consumes: {},
+    rentPerMonth: { money: 2000000 },
+    requires: [{ type: 'upgrade', id: 'permit_federal_review' }],
+  },
+
+  // --- Quantum computer tier. Unlocked entirely by the Develop Quantum
+  // Computer upgrade (data/upgrades.js) - both entries stay hidden until
+  // that's bought, same mechanism as the Autonomous Vehicle Fleet.
+  // Best-in-game tok/$ and tok/kWh by a wide margin; no water draw (a
+  // dilution refrigerator doesn't cool itself with a cooling tower).
+  {
+    id: 'quantum_annealer',
+    name: 'Quantum Annealer',
+    icon: '🌀',
+    era: 'era5',
+    category: 'quantum',
+    flavor: 'A few thousand qubits, a dilution refrigerator colder than deep space, and a workload it turns out is surprisingly good at ranking tokens.',
+    baseCost: { money: 2000000 },
+    costScale: 1.15,
+    land: 0,
+    produces: { tokens: 60000 },
+    consumes: { electricity: 8 },
+    requires: [{ type: 'upgrade', id: 'develop_quantum_computer' }],
+  },
+  {
+    id: 'logical_qubit_array',
+    name: 'Logical Qubit Array',
+    icon: '🌀',
+    era: 'era5',
+    category: 'quantum',
+    flavor: 'Fault-tolerant, error-corrected, and running an inference workload no classical machine on this sheet can touch.',
+    baseCost: { money: 20000000 },
+    costScale: 1.2,
+    land: 0,
+    produces: { tokens: 750000 },
+    consumes: { electricity: 60 },
+    requires: [{ type: 'building', id: 'quantum_annealer', count: 5 }],
   },
 
   // --- Research spending. Both scale hard with costScale - these are meant

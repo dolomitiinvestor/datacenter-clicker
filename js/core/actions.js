@@ -99,6 +99,20 @@ Game.actions = {
     return cost;
   },
 
+  // Generic gate checker, shared by buildings and upgrades: a `requires`
+  // array is a list of { type: 'upgrade'|'building', id, count? } entries,
+  // every one of which must hold. Used directly for an upgrade's own
+  // `requires` (e.g. "own 100 AI Research Engineers"), and wrapped by
+  // meetsRequirements/meetsHardRequirements below for buildings.
+  meetsRequirementsList(list) {
+    if (!list) return true;
+    return list.every((req) => {
+      if (req.type === 'upgrade') return !!Game.state.upgrades[req.id];
+      if (req.type === 'building') return (Game.state.buildings[req.id] || 0) >= (req.count || 1);
+      return true;
+    });
+  },
+
   // Checks a building's `requires` array (upgrade purchased / other building
   // owned in sufficient count), beyond the era gate. True if there's nothing
   // to check. `list` defaults to def.requires but can be overridden (see
@@ -106,13 +120,7 @@ Game.actions = {
   // same upgrade/building-ownership logic.
   meetsRequirements(buildingId, list) {
     const def = Game.data.buildingsById[buildingId];
-    const reqs = list || def.requires;
-    if (!reqs) return true;
-    return reqs.every((req) => {
-      if (req.type === 'upgrade') return !!Game.state.upgrades[req.id];
-      if (req.type === 'building') return (Game.state.buildings[req.id] || 0) >= (req.count || 1);
-      return true;
-    });
+    return this.meetsRequirementsList(list || def.requires);
   },
 
   // hardRequires is a second, independent gate from `requires`: unlike
@@ -190,6 +198,7 @@ Game.actions = {
     const def = Game.data.upgradesById[upgradeId];
     if (Game.state.upgrades[upgradeId]) return false;
     if (def.requiresUpgrade && !Game.state.upgrades[def.requiresUpgrade]) return false;
+    if (!this.meetsRequirementsList(def.requires)) return false;
     return Game.state_helpers.canAfford(this.upgradeCost(upgradeId));
   },
 
@@ -201,5 +210,18 @@ Game.actions = {
     Game.state_helpers.recalcLandCap();
     Game.state_helpers.logEvent('Unlocked upgrade: ' + def.name);
     return true;
+  },
+
+  // --- minimizing tiles ---
+  // Lets the player collapse a card they no longer care about out of the
+  // main catalog view (see render.js's "Show hidden" toggle to bring them
+  // back). Purely a display preference - has no effect on ownership,
+  // production, or affordability.
+  hideTile(id) {
+    Game.state.hiddenTiles[id] = true;
+  },
+
+  unhideTile(id) {
+    delete Game.state.hiddenTiles[id];
   },
 };

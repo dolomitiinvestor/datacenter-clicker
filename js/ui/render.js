@@ -8,14 +8,20 @@ Game.ui = {
       statusTime: document.getElementById('status-time'),
       statusTokens: document.getElementById('status-tokens'),
       statusNet: document.getElementById('status-net'),
+      statusGdp: document.getElementById('status-gdp'),
+      statusUsElec: document.getElementById('status-us-elec'),
       resourceBar: document.getElementById('resource-bar'),
       electricityBar: document.getElementById('electricity-bar'),
+      waterBar: document.getElementById('water-bar'),
       computeList: document.getElementById('compute-list'),
       buildingsList: document.getElementById('buildings-list'),
       researchList: document.getElementById('research-list'),
       regulatoryList: document.getElementById('regulatory-list'),
       companyList: document.getElementById('company-list'),
+      quantumList: document.getElementById('quantum-list'),
+      configurationsList: document.getElementById('configurations-list'),
       upgradesList: document.getElementById('upgrades-list'),
+      btnToggleHidden: document.getElementById('btn-toggle-hidden'),
       logList: document.getElementById('log-list'),
       eraBanner: document.getElementById('era-banner'),
       btnAutoConvert: document.getElementById('btn-auto-convert'),
@@ -34,11 +40,18 @@ Game.ui = {
     };
   },
 
+  // Session-only (not persisted) - whether hidden/minimized cards are
+  // currently shown, dimmed, alongside the normal catalog. See
+  // actions.hideTile/unhideTile and state.hiddenTiles for the persisted
+  // per-tile flag this toggles the visibility of.
+  showHidden: false,
+
   renderAll() {
     this.renderEraBanner();
     this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
+    this.renderWater();
     this.renderCatalog();
     this.renderLog();
     this.renderActionVisibility();
@@ -56,6 +69,7 @@ Game.ui = {
     this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
+    this.renderWater();
     this.refreshAffordability();
     this.renderFreelanceStatus();
   },
@@ -82,11 +96,37 @@ Game.ui = {
       const rate = Game.state.resources.tokens.perSecond || 0;
       this.els.statusTokens.textContent = '🔤 ' + Game.format.number(rate, 2) + ' tokens/s';
     }
+    let arr = 0;
     if (this.els.statusNet) {
       const net = Game.state.netMoneyPerSecond || 0;
-      const arr = net * 3600 * Game.config.hoursPerYear; // $/game-second -> $/game-year
+      arr = net * 3600 * Game.config.hoursPerYear; // $/game-second -> $/game-year
       this.els.statusNet.textContent = '💰 Net: ' + Game.format.moneyRate(net) + '/s • ARR: ' + Game.format.money(arr);
     }
+    if (this.els.statusGdp) {
+      const pct = (arr / Game.config.usGdpAnnual) * 100;
+      this.els.statusGdp.textContent = '🇺🇸 ' + Game.format.number(pct, 4) + '% of US GDP';
+    }
+    if (this.els.statusUsElec) {
+      const elec = Game.state.resources.electricity;
+      const annualKwh = elec.consumed * Game.config.hoursPerYear;
+      const pct = (annualKwh / Game.config.usElectricityAnnualKwh) * 100;
+      this.els.statusUsElec.textContent = '⚡ ' + Game.format.number(pct, 4) + '% of US electricity';
+    }
+  },
+
+  renderWater() {
+    if (!this.els.waterBar) return;
+    const water = Game.state.resources.water;
+    if (!Game.state.erasUnlocked[Game.data.resourcesById.water.unlockEra]) {
+      this.els.waterBar.innerHTML = '';
+      return;
+    }
+    const pct = water.generated > 0 ? Math.min(100, (water.consumed / water.generated) * 100) : 0;
+    const shortage = water.throttle < 0.999;
+    this.els.waterBar.innerHTML =
+      '<div class="bar-track"><div class="bar-fill' + (shortage ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
+      '<div class="bar-label">💧 ' + Game.format.number(water.consumed, 1) + ' / ' + Game.format.number(water.generated, 1) + ' gal/s' +
+      (shortage ? ' — WATER SHORTAGE (' + Math.round(water.throttle * 100) + '% output)' : '') + '</div>';
   },
 
   // Synced on full renders only (see renderTokenControls comment) -
@@ -194,7 +234,7 @@ Game.ui = {
   // upgrades), grouped by each item's own `category` field - e.g. Train
   // New Model (an upgrade) renders in the same Research column as Publish
   // arXiv Paper (a building).
-  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'company', 'upgrades'],
+  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'company', 'quantum', 'configurations', 'upgrades'],
 
   renderCatalog() {
     const unlocked = this.unlockedEraIds();
@@ -204,6 +244,7 @@ Game.ui = {
     // you've already got one per SF Apartment).
     const visibleBuildings = Game.data.buildings.filter((b) => {
       if (unlocked.indexOf(b.era) === -1) return false;
+      if (Game.state.hiddenTiles[b.id] && !this.showHidden) return false;
       if (!Game.actions.meetsHardRequirements(b.id)) return false;
       if (b.blockOnRequirementFail) return true;
       if (!Game.actions.meetsRequirements(b.id)) return false;
@@ -217,8 +258,16 @@ Game.ui = {
     const visibleUpgrades = Game.data.upgrades.filter((u) =>
       unlocked.indexOf(u.era) !== -1 &&
       !Game.state.upgrades[u.id] &&
-      (!u.requiresUpgrade || Game.state.upgrades[u.requiresUpgrade])
+      (!Game.state.hiddenTiles[u.id] || this.showHidden) &&
+      (!u.requiresUpgrade || Game.state.upgrades[u.requiresUpgrade]) &&
+      Game.actions.meetsRequirementsList(u.requires)
     );
+
+    const hiddenCount = Object.keys(Game.state.hiddenTiles).length;
+    if (this.els.btnToggleHidden) {
+      this.els.btnToggleHidden.textContent = (this.showHidden ? 'Hide minimized' : 'Show minimized') + ' (' + hiddenCount + ')';
+      this.els.btnToggleHidden.hidden = hiddenCount === 0;
+    }
 
     this.CATALOG_CATEGORIES.forEach((cat) => {
       const container = this.els[cat + 'List'];
@@ -231,6 +280,7 @@ Game.ui = {
 
     this.bindBuildingButtons();
     this.bindUpgradeButtons();
+    this.bindHideButtons();
   },
 
   buildingCardHtml(b) {
@@ -249,11 +299,13 @@ Game.ui = {
     const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
     const subtitleHtml = b.subtitle ? '<div class="card-subtitle">' + b.subtitle + '</div>' : '';
     const bulkButtonsHtml = this.bulkBuyButtonsHtml(b);
+    const hidden = !!Game.state.hiddenTiles[b.id];
+    const hideBtnHtml = this.hideButtonHtml(b.id, hidden);
     return (
-      '<div class="card" data-building="' + b.id + '">' +
+      '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
       '<span class="card-title">' + b.name + '</span>' +
-      '<span class="card-count">x' + count + '</span></div>' +
+      '<span class="card-count">x' + count + '</span>' + hideBtnHtml + '</div>' +
       subtitleHtml +
       '<div class="card-flavor">' + b.flavor + '</div>' +
       '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
@@ -263,14 +315,46 @@ Game.ui = {
     );
   },
 
-  // Buy 10 / Buy 100 shortcuts, compute cards only - GPUs are the items
-  // players actually stack by the dozen, unlike one-off buildings/upgrades.
-  BULK_BUY_QUANTITIES: [10, 100],
+  // Small "minimize"/"restore" toggle in a card's header - see
+  // actions.hideTile/unhideTile. Purely a display preference.
+  hideButtonHtml(id, hidden) {
+    return hidden
+      ? '<button class="card-hide-btn" data-unhide="' + id + '" title="Restore this card">↺</button>'
+      : '<button class="card-hide-btn" data-hide="' + id + '" title="Minimize - I\'m not using this anymore">✕</button>';
+  },
+
+  bindHideButtons() {
+    document.querySelectorAll('[data-hide]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        Game.actions.hideTile(btn.getAttribute('data-hide'));
+        this.renderCatalog();
+      });
+    });
+    document.querySelectorAll('[data-unhide]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        Game.actions.unhideTile(btn.getAttribute('data-unhide'));
+        this.renderCatalog();
+      });
+    });
+  },
+
+  // Buy 10/100/1000 shortcuts, compute cards only - GPUs are the items
+  // players actually stack by the dozen (or thousand). 100 and 1000 stay
+  // hidden until the purchase is actually within reach - cost no more than
+  // the player's current cash or their current ARR, whichever is bigger -
+  // so the buttons don't clutter every card with options nobody can use
+  // yet. Buy 10 always shows.
+  BULK_BUY_QUANTITIES: [10, 100, 1000],
 
   bulkBuyButtonsHtml(b) {
     if (b.category !== 'compute') return '';
+    const arr = (Game.state.netMoneyPerSecond || 0) * 3600 * Game.config.hoursPerYear;
+    const feasibleCeiling = Math.max(Game.state.resources.money.amount, arr);
     return this.BULK_BUY_QUANTITIES.map((qty) => {
       const qtyCost = Game.actions.buildingCostForQty(b.id, qty);
+      if (qty > 10 && qtyCost.money > feasibleCeiling) return '';
       return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '">Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
     }).join('');
   },
@@ -376,10 +460,12 @@ Game.ui = {
 
   upgradeCardHtml(u) {
     const costHtml = this.costHtml(Game.actions.upgradeCost(u.id));
+    const hidden = !!Game.state.hiddenTiles[u.id];
+    const hideBtnHtml = this.hideButtonHtml(u.id, hidden);
     return (
-      '<div class="card" data-upgrade="' + u.id + '">' +
+      '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-upgrade="' + u.id + '">' +
       '<div class="card-head"><span class="card-icon">' + u.icon + '</span>' +
-      '<span class="card-title">' + u.name + '</span></div>' +
+      '<span class="card-title">' + u.name + '</span>' + hideBtnHtml + '</div>' +
       '<div class="card-flavor">' + u.flavor + '</div>' +
       '<button class="buy-btn" data-upgrade="' + u.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'

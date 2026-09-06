@@ -43,6 +43,8 @@
   <span id="status-time">📅 Day 0 • Nov 30, 2022, 12:00 AM</span>
   <span id="status-tokens">🔤 0 tokens/s</span>
   <span id="status-net">💰 Net: $0.00/s • ARR: $0.00</span>
+  <span id="status-gdp">🇺🇸 0% of US GDP</span>
+  <span id="status-us-elec">⚡ 0% of US electricity</span>
   <div id="token-price-wrap">
     <label for="token-price-input">🔤 Price: $<input type="number" id="token-price-input" min="0" step="0.01" value="5">/M tokens</label>
   </div>
@@ -57,6 +59,7 @@
 
 <div id="resource-bar"></div>
 <div id="electricity-bar"></div>
+<div id="water-bar"></div>
 
 <main>
   <section id="actions-panel">
@@ -76,6 +79,10 @@
       <button id="btn-schmooze">🤝 Schmooze Politician<span class="hint">+influence per click</span></button>
     </div>
   </section>
+
+  <div id="catalog-toolbar">
+    <button id="btn-toggle-hidden" hidden>Show minimized (0)</button>
+  </div>
 
   <div id="catalog-grid">
     <section id="compute-panel" class="catalog-column">
@@ -101,6 +108,16 @@
     <section id="company-panel" class="catalog-column">
       <h2>Company</h2>
       <div id="company-list" class="card-grid"></div>
+    </section>
+
+    <section id="quantum-panel" class="catalog-column">
+      <h2>Quantum</h2>
+      <div id="quantum-list" class="card-grid"></div>
+    </section>
+
+    <section id="configurations-panel" class="catalog-column">
+      <h2>Configurations</h2>
+      <div id="configurations-list" class="card-grid"></div>
     </section>
 
     <section id="upgrades-panel" class="catalog-column">

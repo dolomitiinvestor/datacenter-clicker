@@ -197,11 +197,13 @@ body {
 
 .rate-suffix { color: var(--good); font-size: 11px; }
 
-#electricity-bar {
+#electricity-bar, #water-bar {
   padding: 8px 20px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
+
+#water-bar:empty { display: none; }
 
 .bar-track {
   height: 8px;
@@ -235,6 +237,18 @@ main {
 }
 
 #actions-panel, #log-panel, #save-panel, #catalog-grid { grid-column: 1 / -1; }
+
+#catalog-toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#catalog-toolbar button {
+  flex-direction: row;
+  font-size: 12px;
+  padding: 6px 12px;
+}
 
 #catalog-grid {
   display: grid;
@@ -353,6 +367,24 @@ button .hint {
 .card-icon { font-size: 18px; }
 .card-title { font-weight: 600; flex: 1; }
 .card-count { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.card-hide-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid var(--border);
+  flex-direction: row;
+}
+
+.card-hide-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+.card.card-hidden {
+  opacity: 0.45;
+}
+
+.card.card-hidden:hover { opacity: 0.85; }
 
 .card-subtitle {
   font-size: 11px;

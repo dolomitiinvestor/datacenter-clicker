@@ -29,6 +29,7 @@ Game.stateFactory = {
       tokensPricePerMillion: Game.config.tokensPricePerMillion, // $ per 1M tokens sold via Auto-Convert, editable live from the status bar (see engine._runTokenConversion)
       netMoneyPerSecond: 0, // $/game-second from continuous flows only (rent, electricity, salaries, token auto-convert) - recomputed every tick in main.js's loop(), excludes one-off clicks/payouts. ARR = this * 3600 * hoursPerYear.
       seenAlerts: {}, // alertId -> true once shown, so a one-time popup (e.g. a blocked purchase) doesn't repeat every click
+      hiddenTiles: {}, // buildingId/upgradeId -> true once the player minimizes a card they're no longer using (see actions.hideTile / render.js's "Show hidden" toggle)
       freelance: { day: 0, clicksToday: 0 }, // Freelance (DoorDash) shift cap - day is Math.floor(time.hours / 24) of the last click, resets clicksToday on rollover
       softwareJobEnabled: false, // steady day job, pays config.softwareJobAnnualSalary continuously while on
       autoConvertEnabled: false, // tokens -> money/research points continuous conversion, split by trainAllocationPct

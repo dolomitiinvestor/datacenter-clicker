@@ -6,7 +6,8 @@ Game.data = Game.data || {};
 //   { type: 'mult', target: '<key>', value: 1.5 }  -> multiplies stat by 1.5
 //   { type: 'add',  target: '<key>', value: 2 }    -> adds 2 to stat
 //
-// category: 'compute' | 'buildings' | 'research' | 'regulatory' | 'company' | 'upgrades'
+// category: 'compute' | 'buildings' | 'research' | 'regulatory' | 'company' |
+//           'quantum' | 'configurations' | 'upgrades'
 //           which catalog column it's rendered in (see render.js
 //           renderCatalog) - shared with buildings, grouped by this field
 //           rather than by data source, so e.g. Train New Model shows up
@@ -15,6 +16,10 @@ Game.data = Game.data || {};
 //           one is buyable or even shown - see actions.canBuyUpgrade and
 //           render.js renderCatalog's visibleUpgrades filter. Used to force
 //           the Train New Model chain to be bought strictly in order.
+// requires: optional array of gates, same shape as a building's `requires`
+//           ({type:'upgrade'|'building', id, count?}) - see
+//           actions.meetsRequirementsList. Used for headcount gates, e.g.
+//           Develop Quantum Computer requiring 100 AI Research Engineers.
 //
 // Recognized target keys (see engine.js / actions.js for where each is read):
 //   click_money        multiplier on the "Freelance Gig" click
@@ -210,6 +215,17 @@ Game.data.upgrades = [
     cost: { money: 100000000000 }, // $100B
     effects: [{ type: 'mult', target: 'produce_all', value: 2 }],
     requiresUpgrade: 'buy_stanford', // last link in the university chain - owning it implies all five are already bought
+  },
+  {
+    id: 'develop_quantum_computer',
+    name: 'Develop Quantum Computer',
+    icon: '🌀',
+    era: 'era5',
+    category: 'research',
+    flavor: "A hundred engineers, a decade of dead ends, and one afternoon where the error rate finally drops. Unlocks the Quantum tab - see Quantum.",
+    cost: { money: 500000000000 }, // $500B
+    effects: [], // pure gate flag - unlocks quantum_annealer/logical_qubit_array in data/buildings.js
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 100 }], // needs the headcount, not just the cash
   },
 
   // --- Regulatory / political. incorporate_business is the first legal
@@ -550,6 +566,91 @@ Game.data.upgrades = [
       { type: 'mult', target: 'cost_all', value: 0.75 },
     ],
     requiresUpgrade: 'buy_alphabet',
+  },
+
+  // --- Configurations: small, cheap-ish tuning upgrades - more tokens per
+  // GPU, more $ per token sold, or less power per GPU (high-density
+  // cooling). Deliberately modest multipliers (1.05-1.15, or 0.85-0.95 for
+  // the cost/consume-reducing ones) - these are meant to stack many small
+  // wins, not to be a shortcut past the compute/power/water economy. Each
+  // is gated on headcount (AI Research Engineers or Business people),
+  // reusing the same `requires` mechanism as Develop Quantum Computer.
+  {
+    id: 'batch_inference_tuning',
+    name: 'Batch Inference Tuning',
+    icon: '⚙️',
+    era: 'era3',
+    category: 'configurations',
+    flavor: 'Bigger batches, better GPU utilization, the same silicon doing noticeably more work.',
+    cost: { money: 40000 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.05 }],
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 3 }],
+  },
+  {
+    id: 'kv_cache_optimization',
+    name: 'KV-Cache Optimization',
+    icon: '🗃️',
+    era: 'era4',
+    category: 'configurations',
+    flavor: 'Stops recomputing what the model already figured out three tokens ago.',
+    cost: { money: 150000 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.08 }],
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 10 }],
+  },
+  {
+    id: 'speculative_decoding',
+    name: 'Speculative Decoding',
+    icon: '🔮',
+    era: 'era4',
+    category: 'configurations',
+    flavor: 'A small model guesses ahead, a big model checks its work. Somehow this is faster than just asking the big model.',
+    cost: { money: 600000 },
+    effects: [{ type: 'mult', target: 'produce_all', value: 1.1 }],
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 20 }],
+  },
+  {
+    id: 'enterprise_pricing_tiers',
+    name: 'Enterprise Pricing Tiers',
+    icon: '📊',
+    era: 'era3',
+    category: 'configurations',
+    flavor: 'The API price didn\'t change. The invoice line items just got more creative.',
+    cost: { money: 40000 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.08 }],
+    requires: [{ type: 'building', id: 'business_person', count: 3 }],
+  },
+  {
+    id: 'usage_based_pricing',
+    name: 'Usage-Based Pricing Model',
+    icon: '💳',
+    era: 'era4',
+    category: 'configurations',
+    flavor: 'Nobody can predict their bill anymore. Revenue per token goes up anyway.',
+    cost: { money: 300000 },
+    effects: [{ type: 'mult', target: 'sell_price', value: 1.1 }],
+    requires: [{ type: 'building', id: 'business_person', count: 10 }],
+  },
+  {
+    id: 'high_density_cooling',
+    name: 'High-Density Rack Cooling',
+    icon: '❄️',
+    era: 'era4',
+    category: 'configurations',
+    flavor: 'Rear-door heat exchangers on every rack. The room is quieter and the power bill is smaller.',
+    cost: { money: 500000 },
+    effects: [{ type: 'mult', target: 'consume_all', value: 0.93 }],
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 15 }],
+  },
+  {
+    id: 'liquid_immersion_cooling',
+    name: 'Liquid Immersion Cooling',
+    icon: '🧊',
+    era: 'era5',
+    category: 'configurations',
+    flavor: 'Every board, fully submerged in dielectric fluid. Looks insane in photos, cuts the power bill for real.',
+    cost: { money: 5000000 },
+    effects: [{ type: 'mult', target: 'consume_all', value: 0.9 }],
+    requires: [{ type: 'building', id: 'ai_research_engineer', count: 30 }],
   },
 ];
 

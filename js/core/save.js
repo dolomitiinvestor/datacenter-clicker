@@ -35,9 +35,11 @@ Game.save = {
     Object.assign(Game.state.time, loaded.time || {});
     if (typeof loaded.clockSpeedMultiplier === 'number') Game.state.clockSpeedMultiplier = loaded.clockSpeedMultiplier;
     if (typeof loaded.electricityPricePerKwh === 'number') Game.state.electricityPricePerKwh = loaded.electricityPricePerKwh;
+    if (typeof loaded.tokensPricePerMillion === 'number') Game.state.tokensPricePerMillion = loaded.tokensPricePerMillion;
     Object.assign(Game.state.freelance, loaded.freelance || {});
     Game.state.softwareJobEnabled = !!loaded.softwareJobEnabled;
     Object.assign(Game.state.seenAlerts, loaded.seenAlerts || {});
+    Object.assign(Game.state.hiddenTiles, loaded.hiddenTiles || {});
     Game.state.autoConvertEnabled = !!loaded.autoConvertEnabled;
     if (typeof loaded.trainAllocationPct === 'number') Game.state.trainAllocationPct = loaded.trainAllocationPct;
     Game.state.log = loaded.log || [];

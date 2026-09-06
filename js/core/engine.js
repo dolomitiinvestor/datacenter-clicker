@@ -6,6 +6,7 @@ Game.engine = {
     this._runTime(dtSeconds);
     this._runElectricity(dtSeconds);
     this._runElectricityBilling(dtSeconds);
+    this._runWater(dtSeconds);
     this._runUpkeep(dtSeconds);
     this._runSoftwareJob(dtSeconds);
     this._runProduction(dtSeconds);
@@ -61,6 +62,33 @@ Game.engine = {
     Game.state.stats.totalElectricityCost += cost;
   },
 
+  // Water is a flow, same idea as electricity: no billing, just capacity
+  // vs. draw with a proportional throttle (see high-density compute in
+  // data/buildings.js, which draws water on top of electricity - the two
+  // throttles compound, so a datacenter can be power-rich and still choke
+  // on water, or vice versa).
+  _runWater() {
+    let generated = 0;
+    let consumed = 0;
+
+    Game.data.buildings.forEach((b) => {
+      const count = Game.state.buildings[b.id] || 0;
+      if (!count) return;
+      if (b.produces && b.produces.water) {
+        generated += b.produces.water * count * Game.effects.getMult('produce:' + b.id) * Game.effects.getMult('produce_all');
+      }
+      if (b.consumes && b.consumes.water) {
+        consumed += b.consumes.water * count * Game.effects.getMult('consume:' + b.id) * Game.effects.getMult('consume_all');
+      }
+    });
+
+    const throttle = consumed > 0 ? Math.min(1, generated / consumed) : 1;
+    const water = Game.state.resources.water;
+    water.generated = generated;
+    water.consumed = Math.min(generated, consumed);
+    water.throttle = throttle;
+  },
+
   // Recurring building costs (rent, and anything else added with a
   // rentPerMonth field later) - billed hourly regardless of production,
   // same idea as electricity billing but generic to any resource/building.
@@ -93,7 +121,8 @@ Game.engine = {
   },
 
   _runProduction(dtSeconds) {
-    const throttle = Game.state.resources.electricity.throttle;
+    const elecThrottle = Game.state.resources.electricity.throttle;
+    const waterThrottle = Game.state.resources.water.throttle;
     const rates = {}; // resourceId -> current tokens/$/etc per second, for display
 
     Game.data.buildings.forEach((b) => {
@@ -101,12 +130,14 @@ Game.engine = {
       if (!count || !b.produces) return;
 
       const needsElectricity = !!(b.consumes && b.consumes.electricity);
+      const needsWater = !!(b.consumes && b.consumes.water);
       const rateMult = Game.effects.getMult('produce:' + b.id) * Game.effects.getMult('produce_all');
 
       for (const resId in b.produces) {
-        if (resId === 'electricity') continue; // handled in _runElectricity
+        if (resId === 'electricity' || resId === 'water') continue; // handled in _runElectricity/_runWater
         let rate = b.produces[resId] * count * rateMult;
-        if (needsElectricity) rate *= throttle;
+        if (needsElectricity) rate *= elecThrottle;
+        if (needsWater) rate *= waterThrottle;
         rates[resId] = (rates[resId] || 0) + rate;
 
         const amount = rate * dtSeconds;

@@ -20,7 +20,7 @@ Game.config = {
   freelanceHourlyRate: 15,    // $ earned per Freelance (DoorDash) click
   freelanceMaxClicksPerDay: 12, // shift cap per rolling in-game 24h day (see state.time.hours)
 
-  tokensPricePerMillion: 5, // $ earned per 1,000,000 tokens sold via Auto-Convert (see engine._runTokenConversion)
+  tokensPricePerMillion: 8, // $ earned per 1,000,000 tokens sold via Auto-Convert (see engine._runTokenConversion) - raised from 5 alongside the power/water rebalance below, so the extra infrastructure spend isn't a pure nerf
   tokensToResearchRatio: 0.0001, // research points earned per token trained via Auto-Convert (10,000 tokens = 1 RP)
 
   hoursPerMonth: 730, // 24 * 365/12, average - divides any monthly cost (rent, etc.) into an hourly billing rate
@@ -28,4 +28,11 @@ Game.config = {
 
   softwareJobAnnualSalary: 100000, // $/yr earned continuously while the Software Job toggle is on
   softwareJobRaisePct: 0.03, // annual raise, compounding once per in-game Jan 1 (see actions.softwareJobSalary / format.yearsSinceStart)
+
+  // Real-world reference constants for the top-bar "% of US GDP" / "% of US
+  // electricity" stats (see render.js renderStatusBar). Point-in-time
+  // approximations (~2025-2026), not a live feed - same idea as the
+  // snapshotted tech-company market caps in data/upgrades.js.
+  usGdpAnnual: 29000000000000, // ~$29T nominal US GDP/yr
+  usElectricityAnnualKwh: 4050000000000, // ~4,050 TWh/yr total US electricity consumption (EIA)
 };
