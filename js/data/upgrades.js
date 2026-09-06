@@ -131,6 +131,61 @@ Game.data.upgrades = [
     effects: [{ type: 'mult', target: 'train_ratio', value: 2 }],
   },
 
+  // --- Buy the whole university. A partnership rents grad students; this
+  // buys the endowment, the faculty, and the naming rights outright. Each
+  // is independent (no chain, no ordering) and stacks its own train_ratio
+  // multiplier on top of everything else, including Research Partnership.
+  {
+    id: 'buy_georgia_tech',
+    name: 'Buy Georgia Tech',
+    icon: '🎓',
+    era: 'era5',
+    category: 'research',
+    flavor: 'The whole College of Computing, plus a very confused Yellow Jacket mascot, now reports to you.',
+    cost: { money: 1000000000 },
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.15 }],
+  },
+  {
+    id: 'buy_uc_berkeley',
+    name: 'Buy UC Berkeley',
+    icon: '🎓',
+    era: 'era5',
+    category: 'research',
+    flavor: 'The state legislature is furious. The AI lab is now a wholly-owned subsidiary.',
+    cost: { money: 2000000000 },
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.2 }],
+  },
+  {
+    id: 'buy_carnegie_mellon',
+    name: 'Buy Carnegie Mellon University',
+    icon: '🎓',
+    era: 'era5',
+    category: 'research',
+    flavor: 'The robotics department alone was worth the sticker price. The rest of the campus came free with it.',
+    cost: { money: 4000000000 },
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.25 }],
+  },
+  {
+    id: 'buy_mit',
+    name: 'Buy MIT',
+    icon: '🎓',
+    era: 'era5',
+    category: 'research',
+    flavor: "CSAIL's entire org chart now has your logo on its slide deck.",
+    cost: { money: 8000000000 },
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.3 }],
+  },
+  {
+    id: 'buy_stanford',
+    name: 'Buy Stanford',
+    icon: '🎓',
+    era: 'era5',
+    category: 'research',
+    flavor: "You didn't just hire the founders. You bought the building they dropped out of.",
+    cost: { money: 15000000000 },
+    effects: [{ type: 'mult', target: 'train_ratio', value: 1.4 }],
+  },
+
   // --- Regulatory / political. incorporate_business and campaign_donation
   // are early gates; the permit_* chain (era5) gates the gigawatt-class
   // land sites in data/buildings.js.
