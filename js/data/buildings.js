@@ -108,7 +108,7 @@ Game.data.buildings = [
     name: 'Extra Power Outlet',
     icon: '🔌',
     era: 'era2',
-    category: 'buildings',
+    category: 'power',
     flavor: 'You called an electrician. Your landlord did not approve.',
     baseCost: { money: 120 },
     costScale: 1.2,
@@ -139,7 +139,7 @@ Game.data.buildings = [
     name: 'Substation Upgrade',
     icon: '🔋',
     era: 'era2',
-    category: 'buildings',
+    category: 'power',
     flavor: 'A dedicated transformer and a very patient utility contractor. Buys you real headroom before the next brownout.',
     baseCost: { money: 8000 },
     costScale: 1.2,
@@ -153,7 +153,7 @@ Game.data.buildings = [
     name: '4MW Abandoned Factory',
     icon: '🏚️',
     era: 'era3',
-    category: 'buildings',
+    category: 'power',
     // Was a 10MW connection - repriced down to 4MW as part of making power
     // an actual ongoing constraint instead of one purchase solving it for
     // the rest of the game (see substation_upgrade above and the GPU power
@@ -416,25 +416,11 @@ Game.data.buildings = [
     requires: [{ type: 'building', id: 'rubin_ultra', count: 5 }],
   },
   {
-    id: 'photonic_compute_node',
-    name: 'Photonic Compute Node',
-    icon: '✨',
-    era: 'era5',
-    category: 'compute',
-    flavor: "Light-speed interconnect, no known roadmap, no known vendor. Whoever ships this first wins the decade - right now that's you.",
-    baseCost: { money: 500000 },
-    costScale: 1.15,
-    land: 0,
-    produces: { tokens: 15000 },
-    consumes: { electricity: 5.4, water: 1.62 },
-    requires: [{ type: 'building', id: 'feynman', count: 5 }],
-  },
-  {
     id: 'diesel_generator',
     name: 'Diesel Generator',
     icon: '⛽',
     era: 'era3',
-    category: 'buildings',
+    category: 'power',
     flavor: 'Loud, dirty, and reliably running at 3am. Drinks diesel the whole time.',
     baseCost: { money: 4000 }, // realistic for a quality ~5kW diesel unit
     costScale: 1.18,
@@ -513,6 +499,8 @@ Game.data.buildings = [
   // above) draws it for cooling on top of power. None of these come with
   // a hard "next tier" gate the way land sites do; they're priced to be
   // bought in the same rough order as their power-supply counterparts.
+  // Costs run 4x the original pricing - water rights/infrastructure were
+  // badly underpriced next to the electricity side of the same constraint.
   {
     id: 'municipal_water_hookup',
     name: 'Municipal Water Hookup',
@@ -520,12 +508,12 @@ Game.data.buildings = [
     era: 'era3',
     category: 'buildings',
     flavor: 'A standard commercial tap. The water utility does not yet know what you\'re planning to do with it.',
-    baseCost: { money: 12000 },
+    baseCost: { money: 48000 },
     costScale: 1.2,
     land: 0,
     produces: { water: 20 },
     consumes: {},
-    rentPerMonth: { money: 1500 },
+    rentPerMonth: { money: 6000 },
   },
   {
     id: 'aquifer_water_rights',
@@ -534,12 +522,12 @@ Game.data.buildings = [
     era: 'era4',
     category: 'buildings',
     flavor: 'You now own the right to pump groundwater that took ten thousand years to accumulate. A local farmer is not thrilled.',
-    baseCost: { money: 250000 },
+    baseCost: { money: 1000000 },
     costScale: 1.25,
     land: 0,
     produces: { water: 150 },
     consumes: {},
-    rentPerMonth: { money: 10000 },
+    rentPerMonth: { money: 40000 },
   },
   {
     id: 'hoover_dam_water_allocation',
@@ -548,12 +536,12 @@ Game.data.buildings = [
     era: 'era5',
     category: 'buildings',
     flavor: 'A slice of the Colorado River Compact, renegotiated in your favor by people who bill by the hour. Seven states are furious.',
-    baseCost: { money: 500000000 },
+    baseCost: { money: 2000000000 },
     costScale: 1.4,
     land: 0,
     produces: { water: 5000 },
     consumes: {},
-    rentPerMonth: { money: 2000000 },
+    rentPerMonth: { money: 8000000 },
     requires: [{ type: 'upgrade', id: 'permit_federal_review' }],
   },
 
@@ -611,7 +599,11 @@ Game.data.buildings = [
   // each), not a repeatable farm - every round requires the previous one
   // closed (requires: building/count 1) and pays out dramatically more
   // cash for a dramatically bigger Research Point spend, same idea as the
-  // Train New Model chain in data/upgrades.js.
+  // Train New Model chain in data/upgrades.js. Each round also requires a
+  // growing number of published arXiv papers (starting at 1 for the Angel
+  // round) - no paper trail, no term sheet - which also keeps the whole
+  // chain, including the Angel tile itself, hidden until the first paper
+  // is published.
   {
     id: 'raise_vc_angel',
     name: 'Raise VC Money',
@@ -627,6 +619,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 50000 },
+    requires: [{ type: 'building', id: 'publish_arxiv', count: 1 }],
   },
   {
     id: 'raise_vc_series_a',
@@ -643,7 +636,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 500000 },
-    requires: [{ type: 'building', id: 'raise_vc_angel', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_angel', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 2 }],
   },
   {
     id: 'raise_vc_series_b',
@@ -660,7 +653,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 3000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_a', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_a', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 3 }],
   },
   {
     id: 'raise_vc_series_c',
@@ -677,7 +670,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 15000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_b', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_b', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 4 }],
   },
   {
     id: 'raise_vc_series_d',
@@ -694,7 +687,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 75000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_c', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_c', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 5 }],
   },
   {
     id: 'raise_vc_series_e',
@@ -711,7 +704,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 300000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_d', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_d', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 6 }],
   },
   {
     id: 'raise_vc_series_f',
@@ -728,7 +721,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 1000000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_e', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_e', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 7 }],
   },
   {
     id: 'raise_vc_ipo',
@@ -745,7 +738,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 5000000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 8 }],
   },
 
   // --- Autonomous vehicle fleet, unlocked by the Create Autonomous
@@ -899,7 +892,7 @@ Game.data.buildings = [
     name: 'Small Gas Turbine (Reciprocating)',
     icon: '🔥',
     era: 'era5',
-    category: 'buildings',
+    category: 'power',
     flavor: 'A single reciprocating engine genset. 1MW, diesel-generator-sized but built to run on gas around the clock.',
     baseCost: { money: 1000 * 2500 }, // $2,500/kW x 1,000kW
     costScale: 1.25,
@@ -913,7 +906,7 @@ Game.data.buildings = [
     name: 'Medium Gas Turbine (Simple-Cycle)',
     icon: '🔥',
     era: 'era5',
-    category: 'buildings',
+    category: 'power',
     flavor: 'A single industrial gas turbine, simple-cycle. Fast to build, hungry to feed.',
     baseCost: { money: 50000 * 2500 }, // $2,500/kW x 50,000kW
     costScale: 1.3,
@@ -927,7 +920,7 @@ Game.data.buildings = [
     name: 'Large Gas Turbine (CCGT)',
     icon: '🔥',
     era: 'era5',
-    category: 'buildings',
+    category: 'power',
     flavor: 'Combined-cycle: a gas turbine plus a steam turbine catching its waste heat. Half a gigawatt, and meaningfully more fuel-efficient per MWh than simple-cycle.',
     baseCost: { money: 500000 * 2500 }, // $2,500/kW x 500,000kW
     costScale: 1.35,
@@ -941,7 +934,7 @@ Game.data.buildings = [
     name: 'Utility-Scale Solar Farm',
     icon: '🌞',
     era: 'era5',
-    category: 'buildings',
+    category: 'power',
     flavor: 'Twenty megawatts of panels on land that used to grow something else.',
     baseCost: { money: 20000000 }, // ~$1/W installed, utility-scale
     costScale: 1.3,
@@ -955,7 +948,7 @@ Game.data.buildings = [
     name: 'Small Modular Reactor',
     icon: '☢️',
     era: 'era5',
-    category: 'buildings',
+    category: 'power',
     flavor: 'Three hundred megawatts, baseload, and a stack of federal paperwork thicker than the containment wall.',
     baseCost: { money: 1000000000 },
     costScale: 1.4,
@@ -964,6 +957,22 @@ Game.data.buildings = [
     consumes: {},
     rentPerMonth: { money: 500000 }, // nuclear fuel + O&M - cheap per MWh, expensive in absolute terms at this scale
     requires: [{ type: 'upgrade', id: 'permit_federal_review' }],
+  },
+  {
+    id: 'nuclear_reactor_1gw',
+    name: '1GW Nuclear Reactor',
+    icon: '☢️',
+    era: 'era5',
+    category: 'power',
+    flavor: 'A full-scale pressurized water reactor, not a modular one. Twenty years of permitting, condensed into a purchase button.',
+    baseCost: { money: 6000000000 }, // ~$6,000/kW installed - conventional nuclear overnight cost, pricier per kW than the SMR but the output more than makes up for it
+    costScale: 1.4,
+    land: 35,
+    produces: { electricity: 1000000 }, // 1GW
+    consumes: {},
+    rentPerMonth: { money: 1400000 }, // nuclear fuel + O&M - cheaper per kW than the SMR at this scale
+    requires: [{ type: 'upgrade', id: 'permit_federal_review' }],
+    hardRequires: [{ type: 'building', id: 'smr_reactor', count: 1 }],
   },
 ];
 

@@ -20,7 +20,7 @@ Game.config = {
   freelanceHourlyRate: 15,    // $ earned per Freelance (DoorDash) click
   freelanceMaxClicksPerDay: 12, // shift cap per rolling in-game 24h day (see state.time.hours)
 
-  tokensPricePerMillion: 8, // $ earned per 1,000,000 tokens sold via Auto-Convert (see engine._runTokenConversion) - raised from 5 alongside the power/water rebalance below, so the extra infrastructure spend isn't a pure nerf
+  tokensPricePerMillion: 1, // $ earned per 1,000,000 tokens sold via Auto-Convert (see engine._runTokenConversion), seeded into state.tokensPricePerMillion on a fresh game - editable live from the status bar
   tokensToResearchRatio: 0.0001, // research points earned per token trained via Auto-Convert (10,000 tokens = 1 RP)
 
   hoursPerMonth: 730, // 24 * 365/12, average - divides any monthly cost (rent, etc.) into an hourly billing rate

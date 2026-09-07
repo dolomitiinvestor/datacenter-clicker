@@ -8,6 +8,7 @@ Game.engine = {
     this._runElectricityBilling(dtSeconds);
     this._runWater(dtSeconds);
     this._runUpkeep(dtSeconds);
+    this._runCompanyProfits(dtSeconds);
     this._runSoftwareJob(dtSeconds);
     this._runProduction(dtSeconds);
     this._runTokenConversion();
@@ -109,6 +110,22 @@ Game.engine = {
     });
   },
 
+  // Owned tech companies (see the "Buy the entire company" chain in
+  // data/upgrades.js) pay out their real annual net income continuously,
+  // same hourly-rate treatment as rent/salaries - this is what makes
+  // buying Nvidia etc. actually move your ARR, not just the one-time
+  // stat-boost effect they also grant.
+  _runCompanyProfits(dtSeconds) {
+    const hours = dtSeconds / 3600;
+    for (const upId in Game.state.upgrades) {
+      const up = Game.data.upgradesById[upId];
+      if (!up || !up.annualProfit) continue;
+      const earned = (up.annualProfit / Game.config.hoursPerYear) * hours;
+      Game.state_helpers.add('money', earned);
+      Game.state.stats.totalMoneyEarned += earned;
+    }
+  },
+
   // A steady day job: while toggled on, pays out actions.softwareJobSalary()
   // continuously (converted to an hourly rate), independent of any building.
   _runSoftwareJob(dtSeconds) {
@@ -136,6 +153,7 @@ Game.engine = {
       for (const resId in b.produces) {
         if (resId === 'electricity' || resId === 'water') continue; // handled in _runElectricity/_runWater
         let rate = b.produces[resId] * count * rateMult;
+        if (resId === 'influence') rate *= Game.effects.getMult('influence_gain'); // Campaign Donations/Office Dog boost Lobbyist/Regulatory Affairs Office output now that influence has no click source
         if (needsElectricity) rate *= elecThrottle;
         if (needsWater) rate *= waterThrottle;
         rates[resId] = (rates[resId] || 0) + rate;
@@ -158,7 +176,7 @@ Game.engine = {
   // piling up, split between cash and research points by trainAllocationPct
   // (0 = all sold, 100 = all trained, anything between splits both ways).
   // At 100% sell with no upgrades, one Used Laptop (20,000 tokens/hr) nets
-  // $5 every 50 hours (1,000,000 tokens @ tokensPricePerMillion).
+  // $1 every 50 hours (1,000,000 tokens @ tokensPricePerMillion).
   _runTokenConversion() {
     const tokens = Game.state.resources.tokens;
     if (tokens.amount <= 0 || !Game.state.autoConvertEnabled) return;
