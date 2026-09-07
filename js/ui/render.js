@@ -194,7 +194,13 @@ Game.ui = {
           valueHtml += ' <span class="rate-suffix">(' + Game.format.number(res.used * f, 0) + ' / ' + Game.format.number(res.cap * f, 0) + ' ' + r.secondaryUnit.label + ')</span>';
         }
       } else if (r.kind === 'flow') {
-        valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
+        if (r.id === 'electricity') {
+          const u = Game.format.powerUnit(res.generated);
+          valueHtml = Game.format.number(res.consumed / u.div, 1) + ' / ' + Game.format.number(res.generated / u.div, 1);
+          symbolHtml = '<span class="res-symbol">' + u.unit + '</span>';
+        } else {
+          valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
+        }
       } else {
         valueHtml = Game.format.resourceValue(r, res.amount);
         if (r.format === 'currency') symbolHtml = ''; // $ already embedded in the value
@@ -217,9 +223,10 @@ Game.ui = {
     const elec = Game.state.resources.electricity;
     const pct = elec.generated > 0 ? Math.min(100, (elec.consumed / elec.generated) * 100) : 0;
     const brownout = elec.throttle < 0.999;
+    const u = Game.format.powerUnit(elec.generated);
     this.els.electricityBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (brownout ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
-      '<div class="bar-label">' + Game.format.number(elec.consumed, 1) + ' / ' + Game.format.number(elec.generated, 1) + ' kW' +
+      '<div class="bar-label">' + Game.format.number(elec.consumed / u.div, 1) + ' / ' + Game.format.number(elec.generated / u.div, 1) + ' ' + u.unit +
       ' • ' + Game.format.money(elec.billPerHour || 0) + '/hr @ ' + Game.format.money(Game.state.electricityPricePerKwh) + '/kWh' +
       (brownout ? ' — BROWNOUT (' + Math.round(elec.throttle * 100) + '% output)' : '') + '</div>';
   },

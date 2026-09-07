@@ -29,6 +29,18 @@ Game.format = {
     return sign + this._trimZeros(value.toFixed(2)) + units[unitIndex];
   },
 
+  // Picks the display unit for a raw kW figure, switching up once kW alone
+  // would run past 4 digits - a 15kW apartment panel early on, multi-GW
+  // campuses by the late game. Returns a divisor + unit pair rather than a
+  // formatted string so a caller showing "consumed / generated" can share
+  // one unit across both numbers instead of picking it twice.
+  powerUnit(kw) {
+    const abs = Math.abs(kw);
+    if (abs >= 1000000) return { div: 1000000, unit: 'GW' };
+    if (abs >= 1000) return { div: 1000, unit: 'MW' };
+    return { div: 1, unit: 'kW' };
+  },
+
   _trimZeros(str) {
     if (str.indexOf('.') === -1) return str;
     return str.replace(/0+$/, '').replace(/\.$/, '');

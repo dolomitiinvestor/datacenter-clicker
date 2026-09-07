@@ -123,6 +123,7 @@ Game.data.upgrades = [
     const BASE_COST = 30000; // 30 RP * 1000
     const COST_GROWTH = 1.45;
     const PRODUCE_MULT = 1.12; // per-tier produce_all multiplier - compounds hugely over 42 tiers
+    const SELL_PRICE_MULT = 1.1; // per-tier $/token bump - a newer, better model also commands a higher price, same lever the marketing upgrades (Marketing Plan, Rebrand as an "AI Company") pull on
 
     return CHAIN.map((m, i) => ({
       id: 'train_new_model_' + (i + 1),
@@ -130,9 +131,12 @@ Game.data.upgrades = [
       icon: '🧬',
       era: m.era,
       category: 'research',
-      flavor: 'Frontier model release #' + (i + 1) + '. Somehow the infra bill is always the surprise.',
+      flavor: 'Frontier model release #' + (i + 1) + '. Somehow the infra bill is always the surprise, but so is the price it commands.',
       cost: { reputation: Math.round(BASE_COST * Math.pow(COST_GROWTH, i)) },
-      effects: [{ type: 'mult', target: 'produce_all', value: PRODUCE_MULT }],
+      effects: [
+        { type: 'mult', target: 'produce_all', value: PRODUCE_MULT },
+        { type: 'mult', target: 'sell_price', value: SELL_PRICE_MULT },
+      ],
       requiresUpgrade: i > 0 ? 'train_new_model_' + i : null,
     }));
   })(),
