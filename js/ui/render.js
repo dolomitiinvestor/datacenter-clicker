@@ -28,7 +28,6 @@ Game.ui = {
       allocSlider: document.getElementById('alloc-slider'),
       allocSellPct: document.getElementById('alloc-sell-pct'),
       allocTrainPct: document.getElementById('alloc-train-pct'),
-      btnSchmooze: document.getElementById('btn-schmooze'),
       clockSpeedSlider: document.getElementById('clock-speed-slider'),
       clockSpeedLabel: document.getElementById('clock-speed-label'),
       elecPriceInput: document.getElementById('elec-price-input'),
@@ -354,20 +353,18 @@ Game.ui = {
 
   // Buy 10/100/1000 shortcuts, compute cards only - GPUs are the items
   // players actually stack by the dozen (or thousand). 100 and 1000 stay
-  // hidden until the purchase is actually within reach - cost no more than
-  // the player's current cash or their current ARR, whichever is bigger -
-  // so the buttons don't clutter every card with options nobody can use
-  // yet. Buy 10 always shows.
+  // hidden until actually affordable so they don't clutter every card with
+  // options nobody can use yet - kept live (re-checked every frame in
+  // refreshAffordability, not just on catalog rebuilds) so they pop in/out
+  // as cash crosses the threshold. Buy 10 always shows, just disabled.
   BULK_BUY_QUANTITIES: [10, 100, 1000],
 
   bulkBuyButtonsHtml(b) {
     if (b.category !== 'compute') return '';
-    const arr = (Game.state.netMoneyPerSecond || 0) * 3600 * Game.config.hoursPerYear;
-    const feasibleCeiling = Math.max(Game.state.resources.money.amount, arr);
     return this.BULK_BUY_QUANTITIES.map((qty) => {
       const qtyCost = Game.actions.buildingCostForQty(b.id, qty);
-      if (qty > 10 && qtyCost.money > feasibleCeiling) return '';
-      return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '">Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
+      const hiddenAttr = (qty > 10 && !Game.actions.canBuyBuildingQty(b.id, qty)) ? ' hidden' : '';
+      return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '"' + hiddenAttr + '>Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
     }).join('');
   },
 
@@ -513,7 +510,9 @@ Game.ui = {
     document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       const id = btn.getAttribute('data-building');
       const qty = Number(btn.getAttribute('data-qty')) || 1;
-      btn.disabled = qty === 1 ? Game.actions.buildingButtonDisabled(id) : !Game.actions.canBuyBuildingQty(id, qty);
+      const canBuy = qty === 1 ? !Game.actions.buildingButtonDisabled(id) : Game.actions.canBuyBuildingQty(id, qty);
+      btn.disabled = !canBuy;
+      if (qty > 10) btn.hidden = !canBuy; // Buy 100/1000: hide (not just disable) once unaffordable
     });
     document.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       const id = btn.getAttribute('data-upgrade');
@@ -523,9 +522,7 @@ Game.ui = {
 
   renderActionVisibility() {
     const tokensUnlocked = Game.state.erasUnlocked.era1;
-    const influenceUnlocked = Game.state.erasUnlocked.era3;
     document.getElementById('token-actions').style.display = tokensUnlocked ? '' : 'none';
-    document.getElementById('influence-actions').style.display = influenceUnlocked ? '' : 'none';
   },
 
   renderLog() {

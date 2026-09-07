@@ -611,7 +611,11 @@ Game.data.buildings = [
   // each), not a repeatable farm - every round requires the previous one
   // closed (requires: building/count 1) and pays out dramatically more
   // cash for a dramatically bigger Research Point spend, same idea as the
-  // Train New Model chain in data/upgrades.js.
+  // Train New Model chain in data/upgrades.js. Each round also requires a
+  // growing number of published arXiv papers (starting at 1 for the Angel
+  // round) - no paper trail, no term sheet - which also keeps the whole
+  // chain, including the Angel tile itself, hidden until the first paper
+  // is published.
   {
     id: 'raise_vc_angel',
     name: 'Raise VC Money',
@@ -627,6 +631,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 50000 },
+    requires: [{ type: 'building', id: 'publish_arxiv', count: 1 }],
   },
   {
     id: 'raise_vc_series_a',
@@ -643,7 +648,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 500000 },
-    requires: [{ type: 'building', id: 'raise_vc_angel', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_angel', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 2 }],
   },
   {
     id: 'raise_vc_series_b',
@@ -660,7 +665,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 3000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_a', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_a', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 3 }],
   },
   {
     id: 'raise_vc_series_c',
@@ -677,7 +682,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 15000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_b', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_b', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 4 }],
   },
   {
     id: 'raise_vc_series_d',
@@ -694,7 +699,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 75000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_c', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_c', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 5 }],
   },
   {
     id: 'raise_vc_series_e',
@@ -711,7 +716,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 300000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_d', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_d', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 6 }],
   },
   {
     id: 'raise_vc_series_f',
@@ -728,7 +733,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 1000000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_e', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_e', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 7 }],
   },
   {
     id: 'raise_vc_ipo',
@@ -745,7 +750,7 @@ Game.data.buildings = [
     produces: {},
     consumes: {},
     payout: { money: 5000000000 },
-    requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }],
+    requires: [{ type: 'building', id: 'raise_vc_series_f', count: 1 }, { type: 'building', id: 'publish_arxiv', count: 8 }],
   },
 
   // --- Autonomous vehicle fleet, unlocked by the Create Autonomous

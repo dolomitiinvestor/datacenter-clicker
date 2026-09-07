@@ -136,6 +136,7 @@ Game.engine = {
       for (const resId in b.produces) {
         if (resId === 'electricity' || resId === 'water') continue; // handled in _runElectricity/_runWater
         let rate = b.produces[resId] * count * rateMult;
+        if (resId === 'influence') rate *= Game.effects.getMult('influence_gain'); // Campaign Donations/Office Dog boost Lobbyist/Regulatory Affairs Office output now that influence has no click source
         if (needsElectricity) rate *= elecThrottle;
         if (needsWater) rate *= waterThrottle;
         rates[resId] = (rates[resId] || 0) + rate;
@@ -158,7 +159,7 @@ Game.engine = {
   // piling up, split between cash and research points by trainAllocationPct
   // (0 = all sold, 100 = all trained, anything between splits both ways).
   // At 100% sell with no upgrades, one Used Laptop (20,000 tokens/hr) nets
-  // $5 every 50 hours (1,000,000 tokens @ tokensPricePerMillion).
+  // $1 every 50 hours (1,000,000 tokens @ tokensPricePerMillion).
   _runTokenConversion() {
     const tokens = Game.state.resources.tokens;
     if (tokens.amount <= 0 || !Game.state.autoConvertEnabled) return;

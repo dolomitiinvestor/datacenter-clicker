@@ -18,9 +18,9 @@ window.Game = window.Game || {};
     Game.engine.tick(gameDt);
     const erasAfter = Object.keys(Game.state.erasUnlocked).length;
 
-    // Net $/game-second from continuous flows only: clicks (Freelance,
-    // Schmooze) and one-off building payouts (Publish arXiv, Raise VC)
-    // happen outside engine.tick, so this delta only ever reflects rent,
+    // Net $/game-second from continuous flows only: clicks (Freelance)
+    // and one-off building payouts (Publish arXiv, Raise VC) happen
+    // outside engine.tick, so this delta only ever reflects rent,
     // electricity billing, salaries, and token auto-convert.
     if (gameDt > 0) {
       Game.state.netMoneyPerSecond = (Game.state.resources.money.amount - moneyBefore) / gameDt;
@@ -45,11 +45,6 @@ window.Game = window.Game || {};
       }
       Game.ui.renderResources();
       Game.ui.renderFreelanceStatus();
-    });
-
-    document.getElementById('btn-schmooze').addEventListener('click', () => {
-      Game.actions.schmoozePolitician();
-      Game.ui.renderResources();
     });
 
     document.getElementById('btn-software-job').addEventListener('click', () => {

@@ -31,12 +31,6 @@ Game.actions = {
     return amount;
   },
 
-  schmoozePolitician() {
-    const amount = 1 * Game.effects.getMult('influence_gain') * Game.dev.speedMultiplier;
-    Game.state_helpers.add('influence', amount);
-    return amount;
-  },
-
   // Steady day job toggle: while on, the engine pays out
   // softwareJobSalary() continuously (see engine._runSoftwareJob) instead
   // of requiring clicks.
