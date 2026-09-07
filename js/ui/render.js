@@ -279,6 +279,7 @@ Game.ui = {
     });
 
     this.bindBuildingButtons();
+    this.bindSellButtons();
     this.bindUpgradeButtons();
     this.bindHideButtons();
   },
@@ -301,6 +302,7 @@ Game.ui = {
     const bulkButtonsHtml = this.bulkBuyButtonsHtml(b);
     const hidden = !!Game.state.hiddenTiles[b.id];
     const hideBtnHtml = this.hideButtonHtml(b.id, hidden);
+    const sellBtnHtml = this.sellButtonHtml(b, count);
     return (
       '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-building="' + b.id + '">' +
       '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
@@ -311,8 +313,18 @@ Game.ui = {
       '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">' + (b.buyLabel || 'Buy') + ' — ' + costHtml + '</button>' +
       bulkButtonsHtml +
+      sellBtnHtml +
       '</div>'
     );
+  },
+
+  // Shown only once you own at least one - lets you back out of a
+  // purchase (e.g. one whose upkeep just dragged net ARR negative) for a
+  // partial refund. See actions.sellBuilding.
+  sellButtonHtml(b, count) {
+    if (count <= 0) return '';
+    const refundHtml = this.costHtml(Game.actions.sellRefund(b.id));
+    return '<button class="sell-btn" data-sell="' + b.id + '">Sell 1 — refund ' + refundHtml + '</button>';
   },
 
   // Small "minimize"/"restore" toggle in a card's header - see
@@ -451,6 +463,18 @@ Game.ui = {
         }
         const bought = qty === 1 ? Game.actions.buyBuilding(id) : Game.actions.buyBuildingQty(id, qty);
         if (bought) {
+          this.renderCatalog();
+          this.renderResources();
+        }
+      });
+    });
+  },
+
+  bindSellButtons() {
+    document.querySelectorAll('[data-sell]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-sell');
+        if (Game.actions.sellBuilding(id)) {
           this.renderCatalog();
           this.renderResources();
         }

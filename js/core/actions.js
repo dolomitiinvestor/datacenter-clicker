@@ -185,6 +185,38 @@ Game.actions = {
     return true;
   },
 
+  // --- selling / demolishing ---
+  // Lets a player back out of a building whose upkeep (rent, electricity)
+  // turns out to outweigh what it produces - e.g. it just dragged net ARR
+  // negative. Refunds a fraction (config.sellRefundFraction) of the
+  // building's current buy cost, frees the land it used, and never yields
+  // a profit since the refund is always less than the buy cost.
+
+  canSellBuilding(buildingId) {
+    return (Game.state.buildings[buildingId] || 0) > 0;
+  },
+
+  sellRefund(buildingId) {
+    const unitCost = this.buildingCost(buildingId);
+    const refund = {};
+    for (const resId in unitCost) {
+      refund[resId] = unitCost[resId] * Game.config.sellRefundFraction;
+    }
+    return refund;
+  },
+
+  sellBuilding(buildingId) {
+    if (!this.canSellBuilding(buildingId)) return false;
+    const def = Game.data.buildingsById[buildingId];
+    const refund = this.sellRefund(buildingId);
+    Game.state.buildings[buildingId]--;
+    Game.state.resources.land.used = Math.max(0, Game.state.resources.land.used - (def.land || 0));
+    for (const resId in refund) Game.state_helpers.add(resId, refund[resId]);
+    Game.state_helpers.recalcLandCap();
+    Game.state_helpers.logEvent('Sold: ' + def.name);
+    return true;
+  },
+
   upgradeCost(upgradeId) {
     const def = Game.data.upgradesById[upgradeId];
     const cost = {};

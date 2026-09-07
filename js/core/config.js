@@ -29,6 +29,8 @@ Game.config = {
   softwareJobAnnualSalary: 100000, // $/yr earned continuously while the Software Job toggle is on
   softwareJobRaisePct: 0.03, // annual raise, compounding once per in-game Jan 1 (see actions.softwareJobSalary / format.yearsSinceStart)
 
+  sellRefundFraction: 0.5, // fraction of current buy cost refunded when selling/demolishing one unit of a building (see actions.sellBuilding) - lets a player back out of a purchase that tanked their ARR
+
   // Real-world reference constants for the top-bar "% of US GDP" / "% of US
   // electricity" stats (see render.js renderStatusBar). Point-in-time
   // approximations (~2025-2026), not a live feed - same idea as the
