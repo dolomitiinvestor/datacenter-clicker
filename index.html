@@ -5,7 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Datacenter Clicker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><rect x=%221%22 y=%222%22 width=%2214%22 height=%229%22 rx=%221%22 fill=%224fd1c5%22/><rect x=%226%22 y=%2211%22 width=%224%22 height=%222%22 fill=%224fd1c5%22/></svg>">
-<link rel="stylesheet" href="css/style.css">
+<script>
+  // Cache-bust with a fresh value every page load, so a returning player
+  // never gets a stale copy of the stylesheet from the browser's HTTP
+  // cache - no server cache-control config or manual version bumping
+  // needed. See the matching script loader at the end of <body> for the
+  // same trick applied to the JS files, and js/core/updatecheck.js for
+  // what auto-reloads a tab that's been left open across a deploy.
+  document.write('<link rel="stylesheet" href="css/style.css?v=' + Date.now() + '">');
+</script>
 </head>
 <body>
 <!-- DEV MODE — testing-only speed controls. Delete this <div> (and the
@@ -158,20 +166,35 @@
   </div>
 </div>
 
-<script src="js/core/config.js"></script>
-<script src="js/core/devmode.js"></script>
-<script src="js/core/format.js"></script>
-<script src="js/data/resources.js"></script>
-<script src="js/data/eras.js"></script>
-<script src="js/data/buildings.js"></script>
-<script src="js/data/upgrades.js"></script>
-<script src="js/data/milestones.js"></script>
-<script src="js/core/state.js"></script>
-<script src="js/core/effects.js"></script>
-<script src="js/core/engine.js"></script>
-<script src="js/core/actions.js"></script>
-<script src="js/core/save.js"></script>
-<script src="js/ui/render.js"></script>
-<script src="js/main.js"></script>
+<script>
+  // Same cache-busting trick as the stylesheet above, for every game
+  // script - a fresh ?v= on every page load means a returning player
+  // always gets the current code, never a browser-cached stale copy, with
+  // no server config or manual version bumping required. document.write
+  // (called synchronously here, during initial parse) inserts these as
+  // normal <script> tags in the parse stream, so load order and the
+  // DOMContentLoaded timing main.js relies on are unaffected.
+  var v = Date.now();
+  [
+    'js/core/config.js',
+    'js/core/devmode.js',
+    'js/core/format.js',
+    'js/data/resources.js',
+    'js/data/eras.js',
+    'js/data/buildings.js',
+    'js/data/upgrades.js',
+    'js/data/milestones.js',
+    'js/core/state.js',
+    'js/core/effects.js',
+    'js/core/engine.js',
+    'js/core/actions.js',
+    'js/core/save.js',
+    'js/core/updatecheck.js',
+    'js/ui/render.js',
+    'js/main.js',
+  ].forEach(function (src) {
+    document.write('<script src="' + src + '?v=' + v + '"><\/script>');
+  });
+</script>
 </body>
 </html>
