@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Datacenter Clicker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2214%22>🖥️</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><rect x=%221%22 y=%222%22 width=%2214%22 height=%229%22 rx=%221%22 fill=%224fd1c5%22/><rect x=%226%22 y=%2211%22 width=%224%22 height=%222%22 fill=%224fd1c5%22/></svg>">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <!-- DEV MODE — testing-only speed controls. Delete this <div> (and the
      matching CSS, JS wiring, and devmode.js) to remove dev mode. -->
 <div id="dev-mode-panel">
-  <span class="dev-label">⚙ DEV MODE</span>
+  <span class="dev-label">DEV MODE</span>
   <span class="dev-group-label">Speed</span>
   <button data-speed="1" class="active">1x</button>
   <button data-speed="10">10x</button>
@@ -21,15 +21,15 @@
   <button data-cost="1" class="active">1x</button>
   <button data-cost="10">10x</button>
   <button id="btn-cost-scaling">Cost Scaling: OFF</button>
-  <button id="btn-edit-state">✏️ Edit State</button>
+  <button id="btn-edit-state">Edit State</button>
 </div>
 
 <!-- DEV MODE — raw state editor. Delete this <div> along with the
      bindDevStateEditor() wiring in main.js to remove it. -->
 <div id="dev-state-editor" hidden>
   <div class="dev-state-actions">
-    <button id="btn-state-refresh">🔄 Refresh from game</button>
-    <button id="btn-state-apply">✅ Apply to game</button>
+    <button id="btn-state-refresh">Refresh from game</button>
+    <button id="btn-state-apply">Apply to game</button>
   </div>
   <textarea id="dev-state-textarea" spellcheck="false"></textarea>
 </div>
@@ -41,19 +41,19 @@
 </header>
 
 <div id="status-bar">
-  <span id="status-time">📅 Day 0 • Nov 30, 2022, 12:00 AM</span>
-  <span id="status-tokens">🔤 0 tokens/s</span>
-  <span id="status-net">💰 Net: $0.00/s • ARR: $0.00</span>
-  <span id="status-gdp">🇺🇸 0% of US GDP</span>
-  <span id="status-us-elec">⚡ 0% of US electricity</span>
+  <span id="status-time">Day 0 • Nov 30, 2022, 12:00 AM</span>
+  <span id="status-tokens">0 tokens/s</span>
+  <span id="status-net">Net: $0.00/s • ARR: $0.00</span>
+  <span id="status-gdp">0% of US GDP</span>
+  <span id="status-us-elec">0% of US electricity</span>
   <div id="token-price-wrap">
-    <label for="token-price-input">🔤 Price: $<input type="number" id="token-price-input" min="0" step="0.01" value="1.00">/M tokens</label>
+    <label for="token-price-input">Price: $<input type="number" id="token-price-input" min="0" step="0.01" value="1.00">/M tokens</label>
   </div>
   <div id="elec-price-wrap">
-    <label for="elec-price-input">⚡ Price: $<input type="number" id="elec-price-input" min="0" step="0.01" value="0.10">/kWh</label>
+    <label for="elec-price-input">Price: $<input type="number" id="elec-price-input" min="0" step="0.01" value="0.10">/kWh</label>
   </div>
   <div id="clock-speed-wrap">
-    <label for="clock-speed-slider">⏩ Clock Speed: <span id="clock-speed-label">1x</span></label>
+    <label for="clock-speed-slider">Clock Speed: <span id="clock-speed-label">1x</span></label>
     <input type="range" id="clock-speed-slider" min="0" max="20" step="0.5" value="1">
   </div>
 </div>
@@ -66,13 +66,13 @@
   <section id="actions-panel">
     <h2>Actions</h2>
     <div id="core-actions" class="action-row">
-      <button id="btn-freelance">🛵 Freelance (DoorDash)<span class="hint" id="freelance-hint">$15/click • 12 shifts/day</span></button>
-      <button id="btn-software-job" class="toggle-btn">💼 Software Job<span class="hint" id="software-job-hint">$100k/yr • OFF</span></button>
+      <button id="btn-freelance">Freelance (DoorDash)<span class="hint" id="freelance-hint">$15/click • 12 shifts/day</span></button>
+      <button id="btn-software-job" class="toggle-btn">Software Job<span class="hint" id="software-job-hint">$100k/yr • OFF</span></button>
     </div>
     <div id="token-actions" class="action-row token-alloc-row">
-      <button id="btn-auto-convert" class="toggle-btn">🔁 Auto-Convert Tokens: OFF<span class="hint">continuously converts tokens → cash/research points</span></button>
+      <button id="btn-auto-convert" class="toggle-btn">Auto-Convert Tokens: OFF<span class="hint">continuously converts tokens → cash/research points</span></button>
       <div id="alloc-slider-wrap">
-        <label for="alloc-slider">💸 Sell <span id="alloc-sell-pct">50</span>% &nbsp;/&nbsp; 🎯 Train <span id="alloc-train-pct">50</span>%</label>
+        <label for="alloc-slider">Sell <span id="alloc-sell-pct">50</span>% &nbsp;/&nbsp; Train <span id="alloc-train-pct">50</span>%</label>
         <input type="range" id="alloc-slider" min="0" max="100" value="50" step="5">
       </div>
     </div>

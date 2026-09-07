@@ -390,7 +390,6 @@ button .hint {
   gap: 6px;
 }
 
-.card-icon { font-size: 18px; }
 .card-title { font-weight: 600; flex: 1; }
 .card-count { color: var(--accent); font-variant-numeric: tabular-nums; }
 

@@ -92,27 +92,27 @@ Game.ui = {
   renderStatusBar() {
     if (this.els.statusTime) {
       const gc = Game.format.gameClock(Game.state.time.hours);
-      this.els.statusTime.textContent = '📅 Day ' + gc.daysPassed + ' • ' + gc.dateStr;
+      this.els.statusTime.textContent = 'Day ' + gc.daysPassed + ' • ' + gc.dateStr;
     }
     if (this.els.statusTokens) {
       const rate = Game.state.resources.tokens.perSecond || 0;
-      this.els.statusTokens.textContent = '🔤 ' + Game.format.number(rate, 2) + ' tokens/s';
+      this.els.statusTokens.textContent = Game.format.number(rate, 2) + ' tokens/s';
     }
     let arr = 0;
     if (this.els.statusNet) {
       const net = Game.state.netMoneyPerSecond || 0;
       arr = net * 3600 * Game.config.hoursPerYear; // $/game-second -> $/game-year
-      this.els.statusNet.textContent = '💰 Net: ' + Game.format.moneyRateCompact(net) + '/s • ARR: ' + Game.format.moneyCompact(arr);
+      this.els.statusNet.textContent = 'Net: ' + Game.format.moneyRateCompact(net) + '/s • ARR: ' + Game.format.moneyCompact(arr);
     }
     if (this.els.statusGdp) {
       const pct = (arr / Game.config.usGdpAnnual) * 100;
-      this.els.statusGdp.textContent = '🇺🇸 ' + Game.format.number(pct, 4) + '% of US GDP';
+      this.els.statusGdp.textContent = Game.format.number(pct, 4) + '% of US GDP';
     }
     if (this.els.statusUsElec) {
       const elec = Game.state.resources.electricity;
       const annualKwh = elec.consumed * Game.config.hoursPerYear;
       const pct = (annualKwh / Game.config.usElectricityAnnualKwh) * 100;
-      this.els.statusUsElec.textContent = '⚡ ' + Game.format.number(pct, 4) + '% of US electricity';
+      this.els.statusUsElec.textContent = Game.format.number(pct, 4) + '% of US electricity';
     }
   },
 
@@ -127,7 +127,7 @@ Game.ui = {
     const shortage = water.throttle < 0.999;
     this.els.waterBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (shortage ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
-      '<div class="bar-label">💧 ' + Game.format.number(water.consumed, 1) + ' / ' + Game.format.number(water.generated, 1) + ' gal/s' +
+      '<div class="bar-label">' + Game.format.number(water.consumed, 1) + ' / ' + Game.format.number(water.generated, 1) + ' gal/s' +
       (shortage ? ' — WATER SHORTAGE (' + Math.round(water.throttle * 100) + '% output)' : '') + '</div>';
   },
 
@@ -163,7 +163,7 @@ Game.ui = {
     if (this.els.btnAutoConvert) {
       const on = Game.state.autoConvertEnabled;
       this.els.btnAutoConvert.classList.toggle('active', on);
-      this.els.btnAutoConvert.firstChild.textContent = '🔁 Auto-Convert Tokens: ' + (on ? 'ON' : 'OFF');
+      this.els.btnAutoConvert.firstChild.textContent = 'Auto-Convert Tokens: ' + (on ? 'ON' : 'OFF');
     }
     this.renderAllocLabels();
     if (this.els.allocSlider) this.els.allocSlider.value = Game.state.trainAllocationPct;
@@ -187,7 +187,7 @@ Game.ui = {
   renderModelBanner() {
     if (!this.els.modelBanner) return;
     const model = Game.actions.currentModelName();
-    this.els.modelBanner.innerHTML = model ? '<span class="model-name">🤖 ' + model + '</span>' : '';
+    this.els.modelBanner.innerHTML = model ? '<span class="model-name">' + model + '</span>' : '';
   },
 
   renderResources() {
@@ -219,7 +219,6 @@ Game.ui = {
       }
       return (
         '<div class="resource-chip" title="' + r.name + '">' +
-        '<span class="res-icon">' + r.icon + '</span>' +
         '<span class="res-value">' + valueHtml + '</span>' +
         symbolHtml +
         '</div>'
@@ -313,7 +312,7 @@ Game.ui = {
     const efficiencyHtml = this.tokenEfficiencyHtml(b, cost);
     const powerEfficiencyHtml = this.powerEfficiencyHtml(b);
     const locked = b.blockOnRequirementFail && !Game.actions.meetsRequirements(b.id);
-    const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
+    const lockedHtml = locked ? '<span class="tag tag-locked">locked - try buying for details</span>' : '';
     const subtitleHtml = b.subtitle ? '<div class="card-subtitle">' + b.subtitle + '</div>' : '';
     const bulkButtonsHtml = this.bulkBuyButtonsHtml(b);
     const hidden = !!Game.state.hiddenTiles[b.id];
@@ -321,7 +320,7 @@ Game.ui = {
     const sellBtnHtml = this.sellButtonHtml(b, count);
     return (
       '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-building="' + b.id + '">' +
-      '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
+      '<div class="card-head">' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span>' + hideBtnHtml + '</div>' +
       subtitleHtml +
@@ -348,7 +347,7 @@ Game.ui = {
   hideButtonHtml(id, hidden) {
     return hidden
       ? '<button class="card-hide-btn" data-unhide="' + id + '" title="Restore this card">↺</button>'
-      : '<button class="card-hide-btn" data-hide="' + id + '" title="Minimize - I\'m not using this anymore">✕</button>';
+      : '<button class="card-hide-btn" data-hide="' + id + '" title="Minimize - I\'m not using this anymore">×</button>';
   },
 
   bindHideButtons() {
@@ -438,8 +437,16 @@ Game.ui = {
     return Object.keys(payout).map((resId) => {
       const r = Game.data.resourcesById[resId];
       if (!r) return '';
-      return '<span class="tag tag-payout">grants ' + r.icon + Game.format.resourceValue(r, payout[resId]) + '</span>';
+      return '<span class="tag tag-payout">grants ' + this.amountWithUnit(r, payout[resId]) + '</span>';
     }).join('');
+  },
+
+  // A resource amount with its unit label attached - money's $ is already
+  // embedded by format.resourceValue(), everything else gets its plain-text
+  // symbol appended (e.g. "25K RP", "150 acres", "20K tokens").
+  amountWithUnit(r, amount) {
+    const val = Game.format.resourceValue(r, amount);
+    return r.format === 'currency' ? val : val + ' ' + r.symbol;
   },
 
   rateSummaryHtml(rates) {
@@ -451,9 +458,9 @@ Game.ui = {
       // per-hour instead - always fixed to one decimal (see
       // format.influenceRate) so the display never jumps precision.
       if (resId === 'influence') {
-        return '<span class="tag">' + r.icon + Game.format.influenceRate(rates[resId] * 3600) + '/hr</span>';
+        return '<span class="tag">' + Game.format.influenceRate(rates[resId] * 3600) + ' ' + r.symbol + '/hr</span>';
       }
-      return '<span class="tag">' + r.icon + Game.format.resourceValue(r, rates[resId]) + '/s</span>';
+      return '<span class="tag">' + this.amountWithUnit(r, rates[resId]) + '/s</span>';
     }).join('');
   },
 
@@ -466,14 +473,14 @@ Game.ui = {
       if (!r) return '';
       const monthly = rentPerMonth[resId];
       const hourly = monthly / Game.config.hoursPerMonth;
-      return '<span class="tag tag-rent">' + r.icon + Game.format.resourceValue(r, monthly) + '/mo (' + Game.format.resourceValue(r, hourly) + '/hr)</span>';
+      return '<span class="tag tag-rent">' + this.amountWithUnit(r, monthly) + '/mo (' + this.amountWithUnit(r, hourly) + '/hr)</span>';
     }).join('');
   },
 
   costHtml(cost) {
     return Object.keys(cost).map((resId) => {
       const r = Game.data.resourcesById[resId];
-      return r.icon + Game.format.resourceValue(r, cost[resId]);
+      return this.amountWithUnit(r, cost[resId]);
     }).join(' ');
   },
 
@@ -520,7 +527,7 @@ Game.ui = {
       : '';
     return (
       '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-upgrade="' + u.id + '">' +
-      '<div class="card-head"><span class="card-icon">' + u.icon + '</span>' +
+      '<div class="card-head">' +
       '<span class="card-title">' + u.name + '</span>' + hideBtnHtml + '</div>' +
       '<div class="card-flavor">' + u.flavor + '</div>' +
       profitHtml +

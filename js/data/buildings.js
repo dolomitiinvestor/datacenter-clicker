@@ -60,7 +60,6 @@ Game.data.buildings = [
   {
     id: 'laptop',
     name: 'Used Laptop',
-    icon: '💻',
     era: 'era1',
     category: 'compute',
     flavor: 'A $200 Craigslist find, running inference jobs between browser tabs.',
@@ -75,7 +74,6 @@ Game.data.buildings = [
   {
     id: 'macbook_m5',
     name: 'MacBook M5',
-    icon: '🍎',
     era: 'era1',
     category: 'compute',
     flavor: "Cupertino's finest, quietly out-computing your entire GPU rack while sipping watts.",
@@ -89,7 +87,6 @@ Game.data.buildings = [
   {
     id: 'sf_apartment',
     name: 'Rent SF Apartment',
-    icon: '🏠',
     era: 'era1',
     category: 'buildings',
     flavor: '200 square feet of Bay Area living space, with a 15kW panel that\'s begging to be maxed out.',
@@ -106,7 +103,6 @@ Game.data.buildings = [
   {
     id: 'extra_outlet',
     name: 'Extra Power Outlet',
-    icon: '🔌',
     era: 'era2',
     category: 'power',
     flavor: 'You called an electrician. Your landlord did not approve.',
@@ -121,7 +117,6 @@ Game.data.buildings = [
   {
     id: 'empty_warehouse',
     name: 'Empty Warehouse',
-    icon: '📦',
     era: 'era2',
     category: 'buildings',
     flavor: 'A bare concrete shell with a roll-up door. No power hookup, but the rent is cheap and nobody asks questions.',
@@ -137,7 +132,6 @@ Game.data.buildings = [
   {
     id: 'substation_upgrade',
     name: 'Substation Upgrade',
-    icon: '🔋',
     era: 'era2',
     category: 'power',
     flavor: 'A dedicated transformer and a very patient utility contractor. Buys you real headroom before the next brownout.',
@@ -151,7 +145,6 @@ Game.data.buildings = [
   {
     id: 'abandoned_factory_4mw',
     name: '4MW Abandoned Factory',
-    icon: '🏚️',
     era: 'era3',
     category: 'power',
     // Was a 10MW connection - repriced down to 4MW as part of making power
@@ -170,7 +163,6 @@ Game.data.buildings = [
   {
     id: 'corporate_campus_lease',
     name: 'Corporate Campus Lease',
-    icon: '🏢',
     era: 'era4', // bridges the era3->era5 jump: nothing else sits between the $30k Abandoned Factory and the $5M 50MW Land Site
     category: 'buildings',
     flavor: 'A proper corporate campus lease - real conference rooms, a real lobby, and a real property manager who returns calls.',
@@ -192,7 +184,6 @@ Game.data.buildings = [
   {
     id: 'rtx_4090',
     name: 'GeForce RTX 4090',
-    icon: '🎮',
     era: 'era2',
     category: 'compute',
     flavor: 'Consumer flagship, 450W TDP. Not built for a rack, but it works.',
@@ -205,7 +196,6 @@ Game.data.buildings = [
   {
     id: 'a100_80gb',
     name: 'NVIDIA A100 80GB',
-    icon: '🟩',
     era: 'era3',
     category: 'compute',
     flavor: 'The card that started the arms race. 400W, and every cloud provider wants more of them.',
@@ -219,7 +209,6 @@ Game.data.buildings = [
   {
     id: 'h100_80gb',
     name: 'NVIDIA H100 80GB',
-    icon: '🟩',
     era: 'era3',
     category: 'compute',
     // High-density tier: this and everything below draws water for
@@ -236,7 +225,6 @@ Game.data.buildings = [
   {
     id: 'h100_80gb_rack',
     name: 'H100 Rack (x8)',
-    icon: '🗄️',
     era: 'era3',
     category: 'compute',
     flavor: 'Eight H100s, one chassis, one very serious power connector. A 5% bulk discount for buying by the rack.',
@@ -250,7 +238,6 @@ Game.data.buildings = [
   {
     id: 'h100_80gb_cluster',
     name: 'H100 Cluster (x64)',
-    icon: '🧱',
     era: 'era4',
     category: 'compute',
     flavor: 'Eight racks, networked, cooled, and insured. A 10% bulk discount over buying racks one at a time.',
@@ -264,7 +251,6 @@ Game.data.buildings = [
   {
     id: 'h200',
     name: 'NVIDIA H200',
-    icon: '🟦',
     era: 'era4',
     category: 'compute',
     flavor: 'Same 700W envelope as the H100, but HBM3e memory bandwidth means real throughput gains.',
@@ -278,7 +264,6 @@ Game.data.buildings = [
   {
     id: 'h200_rack',
     name: 'H200 Rack (x8)',
-    icon: '🗄️',
     era: 'era4',
     category: 'compute',
     flavor: 'Eight H200s in one chassis. 5% bulk discount.',
@@ -292,7 +277,6 @@ Game.data.buildings = [
   {
     id: 'h200_cluster',
     name: 'H200 Cluster (x64)',
-    icon: '🧱',
     era: 'era4',
     category: 'compute',
     flavor: 'A full pod of H200 racks. 10% bulk discount.',
@@ -306,7 +290,6 @@ Game.data.buildings = [
   {
     id: 'b200',
     name: 'NVIDIA B200',
-    icon: '🟪',
     era: 'era5',
     category: 'compute',
     flavor: 'Blackwell. 1000W, roughly 2x an H100 for inference, and priced like it.',
@@ -320,7 +303,6 @@ Game.data.buildings = [
   {
     id: 'b200_rack',
     name: 'B200 Rack (x8)',
-    icon: '🗄️',
     era: 'era5',
     category: 'compute',
     flavor: 'Eight B200s. The rack PDU alone needs its own permit. 5% bulk discount.',
@@ -334,7 +316,6 @@ Game.data.buildings = [
   {
     id: 'b200_cluster',
     name: 'B200 Cluster (x64)',
-    icon: '🧱',
     era: 'era5',
     category: 'compute',
     flavor: 'This is what the 50MW site was for. 10% bulk discount.',
@@ -348,7 +329,6 @@ Game.data.buildings = [
   {
     id: 'gb200_superchip',
     name: 'NVIDIA GB200 Superchip',
-    icon: '⬛',
     era: 'era5',
     category: 'compute',
     flavor: 'Blackwell paired with a Grace CPU over NVLink-C2C. Ridiculous memory bandwidth, ridiculous power bill.',
@@ -362,7 +342,6 @@ Game.data.buildings = [
   {
     id: 'gb200_nvl72_rack',
     name: 'GB200 NVL72 Rack (x72)',
-    icon: '🗄️',
     era: 'era5',
     category: 'compute',
     flavor: 'Seventy-two Superchips as one liquid-cooled NVLink domain. This is the actual product photo from the keynote.',
@@ -376,7 +355,6 @@ Game.data.buildings = [
   {
     id: 'rubin',
     name: 'NVIDIA Rubin',
-    icon: '🔷',
     era: 'era5',
     category: 'compute',
     flavor: "Blackwell's successor, named for the astronomer who found dark matter. NVIDIA hasn't shipped this yet - you're buying off the roadmap slide.",
@@ -390,7 +368,6 @@ Game.data.buildings = [
   {
     id: 'rubin_ultra',
     name: 'NVIDIA Rubin Ultra',
-    icon: '🔷',
     era: 'era5',
     category: 'compute',
     flavor: 'The bigger die, higher-power variant, same roadmap slide, further out.',
@@ -404,7 +381,6 @@ Game.data.buildings = [
   {
     id: 'feynman',
     name: 'NVIDIA Feynman',
-    icon: '💠',
     era: 'era5',
     category: 'compute',
     flavor: "Two generations past Blackwell on the same keynote slide. Nobody outside NVIDIA has seen a spec sheet - this is entirely speculative.",
@@ -418,7 +394,6 @@ Game.data.buildings = [
   {
     id: 'diesel_generator',
     name: 'Diesel Generator',
-    icon: '⛽',
     era: 'era3',
     category: 'power',
     flavor: 'Loud, dirty, and reliably running at 3am. Drinks diesel the whole time.',
@@ -435,7 +410,6 @@ Game.data.buildings = [
   {
     id: 'lobbyist',
     name: 'Hire Lobbyist',
-    icon: '🏛️',
     era: 'era3',
     category: 'regulatory',
     flavor: 'He knows a guy on the zoning board. $100k/yr, paid monthly, whether you win or lose.',
@@ -449,7 +423,6 @@ Game.data.buildings = [
   {
     id: 'policy_office',
     name: 'Regulatory Affairs Office',
-    icon: '🏢',
     era: 'era4',
     category: 'regulatory',
     flavor: 'A whole floor dedicated to filling out permits.',
@@ -468,7 +441,6 @@ Game.data.buildings = [
   {
     id: 'ai_research_engineer',
     name: 'Hire AI Research Engineer',
-    icon: '🧑‍🔬',
     era: 'era3',
     category: 'research',
     flavor: 'PhD, three job offers, took yours for the compute budget. Ships small wins constantly.',
@@ -482,7 +454,6 @@ Game.data.buildings = [
   {
     id: 'business_person',
     name: 'Hire Business Development Person',
-    icon: '🧑‍💼',
     era: 'era3',
     category: 'company',
     flavor: 'Owns a relationship with three procurement departments and a very good expense account.',
@@ -504,7 +475,6 @@ Game.data.buildings = [
   {
     id: 'municipal_water_hookup',
     name: 'Municipal Water Hookup',
-    icon: '🚰',
     era: 'era3',
     category: 'buildings',
     flavor: 'A standard commercial tap. The water utility does not yet know what you\'re planning to do with it.',
@@ -518,7 +488,6 @@ Game.data.buildings = [
   {
     id: 'aquifer_water_rights',
     name: 'Aquifer Water Rights',
-    icon: '🕳️',
     era: 'era4',
     category: 'buildings',
     flavor: 'You now own the right to pump groundwater that took ten thousand years to accumulate. A local farmer is not thrilled.',
@@ -532,7 +501,6 @@ Game.data.buildings = [
   {
     id: 'hoover_dam_water_allocation',
     name: 'Hoover Dam Water Allocation',
-    icon: '🌊',
     era: 'era5',
     category: 'buildings',
     flavor: 'A slice of the Colorado River Compact, renegotiated in your favor by people who bill by the hour. Seven states are furious.',
@@ -553,7 +521,6 @@ Game.data.buildings = [
   {
     id: 'quantum_annealer',
     name: 'Quantum Annealer',
-    icon: '🌀',
     era: 'era5',
     category: 'quantum',
     flavor: 'A few thousand qubits, a dilution refrigerator colder than deep space, and a workload it turns out is surprisingly good at ranking tokens.',
@@ -567,7 +534,6 @@ Game.data.buildings = [
   {
     id: 'logical_qubit_array',
     name: 'Logical Qubit Array',
-    icon: '🌀',
     era: 'era5',
     category: 'quantum',
     flavor: 'Fault-tolerant, error-corrected, and running an inference workload no classical machine on this sheet can touch.',
@@ -584,7 +550,6 @@ Game.data.buildings = [
   {
     id: 'publish_arxiv',
     name: 'Publish arXiv Paper',
-    icon: '📄',
     era: 'era3',
     category: 'research',
     flavor: 'Nobody reads it, but it counts. Spends Research Points, builds Reputation.',
@@ -608,7 +573,6 @@ Game.data.buildings = [
     id: 'raise_vc_angel',
     name: 'Raise VC Money',
     subtitle: 'Angel',
-    icon: '🤑',
     era: 'era3',
     category: 'research',
     flavor: "A friend's rich uncle writes a check on a napkin. Spends Research Points, raises Cash.",
@@ -625,7 +589,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_a',
     name: 'Raise VC Money',
     subtitle: 'Series A',
-    icon: '🤑',
     era: 'era3',
     category: 'research',
     flavor: 'A real term sheet, from a real fund, with a board seat attached.',
@@ -642,7 +605,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_b',
     name: 'Raise VC Money',
     subtitle: 'Series B',
-    icon: '🤑',
     era: 'era3',
     category: 'research',
     flavor: 'Growth metrics slide goes up and to the right. Nobody checks the axis labels too closely.',
@@ -659,7 +621,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_c',
     name: 'Raise VC Money',
     subtitle: 'Series C',
-    icon: '🤑',
     era: 'era4',
     category: 'research',
     flavor: 'A sovereign wealth fund joins the round. Someone mentions "the AI supercycle" unironically.',
@@ -676,7 +637,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_d',
     name: 'Raise VC Money',
     subtitle: 'Series D',
-    icon: '🤑',
     era: 'era4',
     category: 'research',
     flavor: 'The valuation is now a headline. The revenue is still a footnote.',
@@ -693,7 +653,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_e',
     name: 'Raise VC Money',
     subtitle: 'Series E',
-    icon: '🤑',
     era: 'era4',
     category: 'research',
     flavor: 'Every fund on Sand Hill Road wants an allocation. You let a few of them in.',
@@ -710,7 +669,6 @@ Game.data.buildings = [
     id: 'raise_vc_series_f',
     name: 'Raise VC Money',
     subtitle: 'Series F',
-    icon: '🤑',
     era: 'era5',
     category: 'research',
     flavor: "This round is really a pre-IPO round wearing a Series F name tag.",
@@ -727,7 +685,6 @@ Game.data.buildings = [
     id: 'raise_vc_ipo',
     name: 'Raise VC Money',
     subtitle: 'IPO',
-    icon: '🔔',
     era: 'era5',
     category: 'research',
     flavor: 'You ring the bell. The stock pops. Somewhere, an intern from era1 becomes a paper millionaire.',
@@ -751,7 +708,6 @@ Game.data.buildings = [
   {
     id: 'autonomous_vehicle_fleet',
     name: 'Autonomous Truck & Taxi Fleet',
-    icon: '🚛',
     era: 'era5',
     category: 'buildings',
     flavor: '$0.60/mile net profit, 300,000 miles a year, no driver, no union, no sleep.',
@@ -777,7 +733,6 @@ Game.data.buildings = [
   {
     id: 'site_50mw',
     name: '50MW Land Site',
-    icon: '🏞️',
     era: 'era5',
     category: 'buildings',
     flavor: 'A hundred acres of nothing, zoned for industrial power draw. On paper.',
@@ -794,7 +749,6 @@ Game.data.buildings = [
   {
     id: 'site_100mw',
     name: '100MW Land Site',
-    icon: '🏞️',
     era: 'era5',
     category: 'buildings',
     flavor: 'Two hundred acres, right next door to the 50MW site. The broker calls it "the natural next parcel."',
@@ -815,7 +769,6 @@ Game.data.buildings = [
   {
     id: 'site_500mw',
     name: '500MW Land Site',
-    icon: '🏞️',
     era: 'era5',
     category: 'buildings',
     flavor: 'Eight hundred acres. This shows up on satellite photos.',
@@ -837,7 +790,6 @@ Game.data.buildings = [
   {
     id: 'site_1gw',
     name: '1GW Land Site',
-    icon: '🏞️',
     era: 'era5',
     category: 'buildings',
     flavor: 'Fifteen hundred acres. You are now a line item in the regional grid operator\'s planning docs.',
@@ -860,7 +812,6 @@ Game.data.buildings = [
   {
     id: 'site_10gw',
     name: '10GW Land Site',
-    icon: '🏞️',
     era: 'era5',
     category: 'buildings',
     flavor: 'Ten thousand acres. At this scale you are, functionally, a small country\'s power grid.',
@@ -890,7 +841,6 @@ Game.data.buildings = [
   {
     id: 'gas_turbine_small',
     name: 'Small Gas Turbine (Reciprocating)',
-    icon: '🔥',
     era: 'era5',
     category: 'power',
     flavor: 'A single reciprocating engine genset. 1MW, diesel-generator-sized but built to run on gas around the clock.',
@@ -904,7 +854,6 @@ Game.data.buildings = [
   {
     id: 'gas_turbine_medium',
     name: 'Medium Gas Turbine (Simple-Cycle)',
-    icon: '🔥',
     era: 'era5',
     category: 'power',
     flavor: 'A single industrial gas turbine, simple-cycle. Fast to build, hungry to feed.',
@@ -918,7 +867,6 @@ Game.data.buildings = [
   {
     id: 'gas_turbine_large_ccgt',
     name: 'Large Gas Turbine (CCGT)',
-    icon: '🔥',
     era: 'era5',
     category: 'power',
     flavor: 'Combined-cycle: a gas turbine plus a steam turbine catching its waste heat. Half a gigawatt, and meaningfully more fuel-efficient per MWh than simple-cycle.',
@@ -932,7 +880,6 @@ Game.data.buildings = [
   {
     id: 'utility_solar_farm',
     name: 'Utility-Scale Solar Farm',
-    icon: '🌞',
     era: 'era5',
     category: 'power',
     flavor: 'Twenty megawatts of panels on land that used to grow something else.',
@@ -946,7 +893,6 @@ Game.data.buildings = [
   {
     id: 'smr_reactor',
     name: 'Small Modular Reactor',
-    icon: '☢️',
     era: 'era5',
     category: 'power',
     flavor: 'Three hundred megawatts, baseload, and a stack of federal paperwork thicker than the containment wall.',
@@ -961,7 +907,6 @@ Game.data.buildings = [
   {
     id: 'nuclear_reactor_1gw',
     name: '1GW Nuclear Reactor',
-    icon: '☢️',
     era: 'era5',
     category: 'power',
     flavor: 'A full-scale pressurized water reactor, not a modular one. Twenty years of permitting, condensed into a purchase button.',
