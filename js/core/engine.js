@@ -8,6 +8,7 @@ Game.engine = {
     this._runElectricityBilling(dtSeconds);
     this._runWater(dtSeconds);
     this._runUpkeep(dtSeconds);
+    this._runCompanyProfits(dtSeconds);
     this._runSoftwareJob(dtSeconds);
     this._runProduction(dtSeconds);
     this._runTokenConversion();
@@ -107,6 +108,22 @@ Game.engine = {
         if (resId === 'money') Game.state.stats.totalRentCost += cost;
       }
     });
+  },
+
+  // Owned tech companies (see the "Buy the entire company" chain in
+  // data/upgrades.js) pay out their real annual net income continuously,
+  // same hourly-rate treatment as rent/salaries - this is what makes
+  // buying Nvidia etc. actually move your ARR, not just the one-time
+  // stat-boost effect they also grant.
+  _runCompanyProfits(dtSeconds) {
+    const hours = dtSeconds / 3600;
+    for (const upId in Game.state.upgrades) {
+      const up = Game.data.upgradesById[upId];
+      if (!up || !up.annualProfit) continue;
+      const earned = (up.annualProfit / Game.config.hoursPerYear) * hours;
+      Game.state_helpers.add('money', earned);
+      Game.state.stats.totalMoneyEarned += earned;
+    }
   },
 
   // A steady day job: while toggled on, pays out actions.softwareJobSalary()

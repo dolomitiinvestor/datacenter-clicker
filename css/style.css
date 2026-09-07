@@ -119,6 +119,20 @@ body {
   margin-right: 8px;
 }
 
+#model-banner {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+#model-banner .model-name {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
 #status-bar {
   display: flex;
   align-items: center;

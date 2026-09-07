@@ -1,6 +1,18 @@
 window.Game = window.Game || {};
 
 Game.actions = {
+  // The name of the highest Train New Model tier owned (see the CHAIN in
+  // data/upgrades.js), stripped of its "Train New Model: " prefix - e.g.
+  // "GPT-4o". Null before the first tier is bought. The chain array is
+  // already in tier order, so the last owned entry is the latest model.
+  currentModelName() {
+    let latest = null;
+    for (const u of Game.data.upgrades) {
+      if (u.id.indexOf('train_new_model_') === 0 && Game.state.upgrades[u.id]) latest = u;
+    }
+    return latest ? latest.name.replace('Train New Model: ', '') : null;
+  },
+
   // --- manual click actions ---
 
   // Current day index for the freelance shift cap, and how many of

@@ -71,6 +71,31 @@ Game.format = {
     return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
   },
 
+  // Compacts a $ figure to M/B/T (3 decimals) once it crosses $1M - ARR and
+  // net $/s both get unreadable as full dollar figures once the game hits
+  // the tech-company-acquisition tier. Below $1M, defers to `smallFn` (e.g.
+  // money() for a balance, moneyRate() for a $/s rate that can be a
+  // fraction of a cent) so small values keep their normal precision.
+  _moneyCompact(n, smallFn) {
+    if (n === undefined || n === null || isNaN(n)) n = 0;
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    if (abs < 1000000) return smallFn.call(this, n);
+    if (abs >= 1e12) return sign + '$' + (abs / 1e12).toFixed(3) + 'T';
+    if (abs >= 1e9) return sign + '$' + (abs / 1e9).toFixed(3) + 'B';
+    return sign + '$' + (abs / 1e6).toFixed(3) + 'M';
+  },
+
+  // ARR/balance-style compaction (falls back to money() under $1M).
+  moneyCompact(n) {
+    return this._moneyCompact(n, this.money);
+  },
+
+  // $/s-rate-style compaction (falls back to moneyRate() under $1M).
+  moneyRateCompact(n) {
+    return this._moneyCompact(n, this.moneyRate);
+  },
+
   // Government/influence points: always exactly one decimal, never trimmed
   // and never K/M/B-compacted, so the display doesn't jump precision as the
   // per-hour rate (see render.js rateSummaryHtml) grows.

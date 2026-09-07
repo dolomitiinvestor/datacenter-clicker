@@ -481,6 +481,10 @@ Game.data.upgrades = [
   // obviously these move every trading day in reality, this is a one-time
   // game-balance snapshot, not a live feed. Bought strictly in ascending
   // order of price (requiresUpgrade), same pattern as the university chain.
+  // annualProfit is the company's real (approximate) trailing annual net
+  // income, paid out continuously as $/game-second from the moment you buy
+  // it (see engine._runCompanyProfits) - counted straight into ARR, same as
+  // rent/salaries/electricity, on top of the one-time stat-boost effect.
   {
     id: 'buy_meta',
     name: 'Buy Meta Platforms',
@@ -490,6 +494,7 @@ Game.data.upgrades = [
     flavor: "The Like button, the metaverse, and Llama all report to you now. Zuck keeps an office, out of respect.",
     cost: { money: 1460000000000 }, // ~$1.46T, Aug 2026
     effects: [{ type: 'mult', target: 'sell_price', value: 1.15 }],
+    annualProfit: 62000000000, // ~$62B/yr net income
   },
   {
     id: 'buy_broadcom',
@@ -500,6 +505,7 @@ Game.data.upgrades = [
     flavor: "Custom AI silicon, networking chips, and the enterprise software empire nobody outside IT has heard of.",
     cost: { money: 1760000000000 }, // ~$1.76T, Aug 2026
     effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
+    annualProfit: 14000000000, // ~$14B/yr net income
     requiresUpgrade: 'buy_meta',
   },
   {
@@ -511,6 +517,7 @@ Game.data.upgrades = [
     flavor: "Every GPU on this entire spreadsheet came out of one of their fabs. Now the fabs are yours.",
     cost: { money: 1930000000000 }, // ~$1.93T, Aug 2026
     effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+    annualProfit: 32000000000, // ~$32B/yr net income
     requiresUpgrade: 'buy_broadcom',
   },
   {
@@ -522,6 +529,7 @@ Game.data.upgrades = [
     flavor: "AWS's entire fleet of datacenters, plus a logistics network that could ship your GPUs overnight.",
     cost: { money: 3000000000000 }, // ~$3.0T, Aug 2026
     effects: [{ type: 'mult', target: 'consume_all', value: 0.9 }],
+    annualProfit: 59000000000, // ~$59B/yr net income
     requiresUpgrade: 'buy_tsmc',
   },
   {
@@ -533,6 +541,7 @@ Game.data.upgrades = [
     flavor: "Azure, Windows, and the world's most valuable OpenAI stake, all under one roof. Your roof, now.",
     cost: { money: 3700000000000 }, // ~$3.7T, Aug 2026
     effects: [{ type: 'mult', target: 'produce_all', value: 1.2 }],
+    annualProfit: 88000000000, // ~$88B/yr net income
     requiresUpgrade: 'buy_amazon',
   },
   {
@@ -544,6 +553,7 @@ Game.data.upgrades = [
     flavor: "Every phone on Earth just became a distribution channel for whatever you decide to ship next.",
     cost: { money: 4400000000000 }, // ~$4.4T, Aug 2026
     effects: [{ type: 'mult', target: 'sell_price', value: 1.3 }],
+    annualProfit: 94000000000, // ~$94B/yr net income
     requiresUpgrade: 'buy_microsoft',
   },
   {
@@ -555,6 +565,7 @@ Game.data.upgrades = [
     flavor: "Search, YouTube, and DeepMind's entire research org. The antitrust lawyers already have a group chat about this.",
     cost: { money: 4530000000000 }, // ~$4.53T, Aug 2026
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.5 }],
+    annualProfit: 100000000000, // ~$100B/yr net income
     requiresUpgrade: 'buy_apple',
   },
   {
@@ -569,6 +580,7 @@ Game.data.upgrades = [
       { type: 'mult', target: 'produce_all', value: 1.5 },
       { type: 'mult', target: 'cost_all', value: 0.75 },
     ],
+    annualProfit: 73000000000, // ~$73B/yr net income
     requiresUpgrade: 'buy_alphabet',
   },
 
