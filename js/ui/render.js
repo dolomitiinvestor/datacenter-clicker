@@ -15,6 +15,7 @@ Game.ui = {
       waterBar: document.getElementById('water-bar'),
       computeList: document.getElementById('compute-list'),
       buildingsList: document.getElementById('buildings-list'),
+      powerList: document.getElementById('power-list'),
       researchList: document.getElementById('research-list'),
       regulatoryList: document.getElementById('regulatory-list'),
       companyList: document.getElementById('company-list'),
@@ -24,11 +25,11 @@ Game.ui = {
       btnToggleHidden: document.getElementById('btn-toggle-hidden'),
       logList: document.getElementById('log-list'),
       eraBanner: document.getElementById('era-banner'),
+      modelBanner: document.getElementById('model-banner'),
       btnAutoConvert: document.getElementById('btn-auto-convert'),
       allocSlider: document.getElementById('alloc-slider'),
       allocSellPct: document.getElementById('alloc-sell-pct'),
       allocTrainPct: document.getElementById('alloc-train-pct'),
-      btnSchmooze: document.getElementById('btn-schmooze'),
       clockSpeedSlider: document.getElementById('clock-speed-slider'),
       clockSpeedLabel: document.getElementById('clock-speed-label'),
       elecPriceInput: document.getElementById('elec-price-input'),
@@ -48,6 +49,7 @@ Game.ui = {
 
   renderAll() {
     this.renderEraBanner();
+    this.renderModelBanner();
     this.renderStatusBar();
     this.renderResources();
     this.renderElectricity();
@@ -90,27 +92,27 @@ Game.ui = {
   renderStatusBar() {
     if (this.els.statusTime) {
       const gc = Game.format.gameClock(Game.state.time.hours);
-      this.els.statusTime.textContent = '📅 Day ' + gc.daysPassed + ' • ' + gc.dateStr;
+      this.els.statusTime.textContent = 'Day ' + gc.daysPassed + ' • ' + gc.dateStr;
     }
     if (this.els.statusTokens) {
       const rate = Game.state.resources.tokens.perSecond || 0;
-      this.els.statusTokens.textContent = '🔤 ' + Game.format.number(rate, 2) + ' tokens/s';
+      this.els.statusTokens.textContent = Game.format.number(rate, 2) + ' tokens/s';
     }
     let arr = 0;
     if (this.els.statusNet) {
       const net = Game.state.netMoneyPerSecond || 0;
       arr = net * 3600 * Game.config.hoursPerYear; // $/game-second -> $/game-year
-      this.els.statusNet.textContent = '💰 Net: ' + Game.format.moneyRate(net) + '/s • ARR: ' + Game.format.money(arr);
+      this.els.statusNet.textContent = 'Net: ' + Game.format.moneyRateCompact(net) + '/s • ARR: ' + Game.format.moneyCompact(arr);
     }
     if (this.els.statusGdp) {
       const pct = (arr / Game.config.usGdpAnnual) * 100;
-      this.els.statusGdp.textContent = '🇺🇸 ' + Game.format.number(pct, 4) + '% of US GDP';
+      this.els.statusGdp.textContent = Game.format.number(pct, 4) + '% of US GDP';
     }
     if (this.els.statusUsElec) {
       const elec = Game.state.resources.electricity;
       const annualKwh = elec.consumed * Game.config.hoursPerYear;
       const pct = (annualKwh / Game.config.usElectricityAnnualKwh) * 100;
-      this.els.statusUsElec.textContent = '⚡ ' + Game.format.number(pct, 4) + '% of US electricity';
+      this.els.statusUsElec.textContent = Game.format.number(pct, 4) + '% of US electricity';
     }
   },
 
@@ -125,7 +127,7 @@ Game.ui = {
     const shortage = water.throttle < 0.999;
     this.els.waterBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (shortage ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
-      '<div class="bar-label">💧 ' + Game.format.number(water.consumed, 1) + ' / ' + Game.format.number(water.generated, 1) + ' gal/s' +
+      '<div class="bar-label">' + Game.format.number(water.consumed, 1) + ' / ' + Game.format.number(water.generated, 1) + ' gal/s' +
       (shortage ? ' — WATER SHORTAGE (' + Math.round(water.throttle * 100) + '% output)' : '') + '</div>';
   },
 
@@ -161,7 +163,7 @@ Game.ui = {
     if (this.els.btnAutoConvert) {
       const on = Game.state.autoConvertEnabled;
       this.els.btnAutoConvert.classList.toggle('active', on);
-      this.els.btnAutoConvert.firstChild.textContent = '🔁 Auto-Convert Tokens: ' + (on ? 'ON' : 'OFF');
+      this.els.btnAutoConvert.firstChild.textContent = 'Auto-Convert Tokens: ' + (on ? 'ON' : 'OFF');
     }
     this.renderAllocLabels();
     if (this.els.allocSlider) this.els.allocSlider.value = Game.state.trainAllocationPct;
@@ -182,6 +184,12 @@ Game.ui = {
       '<span class="era-flavor">' + currentEra.flavor + '</span>';
   },
 
+  renderModelBanner() {
+    if (!this.els.modelBanner) return;
+    const model = Game.actions.currentModelName();
+    this.els.modelBanner.innerHTML = model ? '<span class="model-name">' + model + '</span>' : '';
+  },
+
   renderResources() {
     const html = Game.data.resources.map((r) => {
       if (r.unlockEra && !Game.state.erasUnlocked[r.unlockEra]) return '';
@@ -195,7 +203,13 @@ Game.ui = {
           valueHtml += ' <span class="rate-suffix">(' + Game.format.number(res.used * f, 0) + ' / ' + Game.format.number(res.cap * f, 0) + ' ' + r.secondaryUnit.label + ')</span>';
         }
       } else if (r.kind === 'flow') {
-        valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
+        if (r.id === 'electricity') {
+          const u = Game.format.powerUnit(res.generated);
+          valueHtml = Game.format.number(res.consumed / u.div, 1) + ' / ' + Game.format.number(res.generated / u.div, 1);
+          symbolHtml = '<span class="res-symbol">' + u.unit + '</span>';
+        } else {
+          valueHtml = Game.format.number(res.consumed, 1) + ' / ' + Game.format.number(res.generated, 1);
+        }
       } else {
         valueHtml = Game.format.resourceValue(r, res.amount);
         if (r.format === 'currency') symbolHtml = ''; // $ already embedded in the value
@@ -205,7 +219,6 @@ Game.ui = {
       }
       return (
         '<div class="resource-chip" title="' + r.name + '">' +
-        '<span class="res-icon">' + r.icon + '</span>' +
         '<span class="res-value">' + valueHtml + '</span>' +
         symbolHtml +
         '</div>'
@@ -218,9 +231,10 @@ Game.ui = {
     const elec = Game.state.resources.electricity;
     const pct = elec.generated > 0 ? Math.min(100, (elec.consumed / elec.generated) * 100) : 0;
     const brownout = elec.throttle < 0.999;
+    const u = Game.format.powerUnit(elec.generated);
     this.els.electricityBar.innerHTML =
       '<div class="bar-track"><div class="bar-fill' + (brownout ? ' brownout' : '') + '" style="width:' + pct + '%"></div></div>' +
-      '<div class="bar-label">' + Game.format.number(elec.consumed, 1) + ' / ' + Game.format.number(elec.generated, 1) + ' kW' +
+      '<div class="bar-label">' + Game.format.number(elec.consumed / u.div, 1) + ' / ' + Game.format.number(elec.generated / u.div, 1) + ' ' + u.unit +
       ' • ' + Game.format.money(elec.billPerHour || 0) + '/hr @ ' + Game.format.money(Game.state.electricityPricePerKwh) + '/kWh' +
       (brownout ? ' — BROWNOUT (' + Math.round(elec.throttle * 100) + '% output)' : '') + '</div>';
   },
@@ -234,7 +248,7 @@ Game.ui = {
   // upgrades), grouped by each item's own `category` field - e.g. Train
   // New Model (an upgrade) renders in the same Research column as Publish
   // arXiv Paper (a building).
-  CATALOG_CATEGORIES: ['compute', 'buildings', 'research', 'regulatory', 'company', 'quantum', 'configurations', 'upgrades'],
+  CATALOG_CATEGORIES: ['compute', 'buildings', 'power', 'research', 'regulatory', 'company', 'quantum', 'configurations', 'upgrades'],
 
   renderCatalog() {
     const unlocked = this.unlockedEraIds();
@@ -279,6 +293,7 @@ Game.ui = {
     });
 
     this.bindBuildingButtons();
+    this.bindSellButtons();
     this.bindUpgradeButtons();
     this.bindHideButtons();
   },
@@ -295,24 +310,36 @@ Game.ui = {
     const payoutHtml = this.payoutSummaryHtml(b.payout);
     const maxCountHtml = this.maxCountSummaryHtml(b.maxCount);
     const efficiencyHtml = this.tokenEfficiencyHtml(b, cost);
+    const powerEfficiencyHtml = this.powerEfficiencyHtml(b);
     const locked = b.blockOnRequirementFail && !Game.actions.meetsRequirements(b.id);
-    const lockedHtml = locked ? '<span class="tag tag-locked">🔒 locked - try buying for details</span>' : '';
+    const lockedHtml = locked ? '<span class="tag tag-locked">locked - try buying for details</span>' : '';
     const subtitleHtml = b.subtitle ? '<div class="card-subtitle">' + b.subtitle + '</div>' : '';
     const bulkButtonsHtml = this.bulkBuyButtonsHtml(b);
     const hidden = !!Game.state.hiddenTiles[b.id];
     const hideBtnHtml = this.hideButtonHtml(b.id, hidden);
+    const sellBtnHtml = this.sellButtonHtml(b, count);
     return (
       '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-building="' + b.id + '">' +
-      '<div class="card-head"><span class="card-icon">' + b.icon + '</span>' +
+      '<div class="card-head">' +
       '<span class="card-title">' + b.name + '</span>' +
       '<span class="card-count">x' + count + '</span>' + hideBtnHtml + '</div>' +
       subtitleHtml +
       '<div class="card-flavor">' + b.flavor + '</div>' +
-      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + lockedHtml + '</div>' +
+      '<div class="card-tags">' + produceHtml + consumeHtml + landHtml + landCapHtml + rentHtml + payoutHtml + maxCountHtml + efficiencyHtml + powerEfficiencyHtml + lockedHtml + '</div>' +
       '<button class="buy-btn" data-building="' + b.id + '">' + (b.buyLabel || 'Buy') + ' — ' + costHtml + '</button>' +
       bulkButtonsHtml +
+      sellBtnHtml +
       '</div>'
     );
+  },
+
+  // Shown only once you own at least one - lets you back out of a
+  // purchase (e.g. one whose upkeep just dragged net ARR negative) for a
+  // partial refund. See actions.sellBuilding.
+  sellButtonHtml(b, count) {
+    if (count <= 0) return '';
+    const refundHtml = this.costHtml(Game.actions.sellRefund(b.id));
+    return '<button class="sell-btn" data-sell="' + b.id + '">Sell 1 — refund ' + refundHtml + '</button>';
   },
 
   // Small "minimize"/"restore" toggle in a card's header - see
@@ -320,7 +347,7 @@ Game.ui = {
   hideButtonHtml(id, hidden) {
     return hidden
       ? '<button class="card-hide-btn" data-unhide="' + id + '" title="Restore this card">↺</button>'
-      : '<button class="card-hide-btn" data-hide="' + id + '" title="Minimize - I\'m not using this anymore">✕</button>';
+      : '<button class="card-hide-btn" data-hide="' + id + '" title="Minimize - I\'m not using this anymore">×</button>';
   },
 
   bindHideButtons() {
@@ -340,22 +367,21 @@ Game.ui = {
     });
   },
 
-  // Buy 10/100/1000 shortcuts, compute cards only - GPUs are the items
-  // players actually stack by the dozen (or thousand). 100 and 1000 stay
-  // hidden until the purchase is actually within reach - cost no more than
-  // the player's current cash or their current ARR, whichever is bigger -
-  // so the buttons don't clutter every card with options nobody can use
-  // yet. Buy 10 always shows.
-  BULK_BUY_QUANTITIES: [10, 100, 1000],
+  // Buy 10/100/1000/10,000/100,000 shortcuts, compute cards only - GPUs are
+  // the items players actually stack by the thousands late-game. Everything
+  // past 10 stays hidden until actually affordable so they don't clutter
+  // every card with options nobody can use yet - kept live (re-checked
+  // every frame in refreshAffordability, not just on catalog rebuilds) so
+  // they pop in/out as cash crosses the threshold. Buy 10 always shows,
+  // just disabled.
+  BULK_BUY_QUANTITIES: [10, 100, 1000, 10000, 100000],
 
   bulkBuyButtonsHtml(b) {
     if (b.category !== 'compute') return '';
-    const arr = (Game.state.netMoneyPerSecond || 0) * 3600 * Game.config.hoursPerYear;
-    const feasibleCeiling = Math.max(Game.state.resources.money.amount, arr);
     return this.BULK_BUY_QUANTITIES.map((qty) => {
       const qtyCost = Game.actions.buildingCostForQty(b.id, qty);
-      if (qty > 10 && qtyCost.money > feasibleCeiling) return '';
-      return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '">Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
+      const hiddenAttr = (qty > 10 && !Game.actions.canBuyBuildingQty(b.id, qty)) ? ' hidden' : '';
+      return '<button class="buy-btn buy-btn-bulk" data-building="' + b.id + '" data-qty="' + qty + '"' + hiddenAttr + '>Buy ' + qty + ' — ' + this.costHtml(qtyCost) + '</button>';
     }).join('');
   },
 
@@ -374,6 +400,20 @@ Game.ui = {
       html += '<span class="tag tag-efficiency">' + Game.format.number(perKwh, 0) + ' tok/kWh</span>';
     }
     return html;
+  },
+
+  // $/MWh of ongoing operating cost (fuel + O&M, i.e. rentPerMonth) per MW
+  // of capacity - shown on every power-generation card so a gas turbine's
+  // fuel bill is directly comparable to solar's near-zero opex or a
+  // reactor's fuel+O&M, independent of the separate per-kWh utility bill
+  // (electricityPricePerKwh) you pay on whatever you actually draw.
+  powerEfficiencyHtml(b) {
+    if (b.category !== 'power' || !b.produces || !b.produces.electricity) return '';
+    const mw = b.produces.electricity / 1000;
+    if (mw <= 0) return '';
+    const hourlyCost = (b.rentPerMonth && b.rentPerMonth.money) ? b.rentPerMonth.money / Game.config.hoursPerMonth : 0;
+    const perMwh = hourlyCost / mw;
+    return '<span class="tag tag-efficiency">' + Game.format.money(perMwh) + '/MWh</span>';
   },
 
   // Small acreages (e.g. a 200 sqft apartment's land cap) are unreadable as
@@ -397,8 +437,16 @@ Game.ui = {
     return Object.keys(payout).map((resId) => {
       const r = Game.data.resourcesById[resId];
       if (!r) return '';
-      return '<span class="tag tag-payout">grants ' + r.icon + Game.format.resourceValue(r, payout[resId]) + '</span>';
+      return '<span class="tag tag-payout">grants ' + this.amountWithUnit(r, payout[resId]) + '</span>';
     }).join('');
+  },
+
+  // A resource amount with its unit label attached - money's $ is already
+  // embedded by format.resourceValue(), everything else gets its plain-text
+  // symbol appended (e.g. "25K RP", "150 acres", "20K tokens").
+  amountWithUnit(r, amount) {
+    const val = Game.format.resourceValue(r, amount);
+    return r.format === 'currency' ? val : val + ' ' + r.symbol;
   },
 
   rateSummaryHtml(rates) {
@@ -410,9 +458,9 @@ Game.ui = {
       // per-hour instead - always fixed to one decimal (see
       // format.influenceRate) so the display never jumps precision.
       if (resId === 'influence') {
-        return '<span class="tag">' + r.icon + Game.format.influenceRate(rates[resId] * 3600) + '/hr</span>';
+        return '<span class="tag">' + Game.format.influenceRate(rates[resId] * 3600) + ' ' + r.symbol + '/hr</span>';
       }
-      return '<span class="tag">' + r.icon + Game.format.resourceValue(r, rates[resId]) + '/s</span>';
+      return '<span class="tag">' + this.amountWithUnit(r, rates[resId]) + '/s</span>';
     }).join('');
   },
 
@@ -425,14 +473,14 @@ Game.ui = {
       if (!r) return '';
       const monthly = rentPerMonth[resId];
       const hourly = monthly / Game.config.hoursPerMonth;
-      return '<span class="tag tag-rent">' + r.icon + Game.format.resourceValue(r, monthly) + '/mo (' + Game.format.resourceValue(r, hourly) + '/hr)</span>';
+      return '<span class="tag tag-rent">' + this.amountWithUnit(r, monthly) + '/mo (' + this.amountWithUnit(r, hourly) + '/hr)</span>';
     }).join('');
   },
 
   costHtml(cost) {
     return Object.keys(cost).map((resId) => {
       const r = Game.data.resourcesById[resId];
-      return r.icon + Game.format.resourceValue(r, cost[resId]);
+      return this.amountWithUnit(r, cost[resId]);
     }).join(' ');
   },
 
@@ -458,15 +506,31 @@ Game.ui = {
     });
   },
 
+  bindSellButtons() {
+    document.querySelectorAll('[data-sell]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-sell');
+        if (Game.actions.sellBuilding(id)) {
+          this.renderCatalog();
+          this.renderResources();
+        }
+      });
+    });
+  },
+
   upgradeCardHtml(u) {
     const costHtml = this.costHtml(Game.actions.upgradeCost(u.id));
     const hidden = !!Game.state.hiddenTiles[u.id];
     const hideBtnHtml = this.hideButtonHtml(u.id, hidden);
+    const profitHtml = u.annualProfit
+      ? '<div class="card-tags"><span class="tag tag-payout">grants ' + Game.format.moneyCompact(u.annualProfit) + '/yr ARR</span></div>'
+      : '';
     return (
       '<div class="card' + (hidden ? ' card-hidden' : '') + '" data-upgrade="' + u.id + '">' +
-      '<div class="card-head"><span class="card-icon">' + u.icon + '</span>' +
+      '<div class="card-head">' +
       '<span class="card-title">' + u.name + '</span>' + hideBtnHtml + '</div>' +
       '<div class="card-flavor">' + u.flavor + '</div>' +
+      profitHtml +
       '<button class="buy-btn" data-upgrade="' + u.id + '">Buy — ' + costHtml + '</button>' +
       '</div>'
     );
@@ -480,6 +544,7 @@ Game.ui = {
           this.renderCatalog(); // an upgrade (e.g. Incorporate a Business) can unlock a building's `requires`, or reveal/consume other catalog items
           this.renderResources();
           this.renderSoftwareJobStatus(); // an upgrade (e.g. Mechanical Keyboard) can change the salary shown
+          this.renderModelBanner(); // a Train New Model tier changes the header's current-model display
         }
       });
     });
@@ -489,7 +554,9 @@ Game.ui = {
     document.querySelectorAll('.buy-btn[data-building]').forEach((btn) => {
       const id = btn.getAttribute('data-building');
       const qty = Number(btn.getAttribute('data-qty')) || 1;
-      btn.disabled = qty === 1 ? Game.actions.buildingButtonDisabled(id) : !Game.actions.canBuyBuildingQty(id, qty);
+      const canBuy = qty === 1 ? !Game.actions.buildingButtonDisabled(id) : Game.actions.canBuyBuildingQty(id, qty);
+      btn.disabled = !canBuy;
+      if (qty > 10) btn.hidden = !canBuy; // Buy 100/1000: hide (not just disable) once unaffordable
     });
     document.querySelectorAll('.buy-btn[data-upgrade]').forEach((btn) => {
       const id = btn.getAttribute('data-upgrade');
@@ -499,9 +566,7 @@ Game.ui = {
 
   renderActionVisibility() {
     const tokensUnlocked = Game.state.erasUnlocked.era1;
-    const influenceUnlocked = Game.state.erasUnlocked.era3;
     document.getElementById('token-actions').style.display = tokensUnlocked ? '' : 'none';
-    document.getElementById('influence-actions').style.display = influenceUnlocked ? '' : 'none';
   },
 
   renderLog() {

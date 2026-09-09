@@ -29,6 +29,18 @@ Game.format = {
     return sign + this._trimZeros(value.toFixed(2)) + units[unitIndex];
   },
 
+  // Picks the display unit for a raw kW figure, switching up once kW alone
+  // would run past 4 digits - a 15kW apartment panel early on, multi-GW
+  // campuses by the late game. Returns a divisor + unit pair rather than a
+  // formatted string so a caller showing "consumed / generated" can share
+  // one unit across both numbers instead of picking it twice.
+  powerUnit(kw) {
+    const abs = Math.abs(kw);
+    if (abs >= 1000000) return { div: 1000000, unit: 'GW' };
+    if (abs >= 1000) return { div: 1000, unit: 'MW' };
+    return { div: 1, unit: 'kW' };
+  },
+
   _trimZeros(str) {
     if (str.indexOf('.') === -1) return str;
     return str.replace(/0+$/, '').replace(/\.$/, '');
@@ -57,6 +69,31 @@ Game.format = {
     const sign = n < 0 ? '-' : '';
     const abs = Math.abs(n);
     return sign + '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  },
+
+  // Compacts a $ figure to M/B/T (3 decimals) once it crosses $1M - ARR and
+  // net $/s both get unreadable as full dollar figures once the game hits
+  // the tech-company-acquisition tier. Below $1M, defers to `smallFn` (e.g.
+  // money() for a balance, moneyRate() for a $/s rate that can be a
+  // fraction of a cent) so small values keep their normal precision.
+  _moneyCompact(n, smallFn) {
+    if (n === undefined || n === null || isNaN(n)) n = 0;
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    if (abs < 1000000) return smallFn.call(this, n);
+    if (abs >= 1e12) return sign + '$' + (abs / 1e12).toFixed(3) + 'T';
+    if (abs >= 1e9) return sign + '$' + (abs / 1e9).toFixed(3) + 'B';
+    return sign + '$' + (abs / 1e6).toFixed(3) + 'M';
+  },
+
+  // ARR/balance-style compaction (falls back to money() under $1M).
+  moneyCompact(n) {
+    return this._moneyCompact(n, this.money);
+  },
+
+  // $/s-rate-style compaction (falls back to moneyRate() under $1M).
+  moneyRateCompact(n) {
+    return this._moneyCompact(n, this.moneyRate);
   },
 
   // Government/influence points: always exactly one decimal, never trimmed

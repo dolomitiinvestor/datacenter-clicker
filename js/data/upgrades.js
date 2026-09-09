@@ -38,7 +38,6 @@ Game.data.upgrades = [
   {
     id: 'mech_keyboard',
     name: 'Mechanical Keyboard',
-    icon: '⌨️',
     era: 'era1',
     category: 'upgrades',
     flavor: 'Types clean commits at 3am. Your next performance review notices.',
@@ -48,7 +47,6 @@ Game.data.upgrades = [
   {
     id: 'data_broker_deal',
     name: 'Data Broker Contract',
-    icon: '🤝',
     era: 'era3',
     category: 'upgrades',
     flavor: "Turns out your tokens sell for more than you thought - once there's an actual legal entity to sign the contract.",
@@ -59,7 +57,6 @@ Game.data.upgrades = [
   {
     id: 'buy_ai_domain',
     name: "Buy the .ai Domain",
-    icon: '🌐',
     era: 'era1',
     category: 'upgrades',
     flavor: "Anguilla's national budget thanks you personally.",
@@ -123,23 +120,25 @@ Game.data.upgrades = [
     const BASE_COST = 30000; // 30 RP * 1000
     const COST_GROWTH = 1.45;
     const PRODUCE_MULT = 1.12; // per-tier produce_all multiplier - compounds hugely over 42 tiers
+    const SELL_PRICE_MULT = 1.1; // per-tier $/token bump - a newer, better model also commands a higher price, same lever the marketing upgrades (Marketing Plan, Rebrand as an "AI Company") pull on
 
     return CHAIN.map((m, i) => ({
       id: 'train_new_model_' + (i + 1),
       name: 'Train New Model: ' + m.name,
-      icon: '🧬',
       era: m.era,
       category: 'research',
-      flavor: 'Frontier model release #' + (i + 1) + '. Somehow the infra bill is always the surprise.',
+      flavor: 'Frontier model release #' + (i + 1) + '. Somehow the infra bill is always the surprise, but so is the price it commands.',
       cost: { reputation: Math.round(BASE_COST * Math.pow(COST_GROWTH, i)) },
-      effects: [{ type: 'mult', target: 'produce_all', value: PRODUCE_MULT }],
+      effects: [
+        { type: 'mult', target: 'produce_all', value: PRODUCE_MULT },
+        { type: 'mult', target: 'sell_price', value: SELL_PRICE_MULT },
+      ],
       requiresUpgrade: i > 0 ? 'train_new_model_' + i : null,
     }));
   })(),
   {
     id: 'research_partnership',
     name: 'University Research Partnership',
-    icon: '🎓',
     era: 'era4', // a midgame stepping stone toward outright buying a school (below) - its old 20k RP price was laughably cheap next to same-era Train New Model tiers costing 1M+ RP
     category: 'research',
     flavor: "Grad students, but make it corporate-sponsored - a partnership, not a hostile takeover. That comes later.",
@@ -154,7 +153,6 @@ Game.data.upgrades = [
   {
     id: 'buy_georgia_tech',
     name: 'Buy Georgia Tech',
-    icon: '🎓',
     era: 'era5',
     category: 'research',
     flavor: 'The whole College of Computing, plus a very confused Yellow Jacket mascot, now reports to you.',
@@ -164,7 +162,6 @@ Game.data.upgrades = [
   {
     id: 'buy_uc_berkeley',
     name: 'Buy UC Berkeley',
-    icon: '🎓',
     era: 'era5',
     category: 'research',
     flavor: 'The state legislature is furious. The AI lab is now a wholly-owned subsidiary.',
@@ -175,7 +172,6 @@ Game.data.upgrades = [
   {
     id: 'buy_carnegie_mellon',
     name: 'Buy Carnegie Mellon University',
-    icon: '🎓',
     era: 'era5',
     category: 'research',
     flavor: 'The robotics department alone was worth the sticker price. The rest of the campus came free with it.',
@@ -186,7 +182,6 @@ Game.data.upgrades = [
   {
     id: 'buy_mit',
     name: 'Buy MIT',
-    icon: '🎓',
     era: 'era5',
     category: 'research',
     flavor: "CSAIL's entire org chart now has your logo on its slide deck.",
@@ -197,7 +192,6 @@ Game.data.upgrades = [
   {
     id: 'buy_stanford',
     name: 'Buy Stanford',
-    icon: '🎓',
     era: 'era5',
     category: 'research',
     flavor: "You didn't just hire the founders. You bought the building they dropped out of.",
@@ -208,7 +202,6 @@ Game.data.upgrades = [
   {
     id: 'develop_humanoid_robots',
     name: 'Develop Humanoid Robots',
-    icon: '🤖',
     era: 'era5',
     category: 'research',
     flavor: "Five campuses' worth of robotics departments, mechanical engineers, and grad students who all had the same idea at once.",
@@ -219,7 +212,6 @@ Game.data.upgrades = [
   {
     id: 'develop_quantum_computer',
     name: 'Develop Quantum Computer',
-    icon: '🌀',
     era: 'era5',
     category: 'research',
     flavor: "A hundred engineers, a decade of dead ends, and one afternoon where the error rate finally drops. Unlocks the Quantum tab - see Quantum.",
@@ -235,7 +227,6 @@ Game.data.upgrades = [
   {
     id: 'incorporate_business',
     name: 'Incorporate a Business',
-    icon: '⚖️',
     era: 'era2',
     category: 'regulatory',
     flavor: "An LLC in Delaware. Now you're a real company - landlords, banks, and lawyers will actually talk to you.",
@@ -245,7 +236,6 @@ Game.data.upgrades = [
   {
     id: 'campaign_donation',
     name: 'Campaign Donations',
-    icon: '💰',
     era: 'era3',
     category: 'regulatory',
     flavor: "Democracy: now with a suggested donation amount, and a corporate entity willing to write the check.",
@@ -256,7 +246,6 @@ Game.data.upgrades = [
   {
     id: 'tax_break',
     name: 'Corporate Tax Break',
-    icon: '🧾',
     era: 'era5', // moved much later - this is "an army of lobbyists rewrites the tax code," not a first-year LLC perk
     category: 'regulatory',
     flavor: "You didn't find a loophole. You paid to have one written.",
@@ -266,7 +255,6 @@ Game.data.upgrades = [
   {
     id: 'patent_troll_insurance',
     name: 'Patent Troll Insurance',
-    icon: '🛡️',
     era: 'era4',
     category: 'regulatory',
     flavor: "You're not being sued this quarter. That's the whole product.",
@@ -276,7 +264,6 @@ Game.data.upgrades = [
   {
     id: 'permit_city_planning',
     name: 'City Planning Approval',
-    icon: '🏙️',
     era: 'era5',
     category: 'regulatory',
     flavor: 'A rezoning application, a public comment period, and a lot of donuts at the hearing.',
@@ -286,7 +273,6 @@ Game.data.upgrades = [
   {
     id: 'permit_state_puc',
     name: 'State PUC Approval',
-    icon: '🗳️',
     era: 'era5',
     category: 'regulatory',
     flavor: 'The state Public Utilities Commission signs off on your interconnection request.',
@@ -296,7 +282,6 @@ Game.data.upgrades = [
   {
     id: 'permit_federal_review',
     name: 'Federal Environmental Review',
-    icon: '📋',
     era: 'era5',
     category: 'regulatory',
     flavor: 'An environmental impact statement, several consultants, and eighteen months you don\'t get back.',
@@ -306,7 +291,6 @@ Game.data.upgrades = [
   {
     id: 'permit_national_interest',
     name: 'National Interest Energy Waiver',
-    icon: '🦅',
     era: 'era5',
     category: 'regulatory',
     flavor: 'A gigawatt of demand gets you a seat at a much bigger table.',
@@ -316,7 +300,6 @@ Game.data.upgrades = [
   {
     id: 'permit_global_accord',
     name: 'Global Compute Accord Waiver',
-    icon: '🌐',
     era: 'era5',
     category: 'regulatory',
     flavor: 'Ten gigawatts is a treaty-level number. This is a treaty-level waiver.',
@@ -330,7 +313,6 @@ Game.data.upgrades = [
   {
     id: 'emotional_support_succulent',
     name: 'Emotional Support Succulent',
-    icon: '🪴',
     era: 'era1',
     category: 'company',
     flavor: 'Provides no calculable benefit. You keep it anyway.',
@@ -340,7 +322,6 @@ Game.data.upgrades = [
   {
     id: 'hire_employee_intern',
     name: 'Hire Employee #1: The Intern',
-    icon: '🧑‍💻',
     era: 'era2',
     category: 'company',
     flavor: "Someone to babysit the laptops so you don't have to tab back every 20 minutes.",
@@ -350,7 +331,6 @@ Game.data.upgrades = [
   {
     id: 'free_snacks',
     name: 'Free Snacks & Kombucha',
-    icon: '🍪',
     era: 'era2',
     category: 'company',
     flavor: 'Morale is up. So, mysteriously, is gig throughput.',
@@ -360,7 +340,6 @@ Game.data.upgrades = [
   {
     id: 'aeron_chair',
     name: 'Aeron Chair',
-    icon: '🪑',
     era: 'era2',
     category: 'company',
     flavor: 'Ergonomically perfect for eight more hours of gig-clicking than your back was ready for.',
@@ -370,7 +349,6 @@ Game.data.upgrades = [
   {
     id: 'rebrand_ai_company',
     name: "Rebrand as an \"AI Company\"",
-    icon: '✨',
     era: 'era2',
     category: 'company',
     flavor: 'Nothing about the product changed. Everything about the pitch deck did.',
@@ -380,7 +358,6 @@ Game.data.upgrades = [
   {
     id: 'company_handbook',
     name: 'Write a Company Handbook',
-    icon: '📘',
     era: 'era3',
     category: 'company',
     flavor: 'Forty pages on PTO policy nobody reads, but now HR exists and raises need a paper trail.',
@@ -390,7 +367,6 @@ Game.data.upgrades = [
   {
     id: 'hire_ops_manager',
     name: 'Hire an Ops Manager',
-    icon: '📋',
     era: 'era3',
     category: 'company',
     flavor: 'Negotiates every vendor contract you sign from now on. Ruthlessly.',
@@ -401,7 +377,6 @@ Game.data.upgrades = [
   {
     id: 'office_dog',
     name: 'Office Dog',
-    icon: '🐕',
     era: 'era3',
     category: 'company',
     flavor: 'Karl has no equity, exceptional morale impact, and strong opinions about the thermostat.',
@@ -412,7 +387,6 @@ Game.data.upgrades = [
   {
     id: 'ping_pong_table',
     name: 'Ping Pong Table',
-    icon: '🏓',
     era: 'era3',
     category: 'company',
     flavor: 'A Silicon Valley cliche, purchased unironically, that somehow does help morale.',
@@ -422,7 +396,6 @@ Game.data.upgrades = [
   {
     id: 'marketing_plan',
     name: 'Marketing Plan: Content Blitz',
-    icon: '📣',
     era: 'era3',
     category: 'company',
     flavor: 'A blog post, a Twitter thread, and a suspiciously well-timed Hacker News post drive real demand for your tokens.',
@@ -432,7 +405,6 @@ Game.data.upgrades = [
   {
     id: 'employee_stock_options',
     name: 'Employee Stock Options',
-    icon: '📈',
     era: 'era4',
     category: 'company',
     flavor: 'Pay people in paper instead of cash. They believe in the mission. Mostly.',
@@ -443,7 +415,6 @@ Game.data.upgrades = [
   {
     id: 'hire_sales_team',
     name: 'Hire a Sales Team',
-    icon: '🤝',
     era: 'era4',
     category: 'company',
     flavor: 'Quota-carrying reps who can sell tokens to a company that already makes its own.',
@@ -454,7 +425,6 @@ Game.data.upgrades = [
   {
     id: 'hire_cfo',
     name: 'Hire a CFO',
-    icon: '💼',
     era: 'era5',
     category: 'company',
     flavor: 'Restructures every contract in the building. The lawyers bill more, everything else costs less.',
@@ -465,7 +435,6 @@ Game.data.upgrades = [
   {
     id: 'create_autonomous_vehicles',
     name: 'Create Autonomous Vehicles',
-    icon: '🚦',
     era: 'era5',
     category: 'company',
     flavor: "A new division, a new org chart, and a whole new way to turn cash into more cash while you sleep. Unlocks the autonomous truck & taxi fleet - see Buildings.",
@@ -477,86 +446,89 @@ Game.data.upgrades = [
   // obviously these move every trading day in reality, this is a one-time
   // game-balance snapshot, not a live feed. Bought strictly in ascending
   // order of price (requiresUpgrade), same pattern as the university chain.
+  // annualProfit is the company's real (approximate) trailing annual net
+  // income, paid out continuously as $/game-second from the moment you buy
+  // it (see engine._runCompanyProfits) - counted straight into ARR, same as
+  // rent/salaries/electricity, on top of the one-time stat-boost effect.
   {
     id: 'buy_meta',
     name: 'Buy Meta Platforms',
-    icon: '📱',
     era: 'era5',
     category: 'company',
     flavor: "The Like button, the metaverse, and Llama all report to you now. Zuck keeps an office, out of respect.",
     cost: { money: 1460000000000 }, // ~$1.46T, Aug 2026
     effects: [{ type: 'mult', target: 'sell_price', value: 1.15 }],
+    annualProfit: 62000000000, // ~$62B/yr net income
   },
   {
     id: 'buy_broadcom',
     name: 'Buy Broadcom',
-    icon: '🔗',
     era: 'era5',
     category: 'company',
     flavor: "Custom AI silicon, networking chips, and the enterprise software empire nobody outside IT has heard of.",
     cost: { money: 1760000000000 }, // ~$1.76T, Aug 2026
     effects: [{ type: 'mult', target: 'cost_all', value: 0.95 }],
+    annualProfit: 14000000000, // ~$14B/yr net income
     requiresUpgrade: 'buy_meta',
   },
   {
     id: 'buy_tsmc',
     name: 'Buy TSMC',
-    icon: '🏭',
     era: 'era5',
     category: 'company',
     flavor: "Every GPU on this entire spreadsheet came out of one of their fabs. Now the fabs are yours.",
     cost: { money: 1930000000000 }, // ~$1.93T, Aug 2026
     effects: [{ type: 'mult', target: 'cost_all', value: 0.9 }],
+    annualProfit: 32000000000, // ~$32B/yr net income
     requiresUpgrade: 'buy_broadcom',
   },
   {
     id: 'buy_amazon',
     name: 'Buy Amazon',
-    icon: '📦',
     era: 'era5',
     category: 'company',
     flavor: "AWS's entire fleet of datacenters, plus a logistics network that could ship your GPUs overnight.",
     cost: { money: 3000000000000 }, // ~$3.0T, Aug 2026
     effects: [{ type: 'mult', target: 'consume_all', value: 0.9 }],
+    annualProfit: 59000000000, // ~$59B/yr net income
     requiresUpgrade: 'buy_tsmc',
   },
   {
     id: 'buy_microsoft',
     name: 'Buy Microsoft',
-    icon: '🪟',
     era: 'era5',
     category: 'company',
     flavor: "Azure, Windows, and the world's most valuable OpenAI stake, all under one roof. Your roof, now.",
     cost: { money: 3700000000000 }, // ~$3.7T, Aug 2026
     effects: [{ type: 'mult', target: 'produce_all', value: 1.2 }],
+    annualProfit: 88000000000, // ~$88B/yr net income
     requiresUpgrade: 'buy_amazon',
   },
   {
     id: 'buy_apple',
     name: 'Buy Apple',
-    icon: '🍏',
     era: 'era5',
     category: 'company',
     flavor: "Every phone on Earth just became a distribution channel for whatever you decide to ship next.",
     cost: { money: 4400000000000 }, // ~$4.4T, Aug 2026
     effects: [{ type: 'mult', target: 'sell_price', value: 1.3 }],
+    annualProfit: 94000000000, // ~$94B/yr net income
     requiresUpgrade: 'buy_microsoft',
   },
   {
     id: 'buy_alphabet',
     name: 'Buy Alphabet',
-    icon: '🔍',
     era: 'era5',
     category: 'company',
     flavor: "Search, YouTube, and DeepMind's entire research org. The antitrust lawyers already have a group chat about this.",
     cost: { money: 4530000000000 }, // ~$4.53T, Aug 2026
     effects: [{ type: 'mult', target: 'train_ratio', value: 1.5 }],
+    annualProfit: 100000000000, // ~$100B/yr net income
     requiresUpgrade: 'buy_apple',
   },
   {
     id: 'buy_nvidia',
     name: 'Buy Nvidia',
-    icon: '🟩',
     era: 'era5',
     category: 'company',
     flavor: "The most valuable company on the planet, and every GPU on this screen was theirs before you bought the whole thing.",
@@ -565,6 +537,7 @@ Game.data.upgrades = [
       { type: 'mult', target: 'produce_all', value: 1.5 },
       { type: 'mult', target: 'cost_all', value: 0.75 },
     ],
+    annualProfit: 73000000000, // ~$73B/yr net income
     requiresUpgrade: 'buy_alphabet',
   },
 
@@ -578,7 +551,6 @@ Game.data.upgrades = [
   {
     id: 'batch_inference_tuning',
     name: 'Batch Inference Tuning',
-    icon: '⚙️',
     era: 'era3',
     category: 'configurations',
     flavor: 'Bigger batches, better GPU utilization, the same silicon doing noticeably more work.',
@@ -589,7 +561,6 @@ Game.data.upgrades = [
   {
     id: 'kv_cache_optimization',
     name: 'KV-Cache Optimization',
-    icon: '🗃️',
     era: 'era4',
     category: 'configurations',
     flavor: 'Stops recomputing what the model already figured out three tokens ago.',
@@ -600,7 +571,6 @@ Game.data.upgrades = [
   {
     id: 'speculative_decoding',
     name: 'Speculative Decoding',
-    icon: '🔮',
     era: 'era4',
     category: 'configurations',
     flavor: 'A small model guesses ahead, a big model checks its work. Somehow this is faster than just asking the big model.',
@@ -611,7 +581,6 @@ Game.data.upgrades = [
   {
     id: 'enterprise_pricing_tiers',
     name: 'Enterprise Pricing Tiers',
-    icon: '📊',
     era: 'era3',
     category: 'configurations',
     flavor: 'The API price didn\'t change. The invoice line items just got more creative.',
@@ -622,7 +591,6 @@ Game.data.upgrades = [
   {
     id: 'usage_based_pricing',
     name: 'Usage-Based Pricing Model',
-    icon: '💳',
     era: 'era4',
     category: 'configurations',
     flavor: 'Nobody can predict their bill anymore. Revenue per token goes up anyway.',
@@ -633,7 +601,6 @@ Game.data.upgrades = [
   {
     id: 'high_density_cooling',
     name: 'High-Density Rack Cooling',
-    icon: '❄️',
     era: 'era4',
     category: 'configurations',
     flavor: 'Rear-door heat exchangers on every rack. The room is quieter and the power bill is smaller.',
@@ -644,7 +611,6 @@ Game.data.upgrades = [
   {
     id: 'liquid_immersion_cooling',
     name: 'Liquid Immersion Cooling',
-    icon: '🧊',
     era: 'era5',
     category: 'configurations',
     flavor: 'Every board, fully submerged in dielectric fluid. Looks insane in photos, cuts the power bill for real.',

@@ -15,18 +15,18 @@ Game.data = Game.data || {};
 // Adding a brand new resource later = add an entry here + reference it from
 // buildings/upgrades/actions. Nothing else needs to know about it.
 Game.data.resources = [
-  { id: 'money', name: 'Cash', icon: '💵', symbol: '$', kind: 'stock', decimals: 2, format: 'currency', unlockEra: null },
-  { id: 'electricity', name: 'Electricity', icon: '⚡', symbol: 'kW', kind: 'flow', decimals: 2, unlockEra: null },
-  { id: 'water', name: 'Water', icon: '💧', symbol: 'gal/s', kind: 'flow', decimals: 1, unlockEra: 'era3' },
-  { id: 'tokens', name: 'Tokens', icon: '🔤', symbol: 'tokens', kind: 'stock', decimals: 0, showRate: true, unlockEra: 'era1' },
-  { id: 'land', name: 'Land', icon: '🗺️', symbol: 'acres', kind: 'capacity', decimals: 0, secondaryUnit: { label: 'sqft', factor: 43560 }, unlockEra: 'era2' },
-  { id: 'influence', name: 'Influence', icon: '🏛️', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
+  { id: 'money', name: 'Cash', symbol: '$', kind: 'stock', decimals: 2, format: 'currency', unlockEra: null },
+  { id: 'electricity', name: 'Electricity', symbol: 'kW', kind: 'flow', decimals: 2, unlockEra: null },
+  { id: 'water', name: 'Water', symbol: 'gal/s', kind: 'flow', decimals: 1, unlockEra: 'era3' },
+  { id: 'tokens', name: 'Tokens', symbol: 'tokens', kind: 'stock', decimals: 0, showRate: true, unlockEra: 'era1' },
+  { id: 'land', name: 'Land', symbol: 'acres', kind: 'capacity', decimals: 0, secondaryUnit: { label: 'sqft', factor: 43560 }, unlockEra: 'era2' },
+  { id: 'influence', name: 'Influence', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
   // Note: resource id 'reputation' is "Research Points" (RP) - a legacy id
   // from before the rename. The separate id 'fame' below is the actual
   // "Reputation" resource (industry prestige, spent from RP via the
   // Publish arXiv Paper building) - don't confuse the two.
-  { id: 'reputation', name: 'Research Points', icon: '⭐', symbol: 'RP', kind: 'stock', decimals: 0, unlockEra: 'era3' },
-  { id: 'fame', name: 'Reputation', icon: '🏆', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
+  { id: 'reputation', name: 'Research Points', symbol: 'RP', kind: 'stock', decimals: 0, unlockEra: 'era3' },
+  { id: 'fame', name: 'Reputation', symbol: 'pts', kind: 'stock', decimals: 0, unlockEra: 'era3' },
 ];
 
 Game.data.resourcesById = {};

@@ -119,6 +119,20 @@ body {
   margin-right: 8px;
 }
 
+#model-banner {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+#model-banner .model-name {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
 #status-bar {
   display: flex;
   align-items: center;
@@ -238,6 +252,8 @@ main {
 
 #actions-panel, #log-panel, #save-panel, #catalog-grid { grid-column: 1 / -1; }
 
+#catalog-grid { min-width: 0; }
+
 #catalog-toolbar {
   grid-column: 1 / -1;
   display: flex;
@@ -251,10 +267,16 @@ main {
 }
 
 #catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex;
+  align-items: flex-start;
   gap: 16px;
-  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.catalog-column {
+  flex: 0 0 280px;
+  width: 280px;
 }
 
 .catalog-column .card-grid {
@@ -289,6 +311,10 @@ button {
   align-items: flex-start;
   gap: 2px;
   transition: background 0.15s, border-color 0.15s;
+}
+
+button[hidden] {
+  display: none; /* the display:flex above beats the UA [hidden] rule otherwise */
 }
 
 button:hover:not(:disabled) {
@@ -364,7 +390,6 @@ button .hint {
   gap: 6px;
 }
 
-.card-icon { font-size: 18px; }
 .card-title { font-weight: 600; flex: 1; }
 .card-count { color: var(--accent); font-variant-numeric: tabular-nums; }
 
@@ -432,6 +457,22 @@ button .hint {
   font-size: 12px;
   padding: 6px 14px;
   opacity: 0.85;
+}
+
+.card .sell-btn {
+  width: 100%;
+  align-items: center;
+  margin-top: 2px;
+  font-size: 12px;
+  padding: 6px 14px;
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.card .sell-btn:hover:not(:disabled) {
+  background: var(--danger);
+  color: #2a0a08;
 }
 
 .empty-note {

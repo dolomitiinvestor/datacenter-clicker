@@ -1,6 +1,18 @@
 window.Game = window.Game || {};
 
 Game.actions = {
+  // The name of the highest Train New Model tier owned (see the CHAIN in
+  // data/upgrades.js), stripped of its "Train New Model: " prefix - e.g.
+  // "GPT-4o". Null before the first tier is bought. The chain array is
+  // already in tier order, so the last owned entry is the latest model.
+  currentModelName() {
+    let latest = null;
+    for (const u of Game.data.upgrades) {
+      if (u.id.indexOf('train_new_model_') === 0 && Game.state.upgrades[u.id]) latest = u;
+    }
+    return latest ? latest.name.replace('Train New Model: ', '') : null;
+  },
+
   // --- manual click actions ---
 
   // Current day index for the freelance shift cap, and how many of
@@ -28,12 +40,6 @@ Game.actions = {
     Game.state_helpers.add('money', amount);
     Game.state.stats.totalMoneyEarned += amount;
     Game.state.stats.totalClicks++;
-    return amount;
-  },
-
-  schmoozePolitician() {
-    const amount = 1 * Game.effects.getMult('influence_gain') * Game.dev.speedMultiplier;
-    Game.state_helpers.add('influence', amount);
     return amount;
   },
 
@@ -182,6 +188,38 @@ Game.actions = {
     if (def.payout) {
       for (const resId in def.payout) Game.state_helpers.add(resId, def.payout[resId] * qty);
     }
+    return true;
+  },
+
+  // --- selling / demolishing ---
+  // Lets a player back out of a building whose upkeep (rent, electricity)
+  // turns out to outweigh what it produces - e.g. it just dragged net ARR
+  // negative. Refunds a fraction (config.sellRefundFraction) of the
+  // building's current buy cost, frees the land it used, and never yields
+  // a profit since the refund is always less than the buy cost.
+
+  canSellBuilding(buildingId) {
+    return (Game.state.buildings[buildingId] || 0) > 0;
+  },
+
+  sellRefund(buildingId) {
+    const unitCost = this.buildingCost(buildingId);
+    const refund = {};
+    for (const resId in unitCost) {
+      refund[resId] = unitCost[resId] * Game.config.sellRefundFraction;
+    }
+    return refund;
+  },
+
+  sellBuilding(buildingId) {
+    if (!this.canSellBuilding(buildingId)) return false;
+    const def = Game.data.buildingsById[buildingId];
+    const refund = this.sellRefund(buildingId);
+    Game.state.buildings[buildingId]--;
+    Game.state.resources.land.used = Math.max(0, Game.state.resources.land.used - (def.land || 0));
+    for (const resId in refund) Game.state_helpers.add(resId, refund[resId]);
+    Game.state_helpers.recalcLandCap();
+    Game.state_helpers.logEvent('Sold: ' + def.name);
     return true;
   },
 
